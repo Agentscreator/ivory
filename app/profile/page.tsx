@@ -44,7 +44,7 @@ export default function ProfilePage() {
       {/* Main Content */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-safe">
         {/* Profile Card */}
-        <Card className="p-6 sm:p-8 text-center mb-4 sm:mb-6 bg-white">
+        <Card className="p-6 sm:p-8 text-center mb-4 sm:mb-6 bg-white rounded-3xl shadow-lg">
           <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-br from-terracotta to-rose flex items-center justify-center">
             <span className="text-2xl sm:text-3xl font-bold text-white">{username.charAt(0).toUpperCase()}</span>
           </div>
@@ -53,11 +53,11 @@ export default function ProfilePage() {
         </Card>
 
         {/* Menu Options */}
-        <div className="space-y-2 sm:space-y-2.5 mb-4 sm:mb-6">
+        <div className="space-y-3 sm:space-y-3 mb-4 sm:mb-6">
           {userType === "tech" && (
             <Button
               variant="outline"
-              className="w-full justify-start h-16 sm:h-18 text-left bg-white active:scale-95 transition-transform"
+              className="w-full justify-start h-16 sm:h-18 text-left bg-white active:scale-95 transition-transform rounded-2xl shadow-sm"
               onClick={() => router.push("/tech/profile-setup")}
             >
               <Settings className="w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0" />
@@ -70,7 +70,7 @@ export default function ProfilePage() {
 
           <Button
             variant="outline"
-            className="w-full justify-start h-16 sm:h-18 text-left bg-white active:scale-95 transition-transform"
+            className="w-full justify-start h-16 sm:h-18 text-left bg-white active:scale-95 transition-transform rounded-2xl shadow-sm"
             onClick={() => router.push("/settings")}
           >
             <Settings className="w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0" />
@@ -84,7 +84,7 @@ export default function ProfilePage() {
         {/* Logout */}
         <Button
           variant="outline"
-          className="w-full h-12 sm:h-14 text-base text-destructive hover:text-destructive bg-transparent active:scale-95 transition-transform"
+          className="w-full h-12 sm:h-14 text-base text-destructive hover:text-destructive bg-transparent active:scale-95 transition-transform rounded-2xl"
           onClick={handleLogout}
         >
           <LogOut className="w-5 h-5 mr-2" />
