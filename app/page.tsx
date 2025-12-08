@@ -12,6 +12,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [isSignUp, setIsSignUp] = useState(false)
   const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isChecking, setIsChecking] = useState(true)
 
@@ -49,10 +50,15 @@ export default function LoginPage() {
     try {
       if (isSignUp) {
         // Sign up - create new user
+        if (!email) {
+          alert('Email is required for sign up')
+          return
+        }
+        
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, authProvider: 'email' }),
+          body: JSON.stringify({ username, email, password, authProvider: 'email' }),
         })
         
         if (!response.ok) {
@@ -98,11 +104,13 @@ export default function LoginPage() {
     // For now, create a user with social provider
     // In production, this would use OAuth flow
     try {
+      const username = `${provider}_${Date.now()}`
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          username: `${provider}_${Date.now()}`, 
+          username, 
+          email: `${username}@${provider}.oauth`,
           password: '', 
           authProvider: provider 
         }),
@@ -147,6 +155,18 @@ export default function LoginPage() {
                 required
               />
             </div>
+            {isSignUp && (
+              <div>
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-12 sm:h-14 text-base"
+                  required
+                />
+              </div>
+            )}
             <div>
               <Input
                 type="password"
@@ -213,8 +233,12 @@ export default function LoginPage() {
             </Button>
           </div>
 
-          <div className="mt-6 text-center text-sm">
-            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-primary hover:underline">
+          <div className="mt-6 text-center">
+            <button 
+              type="button" 
+              onClick={() => setIsSignUp(!isSignUp)} 
+              className="text-base font-medium text-primary hover:underline"
+            >
               {isSignUp ? "Already have an account? Log in" : "Don't have an account? Sign up"}
             </button>
           </div>

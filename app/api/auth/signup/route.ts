@@ -7,10 +7,14 @@ import { createSession } from '@/lib/auth';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { username, password, authProvider = 'email' } = body;
+    const { username, email, password, authProvider = 'email' } = body;
 
     if (!username) {
       return NextResponse.json({ error: 'Username is required' }, { status: 400 });
+    }
+
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
     // Check if user already exists
@@ -23,12 +27,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Username already exists' }, { status: 400 });
     }
 
+    // Check if email already exists
+    const existingEmail = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email));
+
+    if (existingEmail.length > 0) {
+      return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
+    }
+
     // Create new user (userType will be set later)
     const newUser = await db
       .insert(users)
       .values({
         username,
-        email: `${username}@ivory.app`, // Temporary email, can be updated later
+        email,
         passwordHash: password, // In production, hash this with bcrypt
         authProvider,
         userType: 'client', // Default to client, can be changed
