@@ -82,6 +82,61 @@ if (isAuthenticated()) {
 }
 ```
 
+### `storage.ts`
+File upload utilities supporting multiple storage providers.
+
+```typescript
+import { uploadFile, deleteFile, generateFilename } from '@/lib/storage';
+
+// Upload a file
+const { url, key } = await uploadFile(file, 'design.jpg', {
+  folder: 'nail-designs',
+});
+
+// Delete a file
+await deleteFile(key);
+
+// Generate unique filename
+const filename = generateFilename('photo.jpg', 'nail');
+```
+
+### `ai.ts`
+AI generation utilities for creating nail designs.
+
+```typescript
+import { generateNailDesign, nailArtStyles } from '@/lib/ai';
+
+// Generate designs from prompt
+const images = await generateNailDesign({
+  prompt: 'minimalist floral nail art',
+  count: 3,
+  size: '1024x1024',
+});
+
+// Use predefined styles
+const prompt = nailArtStyles.minimalist;
+```
+
+### `email.ts`
+Email utilities for sending notifications.
+
+```typescript
+import { sendEmail, emailTemplates } from '@/lib/email';
+
+// Send welcome email
+await sendEmail({
+  to: 'user@example.com',
+  ...emailTemplates.welcome('John'),
+});
+
+// Send custom email
+await sendEmail({
+  to: 'user@example.com',
+  subject: 'Custom Subject',
+  html: '<p>Email content</p>',
+});
+```
+
 ### `utils.ts`
 General utility functions (from shadcn/ui).
 
