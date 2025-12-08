@@ -8,8 +8,6 @@ export default function CapturePage() {
   const router = useRouter()
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
-  const [additionalFilter, setAdditionalFilter] = useState<string>('')
-  const [selectedEffect, setSelectedEffect] = useState<string | null>(null)
   const [isFlipping, setIsFlipping] = useState(false)
   const [zoom, setZoom] = useState(1)
   const [showZoomIndicator, setShowZoomIndicator] = useState(false)
@@ -89,9 +87,8 @@ export default function CapturePage() {
       const ctx = canvas.getContext("2d")
       
       if (ctx) {
-        // Apply beauty filter + additional filter
-        const baseFilter = 'brightness(1.05) contrast(1.05) saturate(1.1) blur(0.3px)'
-        ctx.filter = additionalFilter ? `${baseFilter} ${additionalFilter}` : baseFilter
+        // Apply beauty filter
+        ctx.filter = 'brightness(1.05) contrast(1.05) saturate(1.1) blur(0.3px)'
 
         // Flip for front camera
         if (facingMode === 'user') {
@@ -224,32 +221,7 @@ export default function CapturePage() {
     lastTouchDistanceRef.current = 0
   }, [])
 
-  const filters = [
-    { id: 'none', name: 'None', filter: '' },
-    { id: 'warm', name: 'Warm', filter: 'sepia(0.3) hue-rotate(-10deg)' },
-    { id: 'cool', name: 'Cool', filter: 'hue-rotate(10deg) saturate(1.2)' },
-    { id: 'vintage', name: 'Vintage', filter: 'sepia(0.5) contrast(0.9)' },
-    { id: 'bw', name: 'B&W', filter: 'grayscale(1)' },
-  ]
 
-  const effects = [
-    {
-      id: "flip",
-      name: "Flip Camera",
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-      )
-    },
-    {
-      id: "filter",
-      name: "Filters",
-      icon: (
-        <img src="/logo_1.png" alt="Filter" className="w-6 h-6" />
-      )
-    },
-  ]
 
   if (capturedImage) {
     return (
@@ -294,9 +266,7 @@ export default function CapturePage() {
           className="w-full h-full object-cover transition-opacity duration-200"
           style={{
             transform: `${facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)'} scale(${zoom})`,
-            filter: additionalFilter
-              ? `brightness(1.08) contrast(1.08) saturate(1.15) ${additionalFilter}`
-              : 'brightness(1.08) contrast(1.08) saturate(1.15)',
+            filter: 'brightness(1.08) contrast(1.08) saturate(1.15)',
             opacity: isFlipping ? 0 : 1,
             transition: 'transform 0.15s ease-out, opacity 0.2s ease-out',
           }}
@@ -338,57 +308,22 @@ export default function CapturePage() {
           </div>
         )}
 
-        {/* Side Controls */}
-        <div className="absolute right-5 top-1/2 transform -translate-y-1/2 space-y-4 z-10">
-          {effects.map((effect) => {
-            const isActive = (effect.id === "flip" && facingMode === "environment") || (selectedEffect === effect.id && effect.id !== "flip")
-            const isDisabled = isFlipping && effect.id === "flip"
-
-            return (
-              <button
-                key={effect.id}
-                onClick={() => {
-                  if (effect.id === "flip") {
-                    flipCamera()
-                  } else {
-                    setSelectedEffect(prev => prev === effect.id ? null : effect.id)
-                  }
-                }}
-                disabled={isDisabled}
-                className={`w-14 h-14 rounded-2xl backdrop-blur-md flex flex-col items-center justify-center transition-all duration-200 active:scale-95 ${
-                  isActive
-                    ? "bg-white/95 text-gray-900 shadow-xl"
-                    : "bg-black/40 hover:bg-black/50 text-white shadow-lg"
-                } ${isDisabled ? "opacity-50" : ""}`}
-              >
-                <div className="scale-90">{effect.icon}</div>
-              </button>
-            )
-          })}
+        {/* Flip Camera Button */}
+        <div className="absolute right-5 top-1/2 transform -translate-y-1/2 z-10">
+          <button
+            onClick={flipCamera}
+            disabled={isFlipping}
+            className={`w-14 h-14 rounded-2xl backdrop-blur-md flex flex-col items-center justify-center transition-all duration-200 active:scale-95 ${
+              facingMode === "environment"
+                ? "bg-white/95 text-gray-900 shadow-xl"
+                : "bg-black/40 hover:bg-black/50 text-white shadow-lg"
+            } ${isFlipping ? "opacity-50" : ""}`}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
         </div>
-
-        {/* Filter Panel */}
-        {selectedEffect === "filter" && (
-          <div className="absolute bottom-36 left-0 right-0 px-5 z-10">
-            <div className="bg-black/50 backdrop-blur-xl rounded-3xl p-4 shadow-2xl">
-              <div className="flex space-x-3 overflow-x-auto pb-1 scrollbar-hide">
-                {filters.map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => setAdditionalFilter(filter.filter)}
-                    className={`flex-shrink-0 px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all active:scale-95 ${
-                      additionalFilter === filter.filter
-                        ? "bg-white text-gray-900 shadow-lg"
-                        : "bg-white/20 text-white hover:bg-white/30"
-                    }`}
-                  >
-                    {filter.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Bottom Controls */}
         <div className="absolute bottom-0 left-0 right-0 pb-10 pt-6 px-6 z-10">
