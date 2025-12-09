@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { config } from '@/lib/config'
 
 function getOpenAIClient() {
-  const apiKey = process.env.OPENAI_API_KEY
+  const apiKey = config.OPENAI_API_KEY
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY is not configured')
   }
@@ -13,10 +14,10 @@ function getOpenAIClient() {
 function getR2Client() {
   return new S3Client({
     region: 'auto',
-    endpoint: process.env.R2_ENDPOINT,
+    endpoint: config.R2_ENDPOINT,
     credentials: {
-      accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+      accessKeyId: config.R2_ACCESS_KEY_ID,
+      secretAccessKey: config.R2_SECRET_ACCESS_KEY,
     },
   })
 }
@@ -27,14 +28,14 @@ async function uploadToR2(buffer: Buffer, filename: string): Promise<string> {
   
   await r2Client.send(
     new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME!,
+      Bucket: config.R2_BUCKET_NAME,
       Key: key,
       Body: buffer,
       ContentType: 'image/png',
     })
   )
   
-  return `${process.env.R2_PUBLIC_URL}/${key}`
+  return `${config.R2_PUBLIC_URL}/${key}`
 }
 
 async function fetchImageAsBase64(imageUrl: string): Promise<string> {

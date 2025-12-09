@@ -2,16 +2,18 @@
 // Supports multiple storage providers: Vercel Blob, Backblaze B2, Cloudflare R2
 
 import { env } from './env';
+import { config } from './config';
 
 export type StorageProvider = 'vercel-blob' | 'backblaze-b2' | 'cloudflare-r2' | 'cloudinary';
 
 // Detect which storage provider is configured
 // Priority: R2 > Vercel Blob > B2 > Cloudinary
 export function getStorageProvider(): StorageProvider | null {
-  if (env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_PUBLIC_URL) return 'cloudflare-r2';
-  if (env.BLOB_READ_WRITE_TOKEN) return 'vercel-blob';
-  if (env.B2_KEY_ID && env.B2_APPLICATION_KEY) return 'backblaze-b2';
-  if (env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY) return 'cloudinary';
+  // Use config file as fallback for Turbopack env bug
+  if (config.R2_ACCESS_KEY_ID && config.R2_SECRET_ACCESS_KEY && config.R2_PUBLIC_URL) return 'cloudflare-r2';
+  if (config.BLOB_READ_WRITE_TOKEN) return 'vercel-blob';
+  if (process.env.B2_KEY_ID && process.env.B2_APPLICATION_KEY) return 'backblaze-b2';
+  if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY) return 'cloudinary';
   return null;
 }
 
@@ -56,7 +58,7 @@ async function uploadToVercelBlob(
   
   const blob = await put(pathname, file, {
     access: 'public',
-    token: env.BLOB_READ_WRITE_TOKEN,
+    token: config.BLOB_READ_WRITE_TOKEN,
     contentType: options?.contentType,
   });
 
@@ -76,10 +78,10 @@ async function uploadToR2(
 
   const s3Client = new S3Client({
     region: 'auto',
-    endpoint: env.R2_ENDPOINT,
+    endpoint: config.R2_ENDPOINT,
     credentials: {
-      accessKeyId: env.R2_ACCESS_KEY_ID!,
-      secretAccessKey: env.R2_SECRET_ACCESS_KEY!,
+      accessKeyId: config.R2_ACCESS_KEY_ID,
+      secretAccessKey: config.R2_SECRET_ACCESS_KEY,
     },
   });
 
@@ -88,14 +90,14 @@ async function uploadToR2(
 
   await s3Client.send(
     new PutObjectCommand({
-      Bucket: env.R2_BUCKET_NAME!,
+      Bucket: config.R2_BUCKET_NAME,
       Key: key,
       Body: Buffer.from(buffer),
       ContentType: options?.contentType || file.type,
     })
   );
 
-  const url = `${env.R2_PUBLIC_URL}/${key}`;
+  const url = `${config.R2_PUBLIC_URL}/${key}`;
 
   return { url, key };
 }
