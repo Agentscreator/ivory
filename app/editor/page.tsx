@@ -31,6 +31,9 @@ export default function EditorPage() {
   const [aiPrompt, setAiPrompt] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedDesigns, setGeneratedDesigns] = useState<string[]>([])
+  const [dalleImage, setDalleImage] = useState<string | null>(null)
+  const [expandedImage, setExpandedImage] = useState<'original' | 'dalle' | null>(null)
+  const [isGeneratingDalle, setIsGeneratingDalle] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -59,9 +62,35 @@ export default function EditorPage() {
     )
   }
 
-  const applyColorToSelected = (color: string) => {
+  const applyColorToSelected = async (color: string) => {
     setSelectedColor(color)
     setNails(nails.map((nail) => (nail.selected ? { ...nail, color } : nail)))
+    
+    // Generate DALL-E preview when color is applied
+    await generateDallePreview(color)
+  }
+
+  const generateDallePreview = async (color?: string) => {
+    setIsGeneratingDalle(true)
+    try {
+      const selectedNails = nails.filter(n => n.selected)
+      const prompt = `Professional nail art design on human hand, ${selectedNails.length} nails painted with ${color || selectedColor} color, realistic photography, high quality, studio lighting`
+      
+      const response = await fetch('/api/generate-nail-design', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, originalImage: image }),
+      })
+
+      if (response.ok) {
+        const { imageUrl } = await response.json()
+        setDalleImage(imageUrl)
+      }
+    } catch (error) {
+      console.error('Error generating DALL-E preview:', error)
+    } finally {
+      setIsGeneratingDalle(false)
+    }
   }
 
   const generateAIDesign = async () => {
@@ -145,33 +174,76 @@ export default function EditorPage() {
         </div>
       </header>
 
-      {/* Main Canvas */}
+      {/* Main Canvas - Side by Side Images */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-[450px]">
-        <Card className="overflow-hidden border-0 bg-white shadow-xl mb-4 sm:mb-6 relative touch-none">
-          <div className="aspect-[3/4] relative">
-            <Image src={image || "/placeholder.svg"} alt="Hand photo" fill className="object-cover" />
-            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
-            {/* Nail overlay indicators */}
-            {nails.map((nail) => (
-              <button
-                type="button"
-                key={nail.id}
-                onClick={() => handleNailClick(nail.id)}
-                className={`absolute w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 transition-all active:scale-110 ${
-                  nail.selected ? "border-white scale-125" : "border-white/60"
-                }`}
-                style={{
-                  left: `${nail.x}%`,
-                  top: `${nail.y}%`,
-                  backgroundColor: nail.color,
-                  transform: nail.selected ? "scale(1.25)" : "scale(1)",
-                }}
-              />
-            ))}
-          </div>
-        </Card>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* Original Image */}
+          <button
+            onClick={() => setExpandedImage(expandedImage === 'original' ? null : 'original')}
+            className={`relative overflow-hidden rounded-2xl border-2 transition-all ${
+              expandedImage === 'original' ? 'border-primary shadow-xl' : 'border-border'
+            }`}
+          >
+            <div className="aspect-[3/4] relative bg-white">
+              <Image src={image || "/placeholder.svg"} alt="Original" fill className="object-cover" />
+              <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+              {/* Nail overlay indicators */}
+              {nails.map((nail) => (
+                <button
+                  type="button"
+                  key={nail.id}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleNailClick(nail.id)
+                  }}
+                  className={`absolute w-6 h-6 rounded-full border-2 transition-all active:scale-110 ${
+                    nail.selected ? "border-white scale-125" : "border-white/60"
+                  }`}
+                  style={{
+                    left: `${nail.x}%`,
+                    top: `${nail.y}%`,
+                    backgroundColor: nail.color,
+                    transform: nail.selected ? "scale(1.25)" : "scale(1)",
+                  }}
+                />
+              ))}
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+              Original
+            </div>
+          </button>
 
-        <p className="text-xs sm:text-sm text-center text-muted-foreground mb-4 px-4">Tap on nails to select, then choose a design</p>
+          {/* DALL-E Generated Image */}
+          <button
+            onClick={() => setExpandedImage(expandedImage === 'dalle' ? null : 'dalle')}
+            className={`relative overflow-hidden rounded-2xl border-2 transition-all ${
+              expandedImage === 'dalle' ? 'border-primary shadow-xl' : 'border-border'
+            }`}
+          >
+            <div className="aspect-[3/4] relative bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+              {isGeneratingDalle ? (
+                <div className="text-center">
+                  <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin text-primary" />
+                  <p className="text-xs text-muted-foreground">Generating...</p>
+                </div>
+              ) : dalleImage ? (
+                <Image src={dalleImage} alt="AI Generated" fill className="object-cover" />
+              ) : (
+                <div className="text-center px-4">
+                  <Sparkles className="w-8 h-8 mx-auto mb-2 text-primary" />
+                  <p className="text-xs text-muted-foreground">Select colors to generate AI preview</p>
+                </div>
+              )}
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+              AI Preview
+            </div>
+          </button>
+        </div>
+
+        <p className="text-xs sm:text-sm text-center text-muted-foreground mb-4 px-4">
+          Tap images to expand • Select nails and choose colors below
+        </p>
       </main>
 
       {/* Bottom Drawer */}
