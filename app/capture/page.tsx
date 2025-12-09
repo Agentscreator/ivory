@@ -57,21 +57,29 @@ export default function CapturePage() {
     const newFacingMode = facingMode === 'user' ? 'environment' : 'user'
 
     try {
+      // Stop current stream first
+      stopCamera()
+      
+      // Pause and clear the video element
+      if (videoRef.current) {
+        videoRef.current.pause()
+        videoRef.current.srcObject = null
+      }
+
+      // Get new stream
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: newFacingMode } 
       })
       
-      stopCamera()
       streamRef.current = stream
       setFacingMode(newFacingMode)
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream
-        videoRef.current.onloadedmetadata = () => {
-          setTimeout(() => {
-            setIsFlipping(false)
-          }, 100)
-        }
+        await videoRef.current.play()
+        setTimeout(() => {
+          setIsFlipping(false)
+        }, 100)
       }
     } catch (error) {
       console.error("Error flipping camera:", error)
