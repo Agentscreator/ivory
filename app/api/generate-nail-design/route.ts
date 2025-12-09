@@ -51,9 +51,10 @@ export async function POST(request: NextRequest) {
 
     // Use gpt-image-1-mini with Responses API
     try {
-      // @ts-ignore - responses API is new
+      // @ts-ignore - responses API is new and not yet in TypeScript definitions
       const response = await openai.responses.create({
         model: 'gpt-image-1-mini',
+        // @ts-ignore
         modalities: ['image'], // REQUIRED for image output
         input: [
           {
