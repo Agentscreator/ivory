@@ -14,14 +14,27 @@ export async function POST(request: NextRequest) {
     const openai = getOpenAIClient()
     const { prompt, originalImage, selectedDesignImage } = await request.json()
 
+    console.log('🔍 DEBUG: Received request')
+    console.log('  - Prompt:', prompt?.substring(0, 100) + '...')
+    console.log('  - Original Image URL:', originalImage)
+    console.log('  - Selected Design Image:', selectedDesignImage)
+
     if (!prompt || !originalImage) {
       return NextResponse.json({ error: 'Prompt and original image are required' }, { status: 400 })
     }
 
     // Fetch the original image and convert to base64
+    console.log('📥 Fetching original image from:', originalImage)
     const imageResponse = await fetch(originalImage)
+    console.log('  - Response status:', imageResponse.status)
+    console.log('  - Content-Type:', imageResponse.headers.get('content-type'))
+    
     const imageBuffer = await imageResponse.arrayBuffer()
+    console.log('  - Image buffer size:', imageBuffer.byteLength, 'bytes')
+    
     const base64Image = Buffer.from(imageBuffer).toString('base64')
+    console.log('  - Base64 length:', base64Image.length, 'characters')
+    console.log('  - Base64 preview:', base64Image.substring(0, 50) + '...')
 
     // Build the instruction text
     let instructionText = `Use the exact hand in the image. Do NOT change pose, skin tone, lighting, or background. Detect the fingernails and apply the following design: ${prompt}. Do not alter anything outside the nail boundaries. The result must look like professional nail art photography with the design seamlessly applied only to the nails.`
@@ -38,8 +51,11 @@ export async function POST(request: NextRequest) {
       }
     ]
 
+    console.log('📝 Built input content with', inputContent.length, 'items')
+
     // If there's a selected design image, add it as reference
     if (selectedDesignImage) {
+      console.log('🎨 Adding selected design image as reference')
       const designResponse = await fetch(selectedDesignImage)
       const designBuffer = await designResponse.arrayBuffer()
       const base64Design = Buffer.from(designBuffer).toString('base64')
@@ -52,9 +68,11 @@ export async function POST(request: NextRequest) {
         type: 'input_image',
         image_url: `data:image/png;base64,${base64Design}`
       })
+      console.log('  - Total input items now:', inputContent.length)
     }
 
     // Use gpt-image-1-mini with Responses API
+    console.log('🤖 Attempting gpt-image-1-mini with Responses API...')
     try {
       // @ts-ignore - responses API is new and not yet in TypeScript definitions
       const response = await openai.responses.create({
@@ -69,20 +87,27 @@ export async function POST(request: NextRequest) {
         ]
       })
 
+      console.log('✅ gpt-image-1-mini response received')
+      
       // Extract image output (base64)
       // @ts-ignore
       const outputBase64 = response.output?.[0]?.image?.base64
 
       if (outputBase64) {
+        console.log('🖼️  Got output image, length:', outputBase64.length)
         // Convert base64 to data URL
         const imageUrl = `data:image/png;base64,${outputBase64}`
         return NextResponse.json({ imageUrl })
+      } else {
+        console.log('⚠️  No image in response, falling back')
       }
     } catch (gptImageError: any) {
-      console.log('gpt-image-1-mini error, falling back to DALL-E 3:', gptImageError.message)
+      console.log('❌ gpt-image-1-mini error:', gptImageError.message)
+      console.log('   Falling back to DALL-E 3...')
     }
 
     // Fallback: Use GPT-4o to analyze the image and create a detailed prompt
+    console.log('🔄 Using fallback: GPT-4o + DALL-E 3')
     const analysisResponse = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
