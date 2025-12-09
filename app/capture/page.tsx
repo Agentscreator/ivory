@@ -289,7 +289,7 @@ export default function CapturePage() {
             alt="Hand reference"
             className="hand-outline w-full h-full object-contain"
             style={{
-              transform: `scale(${handReference === 1 ? 2.2 : 2.9})`,
+              transform: `scale(${handReference === 1 ? 1.8 : 2.9})`,
               mixBlendMode: 'screen',
               filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) brightness(1.2)',
             }}
