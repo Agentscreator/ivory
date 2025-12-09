@@ -13,6 +13,17 @@ async function fetchImageAsBase64(imageUrl: string): Promise<string> {
   try {
     console.log('📥 Fetching image from:', imageUrl)
     
+    // If it's a data URL, convert directly
+    if (imageUrl.startsWith('data:')) {
+      console.log('  - Detected data URL, converting directly')
+      const base64Part = imageUrl.split(',')[1]
+      if (!base64Part) {
+        throw new Error('Invalid data URL format')
+      }
+      console.log('  - Base64 length:', base64Part.length, 'characters')
+      return base64Part
+    }
+    
     const imageResponse = await fetch(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; Ivory/1.0)',
