@@ -142,37 +142,53 @@ export default function EditorPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    console.log('=== STARTING FILE UPLOAD ===')
+    console.log('File name:', file.name)
+    console.log('File size:', file.size, 'bytes')
+    console.log('File type:', file.type)
+
     setIsGenerating(true)
     try {
       const formData = new FormData()
       formData.append('file', file)
+
+      console.log('Sending request to /api/analyze-design-image...')
 
       const response = await fetch('/api/analyze-design-image', {
         method: 'POST',
         body: formData,
       })
 
+      console.log('Response status:', response.status)
+
       if (response.ok) {
-        const { imageUrl, inferredSettings } = await response.json()
+        const data = await response.json()
+        const { imageUrl, inferredSettings } = data
         
         // Console log the received data
         console.log('=== DESIGN UPLOAD RESULT ===')
         console.log('Uploaded Image URL:', imageUrl)
         console.log('Extracted Settings:', inferredSettings)
+        console.log('Full Response:', data)
         console.log('===========================')
         
         setSelectedDesignImage(imageUrl)
         
         if (inferredSettings) {
+          console.log('Applying inferred settings to design...')
           setDesignSettings(prev => ({ ...prev, ...inferredSettings }))
         }
         
         await generateAIPreview({ ...designSettings, ...inferredSettings }, imageUrl)
+      } else {
+        const errorData = await response.json()
+        console.error('Upload failed:', errorData)
       }
     } catch (error) {
       console.error('Error uploading design:', error)
     } finally {
       setIsGenerating(false)
+      console.log('Upload process complete')
     }
   }
 
