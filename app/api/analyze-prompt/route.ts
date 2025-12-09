@@ -32,9 +32,12 @@ export async function POST(request: NextRequest) {
     const content = analysisResponse.choices[0]?.message?.content || '{}'
     const inferredSettings = JSON.parse(content)
 
-    // Generate 3 design variations based on the prompt
+    // Generate 3 design variations based on the prompt using DALL-E 3
+    // These are just nail design references, not applied to the hand yet
     const designPrompts = [
-      `Ultra-detailed nail art design applied ONLY inside a fingernail area. ${prompt}. Nail length: ${inferredSettings.nail_length || 'medium'}, Nail shape: ${inferredSettings.nail_shape || 'oval'}. Base color: ${inferredSettings.base_color || '#FF6B9D'}. Finish: ${inferredSettings.finish || 'glossy'}. Texture: ${inferredSettings.texture || 'smooth'}. Design style: ${inferredSettings.pattern_type || 'artistic'} pattern, ${inferredSettings.style_vibe || 'elegant'} aesthetic. Accent color: ${inferredSettings.accent_color || '#FFFFFF'}. Highly realistic nail polish appearance: smooth polish, clean edges, even color distribution, professional salon quality, subtle natural reflections. Design must: stay strictly within the nail surface, follow realistic nail curvature, respect nail boundaries, appear physically painted onto the nail. High resolution, realistic lighting, natural skin reflection preserved.`
+      `Close-up photo of ${inferredSettings.nail_length || 'medium'} ${inferredSettings.nail_shape || 'oval'} shaped nails with ${prompt}. Base color: ${inferredSettings.base_color || 'pink'}. ${inferredSettings.finish || 'glossy'} finish with ${inferredSettings.texture || 'smooth'} texture. Professional nail art photography, high quality, studio lighting, white background.`,
+      `Professional nail art design: ${prompt}. ${inferredSettings.nail_length || 'medium'} length, ${inferredSettings.nail_shape || 'oval'} shape. ${inferredSettings.finish || 'glossy'} ${inferredSettings.base_color || 'pink'} base with ${inferredSettings.texture || 'smooth'} texture. Clean, elegant style. Studio photography.`,
+      `Detailed nail design showing ${prompt}. ${inferredSettings.nail_shape || 'oval'} ${inferredSettings.nail_length || 'medium'} nails, ${inferredSettings.base_color || 'pink'} color, ${inferredSettings.finish || 'glossy'} finish. ${inferredSettings.style_vibe || 'elegant'} aesthetic. Professional salon quality, high resolution.`
     ]
 
     const designs: string[] = []
@@ -48,7 +51,7 @@ export async function POST(request: NextRequest) {
         quality: 'standard',
       })
 
-      const imageUrl = imageResponse.data[0]?.url
+      const imageUrl = imageResponse.data?.[0]?.url
       if (imageUrl) {
         designs.push(imageUrl)
       }
