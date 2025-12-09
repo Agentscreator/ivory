@@ -274,7 +274,7 @@ export default function CapturePage() {
         />
 
         {/* Hand Reference Overlay */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-[5]">
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-[5] overflow-visible">
           <style jsx>{`
             @keyframes blink-outline {
               0%, 100% { opacity: 0.5; }
@@ -287,10 +287,9 @@ export default function CapturePage() {
           <img
             src={`/ref${handReference}.png`}
             alt="Hand reference"
-            className="hand-outline object-contain"
+            className="hand-outline w-full h-full object-contain"
             style={{
-              width: '290%',
-              height: '290%',
+              transform: 'scale(2.9)',
               mixBlendMode: 'screen',
               filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) brightness(1.2)',
             }}
