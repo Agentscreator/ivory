@@ -163,23 +163,16 @@ export default function EditorPage() {
 
       if (response.ok) {
         const data = await response.json()
-        const { imageUrl, inferredSettings } = data
+        const { imageUrl } = data
         
-        // Console log the received data
         console.log('=== DESIGN UPLOAD RESULT ===')
         console.log('Uploaded Image URL:', imageUrl)
-        console.log('Extracted Settings:', inferredSettings)
-        console.log('Full Response:', data)
         console.log('===========================')
         
         setSelectedDesignImage(imageUrl)
         
-        if (inferredSettings) {
-          console.log('Applying inferred settings to design...')
-          setDesignSettings(prev => ({ ...prev, ...inferredSettings }))
-        }
-        
-        await generateAIPreview({ ...designSettings, ...inferredSettings }, imageUrl)
+        // Generate preview with uploaded design image as additional input
+        await generateAIPreview(designSettings, imageUrl)
       } else {
         const errorData = await response.json()
         console.error('Upload failed:', errorData)
