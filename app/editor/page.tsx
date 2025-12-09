@@ -59,7 +59,13 @@ export default function EditorPage() {
   useEffect(() => {
     const savedImage = localStorage.getItem("currentEditingImage")
     if (savedImage) {
-      setImage(savedImage)
+      // If it's a data URL, upload to R2 first
+      if (savedImage.startsWith('data:')) {
+        uploadOriginalImage(savedImage)
+      } else {
+        // It's already a URL (from R2 or elsewhere)
+        setImage(savedImage)
+      }
       setNails([
         { id: 1, x: 30, y: 40, selected: false, color: "#FF6B9D" },
         { id: 2, x: 45, y: 35, selected: false, color: "#FF6B9D" },
@@ -69,6 +75,34 @@ export default function EditorPage() {
       ])
     }
   }, [])
+
+  const uploadOriginalImage = async (dataUrl: string) => {
+    try {
+      const response = await fetch(dataUrl)
+      const blob = await response.blob()
+      
+      const formData = new FormData()
+      formData.append('file', blob, `original-${Date.now()}.jpg`)
+      formData.append('type', 'image')
+      
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      
+      if (uploadResponse.ok) {
+        const { url } = await uploadResponse.json()
+        setImage(url)
+      } else {
+        // Fallback to data URL if upload fails
+        setImage(dataUrl)
+      }
+    } catch (error) {
+      console.error('Error uploading original image:', error)
+      // Fallback to data URL if upload fails
+      setImage(dataUrl)
+    }
+  }
 
   const buildPrompt = (settings: DesignSettings) => {
     return `Ultra-detailed nail art design applied ONLY inside a fingernail area. Nail length: ${settings.nailLength}, Nail shape: ${settings.nailShape}. Base color: ${settings.baseColor}. Finish: ${settings.finish}. Texture: ${settings.texture}. Design style: ${settings.patternType} pattern, ${settings.styleVibe} aesthetic. Accent color: ${settings.accentColor}. Highly realistic nail polish appearance: smooth polish, clean edges, even color distribution, professional salon quality, subtle natural reflections. Design must: stay strictly within the nail surface, follow realistic nail curvature, respect nail boundaries, appear physically painted onto the nail. High resolution, realistic lighting, natural skin reflection preserved.`
