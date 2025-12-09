@@ -6,9 +6,10 @@ import { env } from './env';
 export type StorageProvider = 'vercel-blob' | 'backblaze-b2' | 'cloudflare-r2' | 'cloudinary';
 
 // Detect which storage provider is configured
+// Priority: R2 > Vercel Blob > B2 > Cloudinary
 export function getStorageProvider(): StorageProvider | null {
+  if (env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_PUBLIC_URL) return 'cloudflare-r2';
   if (env.BLOB_READ_WRITE_TOKEN) return 'vercel-blob';
-  if (env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY) return 'cloudflare-r2';
   if (env.B2_KEY_ID && env.B2_APPLICATION_KEY) return 'backblaze-b2';
   if (env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY) return 'cloudinary';
   return null;
