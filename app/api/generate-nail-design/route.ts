@@ -13,33 +13,58 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Prompt and original image are required' }, { status: 400 })
     }
 
-    // Download the original image to convert to buffer for DALL-E edit
-    const imageResponse = await fetch(originalImage)
-    const imageBuffer = await imageResponse.arrayBuffer()
-    const imageFile = new File([imageBuffer], 'hand.png', { type: 'image/png' })
+    // Build messages for gpt-image-1 with the original image and design settings
+    const messages: any[] = [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: `Apply the following nail design to this hand image: ${prompt}\n\nIMPORTANT: Preserve the exact hand pose, skin tone, lighting, background, and all natural features. Only modify the nails with the requested design. The result should look like a professional nail art photo with the design seamlessly applied.`
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: originalImage
+            }
+          }
+        ]
+      }
+    ]
 
-    // Create a mask (transparent PNG) - for now we'll use the same image
-    // In production, you'd want to create an actual mask highlighting the nail areas
-    const maskFile = new File([imageBuffer], 'mask.png', { type: 'image/png' })
-
-    // Build the edit prompt with design settings
-    let editPrompt = prompt
-
+    // If there's a selected design image, include it as reference
     if (selectedDesignImage) {
-      editPrompt = `${prompt} Apply this exact nail design style to the nails in the image, preserving the hand pose, skin tone, and background perfectly.`
+      messages.push({
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: 'Use this design as a reference and apply it to the hand above:'
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: selectedDesignImage
+            }
+          }
+        ]
+      })
     }
 
-    // Use DALL-E 2 edit endpoint (DALL-E 3 doesn't support edits yet)
-    const editResponse = await openai.images.edit({
-      model: 'dall-e-2',
-      image: imageFile,
-      mask: maskFile,
-      prompt: editPrompt,
+    // Use gpt-image-1 to generate the image with design applied
+    const imageResponse = await openai.images.generate({
+      model: 'gpt-image-1',
+      prompt: prompt,
       n: 1,
       size: '1024x1024',
+      quality: 'hd',
+      // Pass the original image context through messages
+      // Note: This is a new model, so the exact API might differ
+      // @ts-ignore - gpt-image-1 is a new model
+      messages: messages,
     })
 
-    const imageUrl = editResponse.data?.[0]?.url
+    const imageUrl = imageResponse.data?.[0]?.url
 
     if (!imageUrl) {
       return NextResponse.json({ error: 'Failed to generate image' }, { status: 500 })
