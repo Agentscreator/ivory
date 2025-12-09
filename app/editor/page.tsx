@@ -108,11 +108,15 @@ export default function EditorPage() {
     return `Ultra-detailed nail art design applied ONLY inside a fingernail area. Nail length: ${settings.nailLength}, Nail shape: ${settings.nailShape}. Base color: ${settings.baseColor}. Finish: ${settings.finish}. Texture: ${settings.texture}. Design style: ${settings.patternType} pattern, ${settings.styleVibe} aesthetic. Accent color: ${settings.accentColor}. Highly realistic nail polish appearance: smooth polish, clean edges, even color distribution, professional salon quality, subtle natural reflections. Design must: stay strictly within the nail surface, follow realistic nail curvature, respect nail boundaries, appear physically painted onto the nail. High resolution, realistic lighting, natural skin reflection preserved.`
   }
 
+  // Generate AI preview using gpt-image-1-mini
+  // This applies design settings to the user's actual hand image
+  // Called from: Design tab (settings change), AI Designs tab (after selection), Upload tab (after upload)
   const generateAIPreview = async (settings: DesignSettings, selectedImage?: string) => {
     setIsGeneratingDalle(true)
     try {
       const prompt = buildPrompt(settings)
       
+      // API route uses gpt-image-1-mini for fast, real-time preview generation
       const response = await fetch('/api/generate-nail-design', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -140,11 +144,16 @@ export default function EditorPage() {
     generateAIPreview(newSettings)
   }
 
+  // Generate AI design concepts using gpt-4o-mini + gpt-image-1
+  // Step 1: gpt-4o-mini analyzes prompt and extracts design parameters
+  // Step 2: gpt-image-1 generates 3 standalone design concept images
+  // These are NOT applied to the user's hand yet - just inspiration/reference
   const generateAIDesigns = async () => {
     if (!aiPrompt.trim()) return
 
     setIsGenerating(true)
     try {
+      // API route uses gpt-4o-mini for prompt analysis + gpt-image-1 for concept generation
       const response = await fetch('/api/analyze-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -167,11 +176,17 @@ export default function EditorPage() {
     }
   }
 
+  // When user selects an AI-generated design concept
+  // Now we use gpt-image-1-mini to apply that design to their actual hand
   const handleDesignSelect = async (designUrl: string) => {
     setSelectedDesignImage(designUrl)
+    // This calls gpt-image-1-mini to apply the selected design to the user's hand
     await generateAIPreview(designSettings, designUrl)
   }
 
+  // Handle custom design image upload
+  // Step 1: Upload to R2 storage (NO AI MODEL USED)
+  // Step 2: Use gpt-image-1-mini to apply uploaded design to user's hand
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -188,6 +203,7 @@ export default function EditorPage() {
 
       console.log('Sending request to /api/analyze-design-image...')
 
+      // Upload to R2 storage (no AI model used here)
       const response = await fetch('/api/analyze-design-image', {
         method: 'POST',
         body: formData,
@@ -205,7 +221,7 @@ export default function EditorPage() {
         
         setSelectedDesignImage(imageUrl)
         
-        // Generate preview with uploaded design image as additional input
+        // Now use gpt-image-1-mini to apply uploaded design to user's hand
         await generateAIPreview(designSettings, imageUrl)
       } else {
         const errorData = await response.json()

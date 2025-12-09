@@ -32,9 +32,33 @@ AI-powered nail design platform connecting clients with professional nail techni
 - **Styling**: Tailwind CSS
 - **UI Components**: Radix UI + shadcn/ui
 - **Storage**: Vercel Blob / Cloudflare R2 / Backblaze B2
-- **AI**: OpenAI DALL-E
+- **AI Models**: 
+  - `gpt-image-1-mini` - Real-time preview generation
+  - `gpt-image-1` - Design concept generation
+  - `gpt-4o-mini` - Text analysis
 - **Email**: Resend
 - **Deployment**: Vercel
+
+### AI Architecture
+
+The app uses three OpenAI models optimized for different tasks:
+
+1. **gpt-image-1-mini** - Fast, cost-effective preview generation
+   - Applies nail designs to user's hand photos
+   - Used in Design, AI Designs, and Upload tabs
+   - ~2-3 seconds per generation
+
+2. **gpt-image-1** - High-quality concept generation
+   - Creates standalone design inspiration images
+   - Used only in AI Designs tab
+   - Generates 3 concepts per prompt
+
+3. **gpt-4o-mini** - Intelligent text analysis
+   - Parses user prompts into structured design parameters
+   - Extracts colors, styles, patterns from natural language
+   - Used in AI Designs tab
+
+See [docs/MODEL_SUMMARY.md](docs/MODEL_SUMMARY.md) for complete architecture details.
 
 ## Quick Start
 
@@ -118,10 +142,17 @@ See [docs/SERVICES.md](docs/SERVICES.md) for detailed setup instructions.
 ## Documentation
 
 - 📖 [Setup Guide](SETUP.md) - Complete setup instructions
+- 🤖 [AI Model Architecture](docs/README.md) - How AI models are used
 - 🔧 [Environment Variables](docs/ENVIRONMENT.md) - All configuration options
 - 🛠️ [Services Integration](docs/SERVICES.md) - Third-party services setup
 - 🗄️ [Database Schema](db/README.md) - Database structure and API
 - 📚 [Utilities](lib/README.md) - Helper functions and utilities
+
+### AI Documentation
+- 🎯 [Model Summary](docs/MODEL_SUMMARY.md) - Quick overview of AI architecture
+- 📊 [Model Flow Diagrams](docs/MODEL_FLOW_DIAGRAM.md) - Visual flow diagrams
+- 📖 [AI Model Usage](docs/AI_MODEL_USAGE.md) - Complete implementation guide
+- ⚡ [Quick Reference](docs/QUICK_REFERENCE.md) - Developer quick reference
 
 ## Project Structure
 

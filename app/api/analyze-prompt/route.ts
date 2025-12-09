@@ -1,9 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { config } from '@/lib/config'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
+
+function getR2Client() {
+  return new S3Client({
+    region: 'auto',
+    endpoint: config.R2_ENDPOINT,
+    credentials: {
+      accessKeyId: config.R2_ACCESS_KEY_ID,
+      secretAccessKey: config.R2_SECRET_ACCESS_KEY,
+    },
+  })
+}
+
+async function uploadToR2(buffer: Buffer, filename: string): Promise<string> {
+  const r2Client = getR2Client()
+  const key = `generated/${filename}`
+  
+  await r2Client.send(
+    new PutObjectCommand({
+      Bucket: config.R2_BUCKET_NAME,
+      Key: key,
+      Body: buffer,
+      ContentType: 'image/png',
+    })
+  )
+  
+  return `${config.R2_PUBLIC_URL}/${key}`
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,9 +62,9 @@ export async function POST(request: NextRequest) {
     const content = analysisResponse.choices[0]?.message?.content || '{}'
     const inferredSettings = JSON.parse(content)
 
-    // STEP 3: Generate 3 design variations using gpt-image-1
+    // STEP 3: Generate 3 design variations using gpt-image-1 (NOT MINI)
     // These are standalone nail design concepts, not applied to the hand yet
-    // Using gpt-image-1 for speed + consistency (can upgrade to dall-e-3 for premium quality)
+    // Using gpt-image-1 for higher quality concept generation
     const designPrompts = [
       `Close-up photo of ${inferredSettings.nail_length || 'medium'} ${inferredSettings.nail_shape || 'oval'} shaped nails with ${prompt}. Base color: ${inferredSettings.base_color || 'pink'}. ${inferredSettings.finish || 'glossy'} finish with ${inferredSettings.texture || 'smooth'} texture. Professional nail art photography, high quality, studio lighting, white background.`,
       `Professional nail art design: ${prompt}. ${inferredSettings.nail_length || 'medium'} length, ${inferredSettings.nail_shape || 'oval'} shape. ${inferredSettings.finish || 'glossy'} ${inferredSettings.base_color || 'pink'} base with ${inferredSettings.texture || 'smooth'} texture. Clean, elegant style. Studio photography.`,
@@ -44,8 +73,11 @@ export async function POST(request: NextRequest) {
 
     const designs: string[] = []
     
-    for (const designPrompt of designPrompts) {
+    for (let i = 0; i < designPrompts.length; i++) {
+      const designPrompt = designPrompts[i]
       try {
+        console.log(`🎨 Generating design concept ${i + 1}/3 with gpt-image-1...`)
+        
         // @ts-ignore - responses API is new and not yet in TypeScript definitions
         const response = await openai.responses.create({
           model: 'gpt-image-1',
@@ -72,14 +104,21 @@ export async function POST(request: NextRequest) {
         // @ts-ignore
         const outputBase64 = response.output?.[0]?.image?.base64
         if (outputBase64) {
-          const imageUrl = `data:image/png;base64,${outputBase64}`
-          designs.push(imageUrl)
+          // Upload to R2 for permanent storage
+          const imageBuffer = Buffer.from(outputBase64, 'base64')
+          const filename = `ai-design-${Date.now()}-${i}-${Math.random().toString(36).substring(2, 8)}.png`
+          const permanentUrl = await uploadToR2(imageBuffer, filename)
+          
+          console.log(`✅ Design concept ${i + 1} uploaded to R2`)
+          designs.push(permanentUrl)
         }
       } catch (error) {
-        console.error('Error generating design variation:', error)
+        console.error(`Error generating design variation ${i + 1}:`, error)
         // Continue with other designs even if one fails
       }
     }
+    
+    console.log(`✅ Generated ${designs.length}/3 design concepts`)
 
     return NextResponse.json({ 
       designs,
