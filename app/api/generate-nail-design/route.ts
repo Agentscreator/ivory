@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const openai = getOpenAIClient()
     const { prompt, originalImage, selectedDesignImage } = await request.json()
 
-    console.log('🔍 DEBUG: Received request')
+    console.log('🔍 DEBUG: Received request for nail design generation')
     console.log('  - Prompt:', prompt?.substring(0, 100) + '...')
     console.log('  - Original Image URL:', originalImage)
     console.log('  - Selected Design Image:', selectedDesignImage)
