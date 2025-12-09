@@ -13,9 +13,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 })
     }
 
-    // Use GPT to analyze the prompt and extract design parameters
+    // STEP 2: Use gpt-4o-mini to analyze the prompt and extract design parameters
+    // Fast, cheap, excellent at structured reasoning - perfect for JSON extraction
     const analysisResponse = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -32,8 +33,9 @@ export async function POST(request: NextRequest) {
     const content = analysisResponse.choices[0]?.message?.content || '{}'
     const inferredSettings = JSON.parse(content)
 
-    // Generate 3 design variations based on the prompt using DALL-E 3
-    // These are just nail design references, not applied to the hand yet
+    // STEP 3: Generate 3 design variations using gpt-image-1
+    // These are standalone nail design concepts, not applied to the hand yet
+    // Using gpt-image-1 for speed + consistency (can upgrade to dall-e-3 for premium quality)
     const designPrompts = [
       `Close-up photo of ${inferredSettings.nail_length || 'medium'} ${inferredSettings.nail_shape || 'oval'} shaped nails with ${prompt}. Base color: ${inferredSettings.base_color || 'pink'}. ${inferredSettings.finish || 'glossy'} finish with ${inferredSettings.texture || 'smooth'} texture. Professional nail art photography, high quality, studio lighting, white background.`,
       `Professional nail art design: ${prompt}. ${inferredSettings.nail_length || 'medium'} length, ${inferredSettings.nail_shape || 'oval'} shape. ${inferredSettings.finish || 'glossy'} ${inferredSettings.base_color || 'pink'} base with ${inferredSettings.texture || 'smooth'} texture. Clean, elegant style. Studio photography.`,
@@ -43,17 +45,39 @@ export async function POST(request: NextRequest) {
     const designs: string[] = []
     
     for (const designPrompt of designPrompts) {
-      const imageResponse = await openai.images.generate({
-        model: 'dall-e-3',
-        prompt: designPrompt,
-        n: 1,
-        size: '1024x1024',
-        quality: 'standard',
-      })
+      try {
+        // @ts-ignore - responses API is new and not yet in TypeScript definitions
+        const response = await openai.responses.create({
+          model: 'gpt-image-1',
+          // @ts-ignore
+          modalities: ['image'],
+          // @ts-ignore
+          image: {
+            size: '1024x1024',
+            quality: 'standard'
+          },
+          input: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'input_text',
+                  text: designPrompt
+                }
+              ]
+            }
+          ]
+        })
 
-      const imageUrl = imageResponse.data?.[0]?.url
-      if (imageUrl) {
-        designs.push(imageUrl)
+        // @ts-ignore
+        const outputBase64 = response.output?.[0]?.image?.base64
+        if (outputBase64) {
+          const imageUrl = `data:image/png;base64,${outputBase64}`
+          designs.push(imageUrl)
+        }
+      } catch (error) {
+        console.error('Error generating design variation:', error)
+        // Continue with other designs even if one fails
       }
     }
 

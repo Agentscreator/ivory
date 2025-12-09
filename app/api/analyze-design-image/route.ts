@@ -15,6 +15,10 @@ export async function POST(request: NextRequest) {
     console.log('File size:', file.size, 'bytes')
     console.log('File type:', file.type)
 
+    // STEP 4: User uploads a reference design image
+    // NO AI MODEL NEEDED - just store and return URL
+    // This URL will be passed as an additional input_image to gpt-image-1-mini during preview generation
+    
     // Upload to R2 storage
     const filename = generateFilename(file.name, 'design')
     const { url } = await uploadFile(file, filename, {
@@ -26,8 +30,6 @@ export async function POST(request: NextRequest) {
     console.log('Image URL:', url)
     console.log('==============================')
 
-    // Return the uploaded image URL - no analysis needed
-    // This will be used as selectedDesignImage input to gpt-image-1-mini
     return NextResponse.json({ 
       imageUrl: url,
       success: true
