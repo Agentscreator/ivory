@@ -38,39 +38,6 @@ async function uploadToR2(buffer: Buffer, filename: string): Promise<string> {
   return `${config.R2_PUBLIC_URL}/${key}`
 }
 
-async function fetchImageAsBase64(imageUrl: string): Promise<string> {
-  try {
-    console.log('📥 Fetching image from:', imageUrl)
-    
-    if (imageUrl.startsWith('data:')) {
-      console.log('  - Detected data URL, converting directly')
-      const base64Part = imageUrl.split(',')[1]
-      if (!base64Part) {
-        throw new Error('Invalid data URL format')
-      }
-      return base64Part
-    }
-    
-    const imageResponse = await fetch(imageUrl, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Ivory/1.0)' },
-    })
-    
-    if (!imageResponse.ok) {
-      throw new Error(`Failed to fetch image: ${imageResponse.status}`)
-    }
-    
-    const imageBuffer = await imageResponse.arrayBuffer()
-    if (imageBuffer.byteLength === 0) {
-      throw new Error('Image buffer is empty')
-    }
-    
-    return Buffer.from(imageBuffer).toString('base64')
-  } catch (error: any) {
-    console.error('Error fetching image:', error)
-    throw new Error(`Failed to fetch image: ${error.message}`)
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
     const openai = getOpenAIClient()
@@ -88,7 +55,12 @@ export async function POST(request: NextRequest) {
     const nailLength = nailLengthMatch ? nailLengthMatch[1] : 'medium'
     const nailShape = nailShapeMatch ? nailShapeMatch[1] : 'oval'
 
-    const instructionText = `Edit this image to apply nail art design to the nails only.
+    // Build enhanced prompt for nail design editing
+    const enhancedPrompt = `Use the exact hand in the uploaded image. Do NOT add hands, props, or backgrounds. Do NOT change pose, lighting, skin tone, or framing.
+
+Your ONLY task:
+1. Detect all fingernails in the image
+2. Apply this nail design inside the existing nails only
 
 Design specifications:
 ${prompt}
@@ -102,72 +74,98 @@ CRITICAL REQUIREMENTS:
 - Natural lighting and reflections matching the original image
 - Keep all other elements of the photo unchanged
 
-${selectedDesignImage ? 'Use the provided reference design image as inspiration for the nail art pattern and style.' : ''}`
+${selectedDesignImage ? 'IMPORTANT: A reference design image was provided. Use its style, colors, and patterns as inspiration for the nail art.' : ''}
+
+Apply the design as if professionally painted. Respect natural nail curvature and realistic lighting. Deliver ONE edited version.`
 
     console.log('🤖 Generating nail design preview with gpt-image-1...')
-    console.log('📥 Fetching original image:', originalImage)
+    console.log('📥 Fetching original hand image:', originalImage)
     
-    // Fetch original image for editing
+    // Fetch original hand image
     const originalImageResponse = await fetch(originalImage, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Ivory/1.0)' },
     })
-    
-    console.log('📥 Fetch response status:', originalImageResponse.status)
     
     if (!originalImageResponse.ok) {
       throw new Error(`Failed to fetch original image: ${originalImageResponse.status}`)
     }
     
     const imageBlob = await originalImageResponse.blob()
-    console.log('📥 Image blob size:', imageBlob.size, 'type:', imageBlob.type)
+    console.log('📥 Hand image blob size:', imageBlob.size, 'type:', imageBlob.type)
     
-    const imageFile = new File([imageBlob], 'hand.jpg', { type: imageBlob.type })
-    console.log('📥 Image file created:', imageFile.name, imageFile.size, imageFile.type)
+    // Convert Blob → ArrayBuffer → File
+    const arrayBuffer = await imageBlob.arrayBuffer()
+    const handImage = new File([arrayBuffer], 'hand.jpg', { type: imageBlob.type })
+    console.log('📥 Hand image file created:', handImage.name, handImage.size, handImage.type)
     
-    // Build enhanced prompt that includes reference design if provided
-    let enhancedPrompt = `Use the exact hand in the uploaded image. Do NOT add hands, props, or backgrounds. Do NOT change pose, lighting, skin tone, or framing.
-
-Your ONLY task:
-1. Detect all fingernails in the image
-2. Apply this nail design inside the existing nails only
-
-${instructionText}
-
-Apply the design as if professionally painted. Respect natural nail curvature and realistic lighting. Deliver ONE edited version.`
-
+    // Prepare content array for the request
+    const contentArray: any[] = [
+      {
+        type: 'input_text',
+        text: enhancedPrompt
+      },
+      {
+        type: 'input_image',
+        image: handImage
+      }
+    ]
+    
+    // If reference design image is provided, fetch and add it
     if (selectedDesignImage) {
-      enhancedPrompt += `\n\nIMPORTANT: A reference design image was provided. Use its style, colors, and patterns as inspiration for the nail art.`
+      console.log('📥 Fetching reference design image:', selectedDesignImage)
+      
+      const designImageResponse = await fetch(selectedDesignImage, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Ivory/1.0)' },
+      })
+      
+      if (designImageResponse.ok) {
+        const designBlob = await designImageResponse.blob()
+        const designArrayBuffer = await designBlob.arrayBuffer()
+        const designImage = new File([designArrayBuffer], 'reference.jpg', { type: designBlob.type })
+        
+        console.log('📥 Reference design file created:', designImage.name, designImage.size)
+        
+        contentArray.push({
+          type: 'input_image',
+          image: designImage
+        })
+      } else {
+        console.warn('⚠️ Failed to fetch reference design, continuing without it')
+      }
     }
     
-    console.log('🎨 Calling OpenAI images.generate() with gpt-image-1...')
-    console.log('Prompt length:', enhancedPrompt.length)
+    console.log('🎨 Calling OpenAI responses.create() with gpt-image-1...')
+    console.log('📊 Content items:', contentArray.length, '(text + images)')
     
-    // Using gpt-image-1 for generation
-    // Note: gpt-image-1 may not support images.edit() yet, using generate() instead
-    const response = await openai.images.generate({
+    // Using gpt-image-1 with responses.create() for image editing
+    // This is the correct API for image-to-image editing with gpt-image-1
+    // @ts-ignore - responses API is new and not yet in TypeScript definitions
+    const response = await openai.responses.create({
       model: 'gpt-image-1',
-      prompt: enhancedPrompt,
-      n: 1,
-      size: '1024x1024',
+      // @ts-ignore
+      input: [
+        {
+          role: 'user',
+          content: contentArray
+        }
+      ]
     })
 
     console.log('✅ OpenAI response received')
-    console.log('Response data:', response.data)
+    
+    // @ts-ignore
+    const base64Image = response.output?.[0]?.image?.base64
 
-    const outputUrl = response.data?.[0]?.url
-
-    if (!outputUrl) {
+    if (!base64Image) {
+      console.error('❌ No image in response:', response)
       throw new Error('No image generated by gpt-image-1')
     }
 
-    console.log('✅ Output URL:', outputUrl)
-    console.log('📥 Downloading from OpenAI and uploading to R2...')
+    console.log('✅ Base64 image received, length:', base64Image.length)
+    console.log('📤 Uploading to R2...')
     
-    // Download the image from OpenAI's URL
-    const imageResponse = await fetch(outputUrl)
-    const imageBuffer = Buffer.from(await imageResponse.arrayBuffer())
-    
-    // Upload to R2 for permanent storage
+    // Convert base64 to buffer and upload to R2
+    const imageBuffer = Buffer.from(base64Image, 'base64')
     const filename = `nail-design-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.png`
     
     const permanentUrl = await uploadToR2(imageBuffer, filename)
@@ -193,6 +191,8 @@ Apply the design as if professionally painted. Respect natural nail curvature an
       errorMessage = 'Rate limited by OpenAI. Please try again later.'
     } else if (error?.status === 400) {
       errorMessage = `Invalid request to OpenAI: ${error.message}`
+    } else if (error?.status === 403) {
+      errorMessage = 'Organization not verified for gpt-image-1. Please verify at https://platform.openai.com/settings/organization/general'
     }
     
     return NextResponse.json(

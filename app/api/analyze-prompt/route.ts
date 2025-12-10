@@ -78,19 +78,29 @@ export async function POST(request: NextRequest) {
       try {
         console.log(`🎨 Generating design concept ${i + 1}/3 with gpt-image-1...`)
         
-        // Using gpt-image-1 for high-quality concept generation
-        const response = await openai.images.generate({
+        // Using gpt-image-1 with responses.create() for concept generation
+        // @ts-ignore - responses API is new and not yet in TypeScript definitions
+        const response = await openai.responses.create({
           model: 'gpt-image-1',
-          prompt: designPrompt,
-          n: 1,
-          size: '1024x1024',
+          // @ts-ignore
+          input: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'input_text',
+                  text: designPrompt
+                }
+              ]
+            }
+          ]
         })
 
-        const outputUrl = response.data?.[0]?.url
-        if (outputUrl) {
-          // Download and upload to R2 for permanent storage
-          const imageResponse = await fetch(outputUrl)
-          const imageBuffer = Buffer.from(await imageResponse.arrayBuffer())
+        // @ts-ignore
+        const base64Image = response.output?.[0]?.image?.base64
+        if (base64Image) {
+          // Upload to R2 for permanent storage
+          const imageBuffer = Buffer.from(base64Image, 'base64')
           const filename = `ai-design-${Date.now()}-${i}-${Math.random().toString(36).substring(2, 8)}.png`
           const permanentUrl = await uploadToR2(imageBuffer, filename)
           
