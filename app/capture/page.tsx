@@ -60,9 +60,17 @@ export default function CapturePage() {
   const zoomIndicatorTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  // Auto-start camera on mount
+  // Check for existing image on mount, skip camera if found
   useEffect(() => {
-    startCamera()
+    const existingImage = localStorage.getItem("currentEditingImage")
+    if (existingImage) {
+      // User already has an image, go straight to design page
+      setCapturedImage(existingImage)
+    } else {
+      // No existing image, start camera
+      startCamera()
+    }
+    
     return () => {
       stopCamera()
       if (zoomIndicatorTimeoutRef.current) {
@@ -429,8 +437,12 @@ export default function CapturePage() {
     }
   }
 
-  const retake = () => {
+  const changePhoto = () => {
     setCapturedImage(null)
+    setFinalPreview(null)
+    setSelectedDesignImage(null)
+    setGeneratedDesigns([])
+    setDesignMode(null)
     startCamera()
   }
 
@@ -484,12 +496,15 @@ export default function CapturePage() {
       <div className="fixed inset-0 z-[100] bg-gradient-to-br from-ivory via-sand to-blush flex flex-col">
         {/* Header */}
         <div className="absolute top-0 left-0 right-0 pt-14 px-5 pb-4 flex items-center justify-between z-10 bg-white/80 backdrop-blur-sm">
-          <button
-            onClick={retake}
-            className="w-11 h-11 rounded-full bg-black/10 flex items-center justify-center text-charcoal hover:bg-black/20 transition-all active:scale-95"
+          <Button
+            onClick={changePhoto}
+            variant="outline"
+            size="sm"
+            className="gap-2"
           >
-            <X className="w-6 h-6" />
-          </button>
+            <Upload className="w-4 h-4" />
+            <span className="hidden sm:inline">Change Photo</span>
+          </Button>
           <div className="text-charcoal font-semibold text-lg">Design Your Nails</div>
           <Button onClick={proceedToEditor} size="sm" disabled={!finalPreview && designMode === 'ai-design'}>
             Continue
@@ -501,9 +516,18 @@ export default function CapturePage() {
           <div className="max-w-2xl mx-auto">
             <div className="grid grid-cols-2 gap-3 mb-4">
               {/* Original Image */}
-              <div className="relative overflow-hidden rounded-2xl border-2 border-border">
+              <div className="relative overflow-hidden rounded-2xl border-2 border-border group">
                 <div className="aspect-[3/4] relative bg-white">
                   <Image src={capturedImage} alt="Original" fill className="object-cover" />
+                  {/* Change Photo Overlay */}
+                  <button
+                    onClick={changePhoto}
+                    className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+                  >
+                    <div className="bg-white rounded-full p-3 shadow-lg">
+                      <Upload className="w-6 h-6 text-charcoal" />
+                    </div>
+                  </button>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
                   Original
