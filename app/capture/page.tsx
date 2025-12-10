@@ -64,9 +64,11 @@ export default function CapturePage() {
     nailEditor_finish: 100,
     nailEditor_texture: 100,
     // Smart Styling weights
-    smartStyling_stylePrompt: 100,
-    smartStyling_designImage: 0,
-    smartStyling_baseColor: 0
+    smartStyling_stylePrompt: 33,
+    smartStyling_designImage: 33,
+    smartStyling_baseColor: 34,
+    smartStyling_finish: 100,
+    smartStyling_texture: 100
   })
 
   // Nail Editor handlers - independent from Smart Styling
@@ -314,8 +316,8 @@ export default function CapturePage() {
         designImage: influenceWeights.smartStyling_designImage,
         stylePrompt: influenceWeights.smartStyling_stylePrompt,
         baseColor: influenceWeights.smartStyling_baseColor,
-        finish: 100, // Always 100 in Smart Styling
-        texture: 100, // Always 100 in Smart Styling
+        finish: influenceWeights.smartStyling_finish,
+        texture: influenceWeights.smartStyling_texture,
         nailLength: 100,
         nailShape: 100
       } : {
@@ -1145,7 +1147,19 @@ export default function CapturePage() {
                         <Input
                           placeholder="e.g. minimalist floral with pink tones..."
                           value={aiPrompt}
-                          onChange={(e) => setAiPrompt(e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value
+                            setAiPrompt(value)
+                            // When user starts typing, set style prompt to 100% and others to 0%
+                            if (value && influenceWeights.smartStyling_stylePrompt !== 100) {
+                              setInfluenceWeights(prev => ({
+                                ...prev,
+                                smartStyling_stylePrompt: 100,
+                                smartStyling_designImage: 0,
+                                smartStyling_baseColor: 0
+                              }))
+                            }
+                          }}
                           className="flex-1"
                           onKeyDown={(e) => e.key === "Enter" && generateAIDesigns()}
                         />
@@ -1374,37 +1388,51 @@ export default function CapturePage() {
                           onClick={() => setExpandedSection(expandedSection === 'ai-finish' ? null : 'ai-finish')}
                           className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-1">
                             <span className="text-xs font-semibold text-charcoal">Finish</span>
                             <span className="text-[10px] text-muted-foreground capitalize">{designSettings.finish}</span>
                           </div>
+                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded mr-1">{influenceWeights.smartStyling_finish}%</span>
                           <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-finish' ? 'rotate-180' : ''}`} />
                         </button>
                         {expandedSection === 'ai-finish' && (
-                          <div className="mt-1.5 grid grid-cols-3 gap-1.5 p-1.5 bg-white rounded-lg">
-                            {[
-                              { value: 'glossy', label: 'Glossy', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
-                              { value: 'matte', label: 'Matte', gradient: 'bg-pink-400' },
-                              { value: 'satin', label: 'Satin', gradient: 'bg-gradient-to-b from-pink-300 to-pink-500' },
-                              { value: 'metallic', label: 'Metal', gradient: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
-                              { value: 'chrome', label: 'Chrome', gradient: 'bg-gradient-to-br from-gray-300 via-pink-200 to-gray-300' }
-                            ].map((finish) => (
-                              <button
-                                key={finish.value}
-                                onClick={() => {
-                                  handleDesignSettingChange('finish', finish.value)
-                                  setExpandedSection(null)
-                                }}
-                                className={`flex flex-col items-center p-1.5 rounded border transition-all ${
-                                  designSettings.finish === finish.value
-                                    ? 'border-primary bg-primary/5'
-                                    : 'border-border hover:border-primary/50'
-                                }`}
-                              >
-                                <div className={`w-full h-8 rounded ${finish.gradient} mb-1 ${finish.value === 'glossy' ? 'shadow-md' : ''}`} />
-                                <span className="text-[9px] font-medium text-charcoal">{finish.label}</span>
-                              </button>
-                            ))}
+                          <div className="mt-1.5 space-y-2 p-1.5 bg-white rounded-lg">
+                            <div className="grid grid-cols-3 gap-1.5">
+                              {[
+                                { value: 'glossy', label: 'Glossy', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
+                                { value: 'matte', label: 'Matte', gradient: 'bg-pink-400' },
+                                { value: 'satin', label: 'Satin', gradient: 'bg-gradient-to-b from-pink-300 to-pink-500' },
+                                { value: 'metallic', label: 'Metal', gradient: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
+                                { value: 'chrome', label: 'Chrome', gradient: 'bg-gradient-to-br from-gray-300 via-pink-200 to-gray-300' }
+                              ].map((finish) => (
+                                <button
+                                  key={finish.value}
+                                  onClick={() => handleDesignSettingChange('finish', finish.value)}
+                                  className={`flex flex-col items-center p-1.5 rounded border transition-all ${
+                                    designSettings.finish === finish.value
+                                      ? 'border-primary bg-primary/5'
+                                      : 'border-border hover:border-primary/50'
+                                  }`}
+                                >
+                                  <div className={`w-full h-8 rounded ${finish.gradient} mb-1 ${finish.value === 'glossy' ? 'shadow-md' : ''}`} />
+                                  <span className="text-[9px] font-medium text-charcoal">{finish.label}</span>
+                                </button>
+                              ))}
+                            </div>
+                            <div className="border-t pt-2">
+                              <div className="flex justify-between items-center mb-1">
+                                <label className="text-[10px] font-medium text-muted-foreground">Influence</label>
+                                <span className="text-[10px] font-bold text-primary">{influenceWeights.smartStyling_finish}%</span>
+                              </div>
+                              <Slider
+                                value={[influenceWeights.smartStyling_finish]}
+                                onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, smartStyling_finish: value[0] }))}
+                                min={0}
+                                max={100}
+                                step={5}
+                                className="w-full"
+                              />
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1415,39 +1443,53 @@ export default function CapturePage() {
                           onClick={() => setExpandedSection(expandedSection === 'ai-texture' ? null : 'ai-texture')}
                           className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-1">
                             <span className="text-xs font-semibold text-charcoal">Texture</span>
                             <span className="text-[10px] text-muted-foreground capitalize">{designSettings.texture}</span>
                           </div>
+                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded mr-1">{influenceWeights.smartStyling_texture}%</span>
                           <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-texture' ? 'rotate-180' : ''}`} />
                         </button>
                         {expandedSection === 'ai-texture' && (
-                          <div className="mt-1.5 grid grid-cols-3 gap-1.5 p-1.5 bg-white rounded-lg">
-                            {[
-                              { value: 'smooth', label: 'Smooth', pattern: 'bg-pink-400' },
-                              { value: 'glitter', label: 'Glitter', pattern: 'bg-gradient-to-br from-pink-300 via-pink-500 to-pink-300' },
-                              { value: 'shimmer', label: 'Shimmer', pattern: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
-                              { value: 'textured', label: 'Texture', pattern: 'bg-pink-400' },
-                              { value: 'holographic', label: 'Holo', pattern: 'bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300' }
-                            ].map((texture) => (
-                              <button
-                                key={texture.value}
-                                onClick={() => {
-                                  handleDesignSettingChange('texture', texture.value)
-                                  setExpandedSection(null)
-                                }}
-                                className={`flex flex-col items-center p-1.5 rounded border transition-all ${
-                                  designSettings.texture === texture.value
-                                    ? 'border-primary bg-primary/5'
-                                    : 'border-border hover:border-primary/50'
-                                }`}
-                              >
-                                <div className={`w-full h-8 rounded ${texture.pattern} mb-1`} 
-                                  style={texture.value === 'textured' ? { backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px)' } : {}}
-                                />
-                                <span className="text-[9px] font-medium text-charcoal">{texture.label}</span>
-                              </button>
-                            ))}
+                          <div className="mt-1.5 space-y-2 p-1.5 bg-white rounded-lg">
+                            <div className="grid grid-cols-3 gap-1.5">
+                              {[
+                                { value: 'smooth', label: 'Smooth', pattern: 'bg-pink-400' },
+                                { value: 'glitter', label: 'Glitter', pattern: 'bg-gradient-to-br from-pink-300 via-pink-500 to-pink-300' },
+                                { value: 'shimmer', label: 'Shimmer', pattern: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
+                                { value: 'textured', label: 'Texture', pattern: 'bg-pink-400' },
+                                { value: 'holographic', label: 'Holo', pattern: 'bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300' }
+                              ].map((texture) => (
+                                <button
+                                  key={texture.value}
+                                  onClick={() => handleDesignSettingChange('texture', texture.value)}
+                                  className={`flex flex-col items-center p-1.5 rounded border transition-all ${
+                                    designSettings.texture === texture.value
+                                      ? 'border-primary bg-primary/5'
+                                      : 'border-border hover:border-primary/50'
+                                  }`}
+                                >
+                                  <div className={`w-full h-8 rounded ${texture.pattern} mb-1`} 
+                                    style={texture.value === 'textured' ? { backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px)' } : {}}
+                                  />
+                                  <span className="text-[9px] font-medium text-charcoal">{texture.label}</span>
+                                </button>
+                              ))}
+                            </div>
+                            <div className="border-t pt-2">
+                              <div className="flex justify-between items-center mb-1">
+                                <label className="text-[10px] font-medium text-muted-foreground">Influence</label>
+                                <span className="text-[10px] font-bold text-primary">{influenceWeights.smartStyling_texture}%</span>
+                              </div>
+                              <Slider
+                                value={[influenceWeights.smartStyling_texture]}
+                                onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, smartStyling_texture: value[0] }))}
+                                min={0}
+                                max={100}
+                                step={5}
+                                className="w-full"
+                              />
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1458,7 +1500,7 @@ export default function CapturePage() {
                           onClick={() => setExpandedSection(expandedSection === 'ai-color' ? null : 'ai-color')}
                           className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-1">
                             <span className="text-xs font-semibold text-charcoal">Base Color</span>
                             <div className="flex items-center gap-1.5">
                               <div 
@@ -1468,6 +1510,7 @@ export default function CapturePage() {
                               <span className="text-[10px] text-muted-foreground">{designSettings.baseColor}</span>
                             </div>
                           </div>
+                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded mr-1">{influenceWeights.smartStyling_baseColor}%</span>
                           <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-color' ? 'rotate-180' : ''}`} />
                         </button>
                         {expandedSection === 'ai-color' && (
@@ -1492,6 +1535,23 @@ export default function CapturePage() {
                                 step={1}
                                 className="w-full"
                               />
+                            </div>
+                            <div className="border-t pt-2">
+                              <div className="flex justify-between items-center mb-1">
+                                <label className="text-[10px] font-medium text-muted-foreground">Influence</label>
+                                <span className="text-[10px] font-bold text-primary">{influenceWeights.smartStyling_baseColor}%</span>
+                              </div>
+                              <Slider
+                                value={[influenceWeights.smartStyling_baseColor]}
+                                onValueChange={(value) => handleSmartStylingBaseColorInfluence(value[0])}
+                                min={0}
+                                max={100}
+                                step={5}
+                                className="w-full"
+                              />
+                              <p className="text-[10px] text-muted-foreground mt-1">
+                                Style Prompt: {influenceWeights.smartStyling_stylePrompt}% {selectedDesignImage && `• Design Image: ${influenceWeights.smartStyling_designImage}%`}
+                              </p>
                             </div>
                           </div>
                         )}
