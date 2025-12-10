@@ -712,130 +712,54 @@ export default function CapturePage() {
                     Upload Design Image
                   </Button>
 
-                  {/* Uploaded Design Preview */}
+                  {/* Uploaded Design Preview with Influence Control */}
                   {selectedDesignImage && (
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-border">
-                      <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-primary flex-shrink-0">
-                        <Image src={selectedDesignImage} alt="Uploaded Design" fill className="object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-charcoal">Uploaded Design</p>
-                        <p className="text-xs text-muted-foreground truncate">Ready to generate</p>
-                      </div>
+                    <div className="mb-3">
                       <button
-                        onClick={() => setSelectedDesignImage(null)}
-                        className="bg-gray-200 hover:bg-gray-300 text-charcoal rounded-full p-1.5 transition-all flex-shrink-0"
+                        onClick={() => setExpandedSection(expandedSection === 'design-image' ? null : 'design-image')}
+                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
-                        <X className="w-4 h-4" />
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-primary flex-shrink-0">
+                            <Image src={selectedDesignImage} alt="Uploaded Design" fill className="object-cover" />
+                          </div>
+                          <div className="flex-1 min-w-0 text-left">
+                            <p className="text-sm font-semibold text-charcoal">Uploaded Design</p>
+                            <p className="text-xs text-muted-foreground">Tap to adjust influence</p>
+                          </div>
+                          <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">{influenceWeights.designImage}%</span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ml-2 ${expandedSection === 'design-image' ? 'rotate-180' : ''}`} />
                       </button>
+                      {expandedSection === 'design-image' && (
+                        <div className="mt-2 p-3 bg-gray-50 rounded-lg space-y-2">
+                          <div className="flex justify-between items-center mb-2">
+                            <label className="text-xs font-medium text-muted-foreground">Influence Strength</label>
+                            <span className="text-xs font-bold text-primary">{influenceWeights.designImage}%</span>
+                          </div>
+                          <Slider
+                            value={[influenceWeights.designImage]}
+                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, designImage: value[0] }))}
+                            min={0}
+                            max={100}
+                            step={5}
+                            className="w-full"
+                          />
+                          <p className="text-[10px] text-muted-foreground">
+                            {influenceWeights.designImage === 0 ? 'Design image ignored' : 
+                             influenceWeights.designImage === 100 ? 'Maximum influence' : 
+                             'Blended with other inputs'}
+                          </p>
+                          <button
+                            onClick={() => setSelectedDesignImage(null)}
+                            className="w-full mt-2 text-xs text-red-600 hover:text-red-700 font-medium"
+                          >
+                            Remove Design Image
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
-
-                  {/* Influence Controls - Collapsible */}
-                  <div className="border border-border rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setExpandedSection(expandedSection === 'influence' ? null : 'influence')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-all"
-                    >
-                      <span className="text-xs font-semibold text-charcoal">Fine-tune Influence</span>
-                      <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'influence' ? 'rotate-180' : ''}`} />
-                    </button>
-                    {expandedSection === 'influence' && (
-                      <div className="p-3 space-y-2 bg-white border-t">
-                        {selectedDesignImage && (
-                          <div>
-                            <div className="flex justify-between items-center mb-1">
-                              <label className="text-[10px] font-medium text-muted-foreground">Uploaded Design</label>
-                              <span className="text-[10px] font-bold text-primary">{influenceWeights.designImage}%</span>
-                            </div>
-                            <Slider
-                              value={[influenceWeights.designImage]}
-                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, designImage: value[0] }))}
-                              min={0}
-                              max={100}
-                              step={5}
-                              className="w-full"
-                            />
-                          </div>
-                        )}
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Nail Length</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.nailLength}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.nailLength]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailLength: value[0] }))}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Nail Shape</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.nailShape}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.nailShape]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailShape: value[0] }))}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Base Color</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.baseColor}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.baseColor]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, baseColor: value[0] }))}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Finish</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.finish}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.finish]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, finish: value[0] }))}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Texture</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.texture}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.texture]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, texture: value[0] }))}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
 
                   <div className="border-t pt-4">
                     <p className="text-xs font-semibold text-muted-foreground uppercase mb-4">Design Parameters</p>
@@ -846,36 +770,50 @@ export default function CapturePage() {
                         onClick={() => setExpandedSection(expandedSection === 'length' ? null : 'length')}
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <span className="text-sm font-semibold text-charcoal">Nail Length</span>
                           <span className="text-xs text-muted-foreground capitalize">{designSettings.nailLength.replace('-', ' ')}</span>
                         </div>
+                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.nailLength}%</span>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'length' ? 'rotate-180' : ''}`} />
                       </button>
                       {expandedSection === 'length' && (
-                        <div className="mt-2 grid grid-cols-4 gap-2 p-2 bg-gray-50 rounded-lg">
-                          {[
-                            { value: 'short', label: 'Short', height: 'h-6' },
-                            { value: 'medium', label: 'Medium', height: 'h-10' },
-                            { value: 'long', label: 'Long', height: 'h-14' },
-                            { value: 'extra-long', label: 'Extra', height: 'h-16' }
-                          ].map((length) => (
-                            <button
-                              key={length.value}
-                              onClick={() => {
-                                handleDesignSettingChange('nailLength', length.value)
-                                setExpandedSection(null)
-                              }}
-                              className={`flex flex-col items-center justify-end p-2 rounded-lg border transition-all ${
-                                designSettings.nailLength === length.value
-                                  ? 'border-primary bg-white'
-                                  : 'border-border bg-white hover:border-primary/50'
-                              }`}
-                            >
-                              <div className={`w-4 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-1.5`} />
-                              <span className="text-[10px] font-medium text-charcoal">{length.label}</span>
-                            </button>
-                          ))}
+                        <div className="mt-2 space-y-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="grid grid-cols-4 gap-2">
+                            {[
+                              { value: 'short', label: 'Short', height: 'h-6' },
+                              { value: 'medium', label: 'Medium', height: 'h-10' },
+                              { value: 'long', label: 'Long', height: 'h-14' },
+                              { value: 'extra-long', label: 'Extra', height: 'h-16' }
+                            ].map((length) => (
+                              <button
+                                key={length.value}
+                                onClick={() => handleDesignSettingChange('nailLength', length.value)}
+                                className={`flex flex-col items-center justify-end p-2 rounded-lg border transition-all ${
+                                  designSettings.nailLength === length.value
+                                    ? 'border-primary bg-white'
+                                    : 'border-border bg-white hover:border-primary/50'
+                                }`}
+                              >
+                                <div className={`w-4 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-1.5`} />
+                                <span className="text-[10px] font-medium text-charcoal">{length.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                          <div className="border-t pt-3">
+                            <div className="flex justify-between items-center mb-2">
+                              <label className="text-xs font-medium text-muted-foreground">Influence</label>
+                              <span className="text-xs font-bold text-primary">{influenceWeights.nailLength}%</span>
+                            </div>
+                            <Slider
+                              value={[influenceWeights.nailLength]}
+                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailLength: value[0] }))}
+                              min={0}
+                              max={100}
+                              step={5}
+                              className="w-full"
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -886,40 +824,54 @@ export default function CapturePage() {
                         onClick={() => setExpandedSection(expandedSection === 'shape' ? null : 'shape')}
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <span className="text-sm font-semibold text-charcoal">Nail Shape</span>
                           <span className="text-xs text-muted-foreground capitalize">{designSettings.nailShape}</span>
                         </div>
+                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.nailShape}%</span>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'shape' ? 'rotate-180' : ''}`} />
                       </button>
                       {expandedSection === 'shape' && (
-                        <div className="mt-2 grid grid-cols-3 gap-2 p-2 bg-gray-50 rounded-lg">
-                          {[
-                            { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
-                            { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
-                            { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
-                            { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
-                            { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
-                            { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
-                          ].map((shape) => (
-                            <button
-                              key={shape.value}
-                              onClick={() => {
-                                handleDesignSettingChange('nailShape', shape.value)
-                                setExpandedSection(null)
-                              }}
-                              className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
-                                designSettings.nailShape === shape.value
-                                  ? 'border-primary bg-white'
-                                  : 'border-border bg-white hover:border-primary/50'
-                              }`}
-                            >
-                              <svg viewBox="0 0 24 24" className="w-6 h-10 mb-1">
-                                <path d={shape.path} fill="currentColor" className="text-primary" />
-                              </svg>
-                              <span className="text-[10px] font-medium text-charcoal">{shape.label}</span>
-                            </button>
-                          ))}
+                        <div className="mt-2 space-y-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="grid grid-cols-3 gap-2">
+                            {[
+                              { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
+                              { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
+                              { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
+                              { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
+                              { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
+                              { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
+                            ].map((shape) => (
+                              <button
+                                key={shape.value}
+                                onClick={() => handleDesignSettingChange('nailShape', shape.value)}
+                                className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                  designSettings.nailShape === shape.value
+                                    ? 'border-primary bg-white'
+                                    : 'border-border bg-white hover:border-primary/50'
+                                }`}
+                              >
+                                <svg viewBox="0 0 24 24" className="w-6 h-10 mb-1">
+                                  <path d={shape.path} fill="currentColor" className="text-primary" />
+                                </svg>
+                                <span className="text-[10px] font-medium text-charcoal">{shape.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                          <div className="border-t pt-3">
+                            <div className="flex justify-between items-center mb-2">
+                              <label className="text-xs font-medium text-muted-foreground">Influence</label>
+                              <span className="text-xs font-bold text-primary">{influenceWeights.nailShape}%</span>
+                            </div>
+                            <Slider
+                              value={[influenceWeights.nailShape]}
+                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailShape: value[0] }))}
+                              min={0}
+                              max={100}
+                              step={5}
+                              className="w-full"
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -930,7 +882,7 @@ export default function CapturePage() {
                         onClick={() => setExpandedSection(expandedSection === 'color' ? null : 'color')}
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <span className="text-sm font-semibold text-charcoal">Base Color</span>
                           <div className="flex items-center gap-2">
                             <div 
@@ -940,6 +892,7 @@ export default function CapturePage() {
                             <span className="text-xs text-muted-foreground">{designSettings.baseColor}</span>
                           </div>
                         </div>
+                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.baseColor}%</span>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'color' ? 'rotate-180' : ''}`} />
                       </button>
                       {expandedSection === 'color' && (
@@ -965,6 +918,20 @@ export default function CapturePage() {
                               className="w-full"
                             />
                           </div>
+                          <div className="border-t pt-3">
+                            <div className="flex justify-between items-center mb-2">
+                              <label className="text-xs font-medium text-muted-foreground">Influence</label>
+                              <span className="text-xs font-bold text-primary">{influenceWeights.baseColor}%</span>
+                            </div>
+                            <Slider
+                              value={[influenceWeights.baseColor]}
+                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, baseColor: value[0] }))}
+                              min={0}
+                              max={100}
+                              step={5}
+                              className="w-full"
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -975,37 +942,51 @@ export default function CapturePage() {
                         onClick={() => setExpandedSection(expandedSection === 'finish' ? null : 'finish')}
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <span className="text-sm font-semibold text-charcoal">Finish</span>
                           <span className="text-xs text-muted-foreground capitalize">{designSettings.finish}</span>
                         </div>
+                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.finish}%</span>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'finish' ? 'rotate-180' : ''}`} />
                       </button>
                       {expandedSection === 'finish' && (
-                        <div className="mt-2 grid grid-cols-3 gap-2 p-2 bg-gray-50 rounded-lg">
-                          {[
-                            { value: 'glossy', label: 'Glossy', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
-                            { value: 'matte', label: 'Matte', gradient: 'bg-pink-400' },
-                            { value: 'satin', label: 'Satin', gradient: 'bg-gradient-to-b from-pink-300 to-pink-500' },
-                            { value: 'metallic', label: 'Metallic', gradient: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
-                            { value: 'chrome', label: 'Chrome', gradient: 'bg-gradient-to-br from-gray-300 via-pink-200 to-gray-300' }
-                          ].map((finish) => (
-                            <button
-                              key={finish.value}
-                              onClick={() => {
-                                handleDesignSettingChange('finish', finish.value)
-                                setExpandedSection(null)
-                              }}
-                              className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
-                                designSettings.finish === finish.value
-                                  ? 'border-primary bg-white'
-                                  : 'border-border bg-white hover:border-primary/50'
-                              }`}
-                            >
-                              <div className={`w-full h-12 rounded-lg ${finish.gradient} mb-1.5 ${finish.value === 'glossy' ? 'shadow-lg' : ''}`} />
-                              <span className="text-[10px] font-medium text-charcoal">{finish.label}</span>
-                            </button>
-                          ))}
+                        <div className="mt-2 space-y-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="grid grid-cols-3 gap-2">
+                            {[
+                              { value: 'glossy', label: 'Glossy', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
+                              { value: 'matte', label: 'Matte', gradient: 'bg-pink-400' },
+                              { value: 'satin', label: 'Satin', gradient: 'bg-gradient-to-b from-pink-300 to-pink-500' },
+                              { value: 'metallic', label: 'Metallic', gradient: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
+                              { value: 'chrome', label: 'Chrome', gradient: 'bg-gradient-to-br from-gray-300 via-pink-200 to-gray-300' }
+                            ].map((finish) => (
+                              <button
+                                key={finish.value}
+                                onClick={() => handleDesignSettingChange('finish', finish.value)}
+                                className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                  designSettings.finish === finish.value
+                                    ? 'border-primary bg-white'
+                                    : 'border-border bg-white hover:border-primary/50'
+                                }`}
+                              >
+                                <div className={`w-full h-12 rounded-lg ${finish.gradient} mb-1.5 ${finish.value === 'glossy' ? 'shadow-lg' : ''}`} />
+                                <span className="text-[10px] font-medium text-charcoal">{finish.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                          <div className="border-t pt-3">
+                            <div className="flex justify-between items-center mb-2">
+                              <label className="text-xs font-medium text-muted-foreground">Influence</label>
+                              <span className="text-xs font-bold text-primary">{influenceWeights.finish}%</span>
+                            </div>
+                            <Slider
+                              value={[influenceWeights.finish]}
+                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, finish: value[0] }))}
+                              min={0}
+                              max={100}
+                              step={5}
+                              className="w-full"
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1016,39 +997,53 @@ export default function CapturePage() {
                         onClick={() => setExpandedSection(expandedSection === 'texture' ? null : 'texture')}
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <span className="text-sm font-semibold text-charcoal">Texture</span>
                           <span className="text-xs text-muted-foreground capitalize">{designSettings.texture}</span>
                         </div>
+                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.texture}%</span>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'texture' ? 'rotate-180' : ''}`} />
                       </button>
                       {expandedSection === 'texture' && (
-                        <div className="mt-2 grid grid-cols-3 gap-2 p-2 bg-gray-50 rounded-lg">
-                          {[
-                            { value: 'smooth', label: 'Smooth', pattern: 'bg-pink-400' },
-                            { value: 'glitter', label: 'Glitter', pattern: 'bg-gradient-to-br from-pink-300 via-pink-500 to-pink-300 bg-[length:4px_4px]' },
-                            { value: 'shimmer', label: 'Shimmer', pattern: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
-                            { value: 'textured', label: 'Textured', pattern: 'bg-pink-400' },
-                            { value: 'holographic', label: 'Holo', pattern: 'bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300' }
-                          ].map((texture) => (
-                            <button
-                              key={texture.value}
-                              onClick={() => {
-                                handleDesignSettingChange('texture', texture.value)
-                                setExpandedSection(null)
-                              }}
-                              className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
-                                designSettings.texture === texture.value
-                                  ? 'border-primary bg-white'
-                                  : 'border-border bg-white hover:border-primary/50'
-                              }`}
-                            >
-                              <div className={`w-full h-12 rounded-lg ${texture.pattern} mb-1.5 ${texture.value === 'glitter' ? 'animate-pulse' : ''}`} 
-                                style={texture.value === 'textured' ? { backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px)' } : {}}
-                              />
-                              <span className="text-[10px] font-medium text-charcoal">{texture.label}</span>
-                            </button>
-                          ))}
+                        <div className="mt-2 space-y-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="grid grid-cols-3 gap-2">
+                            {[
+                              { value: 'smooth', label: 'Smooth', pattern: 'bg-pink-400' },
+                              { value: 'glitter', label: 'Glitter', pattern: 'bg-gradient-to-br from-pink-300 via-pink-500 to-pink-300 bg-[length:4px_4px]' },
+                              { value: 'shimmer', label: 'Shimmer', pattern: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
+                              { value: 'textured', label: 'Textured', pattern: 'bg-pink-400' },
+                              { value: 'holographic', label: 'Holo', pattern: 'bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300' }
+                            ].map((texture) => (
+                              <button
+                                key={texture.value}
+                                onClick={() => handleDesignSettingChange('texture', texture.value)}
+                                className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                  designSettings.texture === texture.value
+                                    ? 'border-primary bg-white'
+                                    : 'border-border bg-white hover:border-primary/50'
+                                }`}
+                              >
+                                <div className={`w-full h-12 rounded-lg ${texture.pattern} mb-1.5 ${texture.value === 'glitter' ? 'animate-pulse' : ''}`} 
+                                  style={texture.value === 'textured' ? { backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px)' } : {}}
+                                />
+                                <span className="text-[10px] font-medium text-charcoal">{texture.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                          <div className="border-t pt-3">
+                            <div className="flex justify-between items-center mb-2">
+                              <label className="text-xs font-medium text-muted-foreground">Influence</label>
+                              <span className="text-xs font-bold text-primary">{influenceWeights.texture}%</span>
+                            </div>
+                            <Slider
+                              value={[influenceWeights.texture]}
+                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, texture: value[0] }))}
+                              min={0}
+                              max={100}
+                              step={5}
+                              className="w-full"
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1108,128 +1103,54 @@ export default function CapturePage() {
                     </div>
                   )}
 
-                  {/* Influence Controls - Collapsible */}
-                  <div className="border border-border rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setExpandedSection(expandedSection === 'ai-influence' ? null : 'ai-influence')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-all"
-                    >
-                      <span className="text-xs font-semibold text-charcoal">Fine-tune Influence</span>
-                      <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'ai-influence' ? 'rotate-180' : ''}`} />
-                    </button>
-                    {expandedSection === 'ai-influence' && (
-                      <div className="p-3 space-y-2 bg-white border-t">
-                        {selectedDesignImage && (
-                          <div>
-                            <div className="flex justify-between items-center mb-1">
-                              <label className="text-[10px] font-medium text-muted-foreground">Uploaded Design</label>
-                              <span className="text-[10px] font-bold text-primary">{influenceWeights.designImage}%</span>
-                            </div>
-                            <Slider
-                              value={[influenceWeights.designImage]}
-                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, designImage: value[0] }))}
-                              min={0}
-                              max={100}
-                              step={5}
-                              className="w-full"
-                            />
+                  {/* Uploaded Design Preview with Influence Control */}
+                  {selectedDesignImage && !generatedDesigns.length && (
+                    <div className="mb-3">
+                      <button
+                        onClick={() => setExpandedSection(expandedSection === 'ai-design-image' ? null : 'ai-design-image')}
+                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-primary flex-shrink-0">
+                            <Image src={selectedDesignImage} alt="Uploaded Design" fill className="object-cover" />
                           </div>
-                        )}
-
-                        {aiPrompt && (
-                          <div>
-                            <div className="flex justify-between items-center mb-1">
-                              <label className="text-[10px] font-medium text-muted-foreground">Style Description</label>
-                              <span className="text-[10px] font-bold text-primary">{influenceWeights.stylePrompt}%</span>
-                            </div>
-                            <Slider
-                              value={[influenceWeights.stylePrompt]}
-                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, stylePrompt: value[0] }))}
-                              min={0}
-                              max={100}
-                              step={5}
-                              className="w-full"
-                            />
+                          <div className="flex-1 min-w-0 text-left">
+                            <p className="text-sm font-semibold text-charcoal">Uploaded Design</p>
+                            <p className="text-xs text-muted-foreground">Tap to adjust influence</p>
                           </div>
-                        )}
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Nail Length</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.nailLength}%</span>
+                          <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">{influenceWeights.designImage}%</span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ml-2 ${expandedSection === 'ai-design-image' ? 'rotate-180' : ''}`} />
+                      </button>
+                      {expandedSection === 'ai-design-image' && (
+                        <div className="mt-2 p-3 bg-gray-50 rounded-lg space-y-2">
+                          <div className="flex justify-between items-center mb-2">
+                            <label className="text-xs font-medium text-muted-foreground">Influence Strength</label>
+                            <span className="text-xs font-bold text-primary">{influenceWeights.designImage}%</span>
                           </div>
                           <Slider
-                            value={[influenceWeights.nailLength]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailLength: value[0] }))}
+                            value={[influenceWeights.designImage]}
+                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, designImage: value[0] }))}
                             min={0}
                             max={100}
                             step={5}
                             className="w-full"
                           />
+                          <p className="text-[10px] text-muted-foreground">
+                            {influenceWeights.designImage === 0 ? 'Design image ignored' : 
+                             influenceWeights.designImage === 100 ? 'Maximum influence' : 
+                             'Blended with other inputs'}
+                          </p>
+                          <button
+                            onClick={() => setSelectedDesignImage(null)}
+                            className="w-full mt-2 text-xs text-red-600 hover:text-red-700 font-medium"
+                          >
+                            Remove Design Image
+                          </button>
                         </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Nail Shape</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.nailShape}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.nailShape]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailShape: value[0] }))}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Base Color</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.baseColor}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.baseColor]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, baseColor: value[0] }))}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Finish</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.finish}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.finish]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, finish: value[0] }))}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-center mb-1">
-                            <label className="text-[10px] font-medium text-muted-foreground">Texture</label>
-                            <span className="text-[10px] font-bold text-primary">{influenceWeights.texture}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.texture]}
-                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, texture: value[0] }))}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
 
                   <div className="border-t pt-4">
                     <h3 className="font-serif text-lg font-bold text-charcoal mb-2">Describe your style</h3>
@@ -1237,17 +1158,36 @@ export default function CapturePage() {
                       AI will analyze your prompt and generate design options
                     </p>
 
-                    <div className="flex gap-2 mb-4">
-                      <Input
-                        placeholder="e.g. minimalist floral with pink tones..."
-                        value={aiPrompt}
-                        onChange={(e) => setAiPrompt(e.target.value)}
-                        className="flex-1"
-                        onKeyDown={(e) => e.key === "Enter" && generateAIDesigns()}
-                      />
-                      <Button onClick={generateAIDesigns} disabled={isGenerating || !aiPrompt.trim()}>
-                        {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                      </Button>
+                    <div className="space-y-3">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="e.g. minimalist floral with pink tones..."
+                          value={aiPrompt}
+                          onChange={(e) => setAiPrompt(e.target.value)}
+                          className="flex-1"
+                          onKeyDown={(e) => e.key === "Enter" && generateAIDesigns()}
+                        />
+                        <Button onClick={generateAIDesigns} disabled={isGenerating || !aiPrompt.trim()}>
+                          {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                        </Button>
+                      </div>
+
+                      {aiPrompt && (
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <label className="text-xs font-medium text-muted-foreground">Style Prompt Influence</label>
+                            <span className="text-xs font-bold text-primary">{influenceWeights.stylePrompt}%</span>
+                          </div>
+                          <Slider
+                            value={[influenceWeights.stylePrompt]}
+                            onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, stylePrompt: value[0] }))}
+                            min={0}
+                            max={100}
+                            step={5}
+                            className="w-full"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {generatedDesigns.length > 0 && (
