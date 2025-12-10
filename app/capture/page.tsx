@@ -714,35 +714,57 @@ export default function CapturePage() {
                     {/* Nail Length */}
                     <div className="mb-4">
                       <label className="text-sm font-semibold text-charcoal mb-2 block">Nail Length</label>
-                      <Select value={designSettings.nailLength} onValueChange={(v) => handleDesignSettingChange('nailLength', v)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="short">Short</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="long">Long</SelectItem>
-                          <SelectItem value="extra-long">Extra Long</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          { value: 'short', label: 'Short', height: 'h-8' },
+                          { value: 'medium', label: 'Medium', height: 'h-12' },
+                          { value: 'long', label: 'Long', height: 'h-16' },
+                          { value: 'extra-long', label: 'Extra', height: 'h-20' }
+                        ].map((length) => (
+                          <button
+                            key={length.value}
+                            onClick={() => handleDesignSettingChange('nailLength', length.value)}
+                            className={`flex flex-col items-center justify-end p-3 rounded-xl border-2 transition-all ${
+                              designSettings.nailLength === length.value
+                                ? 'border-primary bg-primary/5'
+                                : 'border-border bg-white hover:border-primary/50'
+                            }`}
+                          >
+                            <div className={`w-6 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-2`} />
+                            <span className="text-xs font-medium text-charcoal">{length.label}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Nail Shape */}
                     <div className="mb-4">
                       <label className="text-sm font-semibold text-charcoal mb-2 block">Nail Shape</label>
-                      <Select value={designSettings.nailShape} onValueChange={(v) => handleDesignSettingChange('nailShape', v)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="oval">Oval</SelectItem>
-                          <SelectItem value="square">Square</SelectItem>
-                          <SelectItem value="round">Round</SelectItem>
-                          <SelectItem value="almond">Almond</SelectItem>
-                          <SelectItem value="stiletto">Stiletto</SelectItem>
-                          <SelectItem value="coffin">Coffin</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
+                          { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
+                          { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
+                          { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
+                          { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
+                          { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
+                        ].map((shape) => (
+                          <button
+                            key={shape.value}
+                            onClick={() => handleDesignSettingChange('nailShape', shape.value)}
+                            className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all ${
+                              designSettings.nailShape === shape.value
+                                ? 'border-primary bg-primary/5'
+                                : 'border-border bg-white hover:border-primary/50'
+                            }`}
+                          >
+                            <svg viewBox="0 0 24 24" className="w-8 h-12 mb-2">
+                              <path d={shape.path} fill="currentColor" className="text-primary" />
+                            </svg>
+                            <span className="text-xs font-medium text-charcoal">{shape.label}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Base Color Sliders */}
@@ -918,38 +940,63 @@ export default function CapturePage() {
                     <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
                       <p className="text-xs font-semibold text-muted-foreground uppercase">Design Parameters</p>
                       
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs font-semibold text-charcoal mb-1 block">Length</label>
-                          <Select value={designSettings.nailLength} onValueChange={(v) => handleDesignSettingChange('nailLength', v)}>
-                            <SelectTrigger className="h-9">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="short">Short</SelectItem>
-                              <SelectItem value="medium">Medium</SelectItem>
-                              <SelectItem value="long">Long</SelectItem>
-                              <SelectItem value="extra-long">Extra Long</SelectItem>
-                            </SelectContent>
-                          </Select>
+                      {/* Nail Length - Compact */}
+                      <div>
+                        <label className="text-xs font-semibold text-charcoal mb-2 block">Length</label>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {[
+                            { value: 'short', label: 'Short', height: 'h-6' },
+                            { value: 'medium', label: 'Med', height: 'h-8' },
+                            { value: 'long', label: 'Long', height: 'h-10' },
+                            { value: 'extra-long', label: 'XL', height: 'h-12' }
+                          ].map((length) => (
+                            <button
+                              key={length.value}
+                              onClick={() => handleDesignSettingChange('nailLength', length.value)}
+                              className={`flex flex-col items-center justify-end p-2 rounded-lg border transition-all ${
+                                designSettings.nailLength === length.value
+                                  ? 'border-primary bg-white'
+                                  : 'border-border bg-white/50 hover:border-primary/50'
+                              }`}
+                            >
+                              <div className={`w-4 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-1`} />
+                              <span className="text-[10px] font-medium text-charcoal">{length.label}</span>
+                            </button>
+                          ))}
                         </div>
+                      </div>
 
-                        <div>
-                          <label className="text-xs font-semibold text-charcoal mb-1 block">Shape</label>
-                          <Select value={designSettings.nailShape} onValueChange={(v) => handleDesignSettingChange('nailShape', v)}>
-                            <SelectTrigger className="h-9">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="oval">Oval</SelectItem>
-                              <SelectItem value="square">Square</SelectItem>
-                              <SelectItem value="round">Round</SelectItem>
-                              <SelectItem value="almond">Almond</SelectItem>
-                              <SelectItem value="stiletto">Stiletto</SelectItem>
-                              <SelectItem value="coffin">Coffin</SelectItem>
-                            </SelectContent>
-                          </Select>
+                      {/* Nail Shape - Compact */}
+                      <div>
+                        <label className="text-xs font-semibold text-charcoal mb-2 block">Shape</label>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {[
+                            { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
+                            { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
+                            { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
+                            { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
+                            { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
+                            { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
+                          ].map((shape) => (
+                            <button
+                              key={shape.value}
+                              onClick={() => handleDesignSettingChange('nailShape', shape.value)}
+                              className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                designSettings.nailShape === shape.value
+                                  ? 'border-primary bg-white'
+                                  : 'border-border bg-white/50 hover:border-primary/50'
+                              }`}
+                            >
+                              <svg viewBox="0 0 24 24" className="w-6 h-8 mb-1">
+                                <path d={shape.path} fill="currentColor" className="text-primary" />
+                              </svg>
+                              <span className="text-[10px] font-medium text-charcoal">{shape.label}</span>
+                            </button>
+                          ))}
                         </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
 
                         <div>
                           <label className="text-xs font-semibold text-charcoal mb-1 block">Finish</label>
