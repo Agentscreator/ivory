@@ -56,27 +56,38 @@ export async function POST(request: NextRequest) {
     const nailShape = nailShapeMatch ? nailShapeMatch[1] : 'oval'
 
     // Build enhanced prompt for nail design editing
-    const enhancedPrompt = `Use the exact hand in the uploaded image. Do NOT add hands, props, or backgrounds. Do NOT change pose, lighting, skin tone, or framing.
+    const enhancedPrompt = `Use the exact hand in the uploaded image. Do NOT add any extra hands, fingers, arms, bodies, props, or backgrounds. Do NOT change the pose, angle, lighting, skin tone, or environment unless I explicitly say so.
 
-Your ONLY task:
-1. Detect all fingernails in the image
-2. Apply this nail design inside the existing nails only
+Your ONLY task is to:
+- Detect the fingernails on the hand in the image.
+- Apply the design strictly inside the nail boundaries while keeping everything else unchanged.
 
-Design specifications:
-${prompt}
+Nail Design Inputs:
 
-CRITICAL REQUIREMENTS:
-- Preserve the original hand, fingers, skin, pose, and background EXACTLY
-- Only modify the nail surfaces
-- Apply the design with ${nailLength} length and ${nailShape} shape
-- Professional salon quality finish with ULTRA-HIGH DETAIL
-- Realistic nail polish appearance with smooth edges and crisp details
-- Natural lighting and reflections matching the original image
-- Keep all other elements of the photo unchanged
+1. Design Image (Optional)
+${selectedDesignImage ? `Influence Weight: 100% - Controls how strongly the uploaded design image affects the final style.
+IMPORTANT: A reference design image was provided. Follow the image's color/pattern exactly. REPLICATE its exact style, colors, patterns, and fine details with MAXIMUM FIDELITY. Preserve all intricate design elements, textures, and color gradients from the reference. Apply the design with professional precision and clarity, maintaining sharp edges and high-resolution details. The nail art should look exactly like the reference design, just adapted to fit the natural nail shape and curvature.` : 'Influence Weight: 0% - No design image provided, ignore this input.'}
 
-${selectedDesignImage ? 'IMPORTANT: A reference design image was provided. REPLICATE its exact style, colors, patterns, and fine details with MAXIMUM FIDELITY. Preserve all intricate design elements, textures, and color gradients from the reference. Apply the design with professional precision and clarity, maintaining sharp edges and high-resolution details. The nail art should look exactly like the reference design, just adapted to fit the natural nail shape and curvature.' : ''}
+2. Smart Styling Prompt (Optional)
+Text: ${prompt}
+Influence Weight: 50% - Blend the text with all other inputs.
 
-Apply the design as if professionally painted by an expert nail artist. Respect natural nail curvature and realistic lighting. Use high-resolution detail and crisp, clear rendering. Deliver ONE edited version with maximum quality and detail preservation.`
+3. Manual Design Parameters
+These are direct selections the user makes in the UI:
+- Nail Length: ${nailLength.toUpperCase()}
+- Nail Shape: ${nailShape.toUpperCase()}
+- Manual Parameter Influence Weight: 100% - Apply them with full priority over other inputs.
+
+Rules:
+– Keep my hand exactly as it appears.
+– Do not generate a second hand.
+– Do not reposition or reshape my fingers.
+– Add no jewelry unless specified.
+– Apply the design as if professionally painted on my real nails.
+– Respect natural nail curvature and realistic lighting reflections.
+– No alterations to skin, background, or camera framing.
+
+Deliver only ONE edited version of the same hand.`
 
     console.log('🤖 Generating nail design preview with gpt-image-1...')
     console.log('📥 Fetching original hand image:', originalImage)
