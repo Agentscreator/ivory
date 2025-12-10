@@ -9,8 +9,9 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Palette, Sparkles, Upload, Loader2, X } from "lucide-react"
 import Image from "next/image"
+import { Slider } from "@/components/ui/slider"
 
-type DesignMode = 'design' | 'ai-design'
+type DesignMode = 'design' | 'ai-design' | null
 
 type DesignSettings = {
   nailLength: string
@@ -33,7 +34,7 @@ export default function CapturePage() {
   const [zoom, setZoom] = useState(1)
   const [showZoomIndicator, setShowZoomIndicator] = useState(false)
   const [handReference, setHandReference] = useState<1 | 2 | 3>(3)
-  const [designMode, setDesignMode] = useState<DesignMode>('design')
+  const [designMode, setDesignMode] = useState<DesignMode>(null)
   const [aiPrompt, setAiPrompt] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedDesigns, setGeneratedDesigns] = useState<string[]>([])
@@ -251,6 +252,70 @@ export default function CapturePage() {
     setDesignSettings(newSettings)
   }
 
+  // Convert hue (0-360) to hex color
+  const hueToHex = (hue: number) => {
+    const h = hue / 360
+    const s = 0.7
+    const l = 0.6
+    
+    const hue2rgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1
+      if (t > 1) t -= 1
+      if (t < 1/6) return p + (q - p) * 6 * t
+      if (t < 1/2) return q
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6
+      return p
+    }
+    
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+    const p = 2 * l - q
+    const r = Math.round(hue2rgb(p, q, h + 1/3) * 255)
+    const g = Math.round(hue2rgb(p, q, h) * 255)
+    const b = Math.round(hue2rgb(p, q, h - 1/3) * 255)
+    
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
+  }
+
+  // Convert hex to hue (0-360)
+  const hexToHue = (hex: string) => {
+    const r = parseInt(hex.slice(1, 3), 16) / 255
+    const g = parseInt(hex.slice(3, 5), 16) / 255
+    const b = parseInt(hex.slice(5, 7), 16) / 255
+    
+    const max = Math.max(r, g, b)
+    const min = Math.min(r, g, b)
+    const delta = max - min
+    
+    if (delta === 0) return 0
+    
+    let hue = 0
+    if (max === r) {
+      hue = ((g - b) / delta) % 6
+    } else if (max === g) {
+      hue = (b - r) / delta + 2
+    } else {
+      hue = (r - g) / delta + 4
+    }
+    
+    hue = Math.round(hue * 60)
+    if (hue < 0) hue += 360
+    
+    return hue
+  }
+
+  const handleColorChange = (hue: number[]) => {
+    const hex = hueToHex(hue[0])
+    handleDesignSettingChange('baseColor', hex)
+  }
+
+  const toggleDesignMode = (mode: DesignMode) => {
+    if (designMode === mode) {
+      setDesignMode(null)
+    } else {
+      setDesignMode(mode)
+    }
+  }
+
   const generateAIDesigns = async () => {
     if (!aiPrompt.trim()) return
 
@@ -452,253 +517,326 @@ export default function CapturePage() {
           <div className="max-w-2xl mx-auto">
             <div className="h-1 w-12 bg-border rounded-full mx-auto my-3"></div>
 
-            <Tabs value={designMode} onValueChange={(v) => setDesignMode(v as DesignMode)} className="w-full">
-              <TabsList className="w-full justify-start px-6 bg-transparent border-b rounded-none h-14">
-                <TabsTrigger value="design" className="flex items-center gap-2">
-                  <Palette className="w-5 h-5" />
-                  Design
-                </TabsTrigger>
-                <TabsTrigger value="ai-design" className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  AI Design
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="design" className="p-6 space-y-4 max-h-80 overflow-y-auto">
-                {/* Nail Length */}
-                <div>
-                  <label className="text-sm font-semibold text-charcoal mb-2 block">Nail Length</label>
-                  <Select value={designSettings.nailLength} onValueChange={(v) => handleDesignSettingChange('nailLength', v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="short">Short</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="long">Long</SelectItem>
-                      <SelectItem value="extra-long">Extra Long</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Nail Shape */}
-                <div>
-                  <label className="text-sm font-semibold text-charcoal mb-2 block">Nail Shape</label>
-                  <Select value={designSettings.nailShape} onValueChange={(v) => handleDesignSettingChange('nailShape', v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="oval">Oval</SelectItem>
-                      <SelectItem value="square">Square</SelectItem>
-                      <SelectItem value="round">Round</SelectItem>
-                      <SelectItem value="almond">Almond</SelectItem>
-                      <SelectItem value="stiletto">Stiletto</SelectItem>
-                      <SelectItem value="coffin">Coffin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Base Color */}
-                <div>
-                  <label className="text-sm font-semibold text-charcoal mb-2 block">Base Color</label>
-                  <div className="flex gap-2 overflow-x-auto pb-2">
-                    {baseColors.map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => handleDesignSettingChange('baseColor', color)}
-                        className={`w-12 h-12 rounded-full border-4 transition-all flex-shrink-0 ${
-                          designSettings.baseColor === color ? "border-primary scale-110" : "border-white"
-                        }`}
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Finish */}
-                <div>
-                  <label className="text-sm font-semibold text-charcoal mb-2 block">Finish</label>
-                  <Select value={designSettings.finish} onValueChange={(v) => handleDesignSettingChange('finish', v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="glossy">Glossy</SelectItem>
-                      <SelectItem value="matte">Matte</SelectItem>
-                      <SelectItem value="satin">Satin</SelectItem>
-                      <SelectItem value="metallic">Metallic</SelectItem>
-                      <SelectItem value="chrome">Chrome</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Texture */}
-                <div>
-                  <label className="text-sm font-semibold text-charcoal mb-2 block">Texture</label>
-                  <Select value={designSettings.texture} onValueChange={(v) => handleDesignSettingChange('texture', v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="smooth">Smooth</SelectItem>
-                      <SelectItem value="glitter">Glitter</SelectItem>
-                      <SelectItem value="shimmer">Shimmer</SelectItem>
-                      <SelectItem value="textured">Textured</SelectItem>
-                      <SelectItem value="holographic">Holographic</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button 
-                  onClick={() => generateAIPreview(designSettings)} 
-                  className="w-full"
-                  disabled={isGenerating}
+            <div className="w-full">
+              <div className="w-full flex px-6 bg-transparent border-b h-14 gap-2">
+                <button
+                  onClick={() => toggleDesignMode('design')}
+                  className={`flex-1 flex items-center justify-center gap-2 transition-all border-b-2 ${
+                    designMode === 'design' 
+                      ? 'border-primary text-primary' 
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
                 >
-                  {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                  Generate Preview
-                </Button>
-              </TabsContent>
+                  <Palette className="w-5 h-5" />
+                  <span className="font-semibold">Design</span>
+                </button>
+                <button
+                  onClick={() => toggleDesignMode('ai-design')}
+                  className={`flex-1 flex items-center justify-center gap-2 transition-all border-b-2 ${
+                    designMode === 'ai-design' 
+                      ? 'border-primary text-primary' 
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Sparkles className="w-5 h-5" />
+                  <span className="font-semibold">AI Design</span>
+                </button>
+              </div>
 
-              <TabsContent value="ai-design" className="p-6 max-h-80 overflow-y-auto space-y-4">
-                <div>
-                  <h3 className="font-serif text-lg font-bold text-charcoal mb-2">Describe your style</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    AI will analyze your prompt and generate design options
-                  </p>
+              {designMode === 'design' && (
+                <div className="p-6 space-y-4 max-h-80 overflow-y-auto">
+                  {/* Generate Preview Button */}
+                  <Button 
+                    onClick={() => generateAIPreview(designSettings)} 
+                    className="w-full"
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                    Generate Preview
+                  </Button>
 
-                  <div className="flex gap-2 mb-4">
-                    <Input
-                      placeholder="e.g. minimalist floral with pink tones..."
-                      value={aiPrompt}
-                      onChange={(e) => setAiPrompt(e.target.value)}
-                      className="flex-1"
-                      onKeyDown={(e) => e.key === "Enter" && generateAIDesigns()}
-                    />
-                    <Button onClick={generateAIDesigns} disabled={isGenerating || !aiPrompt.trim()}>
-                      {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                    </Button>
-                  </div>
+                  {/* Upload Design Image */}
+                  <Button 
+                    variant="outline" 
+                    onClick={() => designUploadRef.current?.click()}
+                    className="w-full"
+                    disabled={isGenerating}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Design Image
+                  </Button>
 
-                  {/* Design Settings for AI Design */}
-                  <div className="space-y-3 mb-4 p-4 bg-gray-50 rounded-lg">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase">Design Parameters</p>
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs font-semibold text-charcoal mb-1 block">Length</label>
-                        <Select value={designSettings.nailLength} onValueChange={(v) => handleDesignSettingChange('nailLength', v)}>
-                          <SelectTrigger className="h-9">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="short">Short</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="long">Long</SelectItem>
-                            <SelectItem value="extra-long">Extra Long</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                  <div className="border-t pt-4">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-4">Design Parameters</p>
 
-                      <div>
-                        <label className="text-xs font-semibold text-charcoal mb-1 block">Shape</label>
-                        <Select value={designSettings.nailShape} onValueChange={(v) => handleDesignSettingChange('nailShape', v)}>
-                          <SelectTrigger className="h-9">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="oval">Oval</SelectItem>
-                            <SelectItem value="square">Square</SelectItem>
-                            <SelectItem value="round">Round</SelectItem>
-                            <SelectItem value="almond">Almond</SelectItem>
-                            <SelectItem value="stiletto">Stiletto</SelectItem>
-                            <SelectItem value="coffin">Coffin</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    {/* Nail Length */}
+                    <div className="mb-4">
+                      <label className="text-sm font-semibold text-charcoal mb-2 block">Nail Length</label>
+                      <Select value={designSettings.nailLength} onValueChange={(v) => handleDesignSettingChange('nailLength', v)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="short">Short</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="long">Long</SelectItem>
+                          <SelectItem value="extra-long">Extra Long</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                      <div>
-                        <label className="text-xs font-semibold text-charcoal mb-1 block">Finish</label>
-                        <Select value={designSettings.finish} onValueChange={(v) => handleDesignSettingChange('finish', v)}>
-                          <SelectTrigger className="h-9">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="glossy">Glossy</SelectItem>
-                            <SelectItem value="matte">Matte</SelectItem>
-                            <SelectItem value="satin">Satin</SelectItem>
-                            <SelectItem value="metallic">Metallic</SelectItem>
-                            <SelectItem value="chrome">Chrome</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    {/* Nail Shape */}
+                    <div className="mb-4">
+                      <label className="text-sm font-semibold text-charcoal mb-2 block">Nail Shape</label>
+                      <Select value={designSettings.nailShape} onValueChange={(v) => handleDesignSettingChange('nailShape', v)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="oval">Oval</SelectItem>
+                          <SelectItem value="square">Square</SelectItem>
+                          <SelectItem value="round">Round</SelectItem>
+                          <SelectItem value="almond">Almond</SelectItem>
+                          <SelectItem value="stiletto">Stiletto</SelectItem>
+                          <SelectItem value="coffin">Coffin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                      <div>
-                        <label className="text-xs font-semibold text-charcoal mb-1 block">Texture</label>
-                        <Select value={designSettings.texture} onValueChange={(v) => handleDesignSettingChange('texture', v)}>
-                          <SelectTrigger className="h-9">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="smooth">Smooth</SelectItem>
-                            <SelectItem value="glitter">Glitter</SelectItem>
-                            <SelectItem value="shimmer">Shimmer</SelectItem>
-                            <SelectItem value="textured">Textured</SelectItem>
-                            <SelectItem value="holographic">Holographic</SelectItem>
-                          </SelectContent>
-                        </Select>
+                    {/* Base Color Slider */}
+                    <div className="mb-4">
+                      <label className="text-sm font-semibold text-charcoal mb-2 block">Base Color</label>
+                      <div className="space-y-3">
+                        <Slider
+                          value={[hexToHue(designSettings.baseColor)]}
+                          onValueChange={handleColorChange}
+                          max={360}
+                          step={1}
+                          className="w-full"
+                        />
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="w-12 h-12 rounded-full border-2 border-border"
+                            style={{ backgroundColor: designSettings.baseColor }}
+                          />
+                          <span className="text-sm text-muted-foreground">{designSettings.baseColor}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {generatedDesigns.length > 0 && (
-                    <div className="space-y-3">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Select a Design
-                      </p>
-                      <div className="grid grid-cols-3 gap-3">
-                        {generatedDesigns.map((design, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleDesignSelect(design)}
-                            className={`aspect-square relative rounded-lg overflow-hidden border-2 transition-all ${
-                              selectedDesignImage === design ? 'border-primary' : 'border-border'
-                            }`}
-                          >
-                            <Image
-                              src={design}
-                              alt={`Design ${index + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          </button>
-                        ))}
-                      </div>
+                    {/* Finish */}
+                    <div className="mb-4">
+                      <label className="text-sm font-semibold text-charcoal mb-2 block">Finish</label>
+                      <Select value={designSettings.finish} onValueChange={(v) => handleDesignSettingChange('finish', v)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="glossy">Glossy</SelectItem>
+                          <SelectItem value="matte">Matte</SelectItem>
+                          <SelectItem value="satin">Satin</SelectItem>
+                          <SelectItem value="metallic">Metallic</SelectItem>
+                          <SelectItem value="chrome">Chrome</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  )}
 
-                  <div className="pt-4 border-t">
-                    <p className="text-sm font-semibold text-charcoal mb-3">Or Upload Custom Design</p>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => designUploadRef.current?.click()}
-                      className="w-full"
-                      disabled={isGenerating}
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Design Image
-                    </Button>
-                    <input
-                      ref={designUploadRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleDesignUpload}
-                      className="hidden"
-                    />
+                    {/* Texture */}
+                    <div className="mb-4">
+                      <label className="text-sm font-semibold text-charcoal mb-2 block">Texture</label>
+                      <Select value={designSettings.texture} onValueChange={(v) => handleDesignSettingChange('texture', v)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="smooth">Smooth</SelectItem>
+                          <SelectItem value="glitter">Glitter</SelectItem>
+                          <SelectItem value="shimmer">Shimmer</SelectItem>
+                          <SelectItem value="textured">Textured</SelectItem>
+                          <SelectItem value="holographic">Holographic</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
+              )}
+
+              {designMode === 'ai-design' && (
+                <div className="p-6 max-h-80 overflow-y-auto space-y-4">
+                  {/* Generate Preview Button */}
+                  <Button 
+                    onClick={() => generateAIPreview(designSettings)} 
+                    className="w-full"
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                    Generate Preview
+                  </Button>
+
+                  {/* Upload Design Image */}
+                  <Button 
+                    variant="outline" 
+                    onClick={() => designUploadRef.current?.click()}
+                    className="w-full"
+                    disabled={isGenerating}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Design Image
+                  </Button>
+
+                  <div className="border-t pt-4">
+                    <h3 className="font-serif text-lg font-bold text-charcoal mb-2">Describe your style</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      AI will analyze your prompt and generate design options
+                    </p>
+
+                    <div className="flex gap-2 mb-4">
+                      <Input
+                        placeholder="e.g. minimalist floral with pink tones..."
+                        value={aiPrompt}
+                        onChange={(e) => setAiPrompt(e.target.value)}
+                        className="flex-1"
+                        onKeyDown={(e) => e.key === "Enter" && generateAIDesigns()}
+                      />
+                      <Button onClick={generateAIDesigns} disabled={isGenerating || !aiPrompt.trim()}>
+                        {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                      </Button>
+                    </div>
+
+                    {generatedDesigns.length > 0 && (
+                      <div className="space-y-3 mb-4">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                          Select a Design
+                        </p>
+                        <div className="grid grid-cols-3 gap-3">
+                          {generatedDesigns.map((design, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleDesignSelect(design)}
+                              className={`aspect-square relative rounded-lg overflow-hidden border-2 transition-all ${
+                                selectedDesignImage === design ? 'border-primary' : 'border-border'
+                              }`}
+                            >
+                              <Image
+                                src={design}
+                                alt={`Design ${index + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Design Settings for AI Design */}
+                    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">Design Parameters</p>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-semibold text-charcoal mb-1 block">Length</label>
+                          <Select value={designSettings.nailLength} onValueChange={(v) => handleDesignSettingChange('nailLength', v)}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="short">Short</SelectItem>
+                              <SelectItem value="medium">Medium</SelectItem>
+                              <SelectItem value="long">Long</SelectItem>
+                              <SelectItem value="extra-long">Extra Long</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold text-charcoal mb-1 block">Shape</label>
+                          <Select value={designSettings.nailShape} onValueChange={(v) => handleDesignSettingChange('nailShape', v)}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="oval">Oval</SelectItem>
+                              <SelectItem value="square">Square</SelectItem>
+                              <SelectItem value="round">Round</SelectItem>
+                              <SelectItem value="almond">Almond</SelectItem>
+                              <SelectItem value="stiletto">Stiletto</SelectItem>
+                              <SelectItem value="coffin">Coffin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold text-charcoal mb-1 block">Finish</label>
+                          <Select value={designSettings.finish} onValueChange={(v) => handleDesignSettingChange('finish', v)}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="glossy">Glossy</SelectItem>
+                              <SelectItem value="matte">Matte</SelectItem>
+                              <SelectItem value="satin">Satin</SelectItem>
+                              <SelectItem value="metallic">Metallic</SelectItem>
+                              <SelectItem value="chrome">Chrome</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold text-charcoal mb-1 block">Texture</label>
+                          <Select value={designSettings.texture} onValueChange={(v) => handleDesignSettingChange('texture', v)}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="smooth">Smooth</SelectItem>
+                              <SelectItem value="glitter">Glitter</SelectItem>
+                              <SelectItem value="shimmer">Shimmer</SelectItem>
+                              <SelectItem value="textured">Textured</SelectItem>
+                              <SelectItem value="holographic">Holographic</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Base Color Slider */}
+                      <div>
+                        <label className="text-xs font-semibold text-charcoal mb-2 block">Base Color</label>
+                        <div className="space-y-2">
+                          <Slider
+                            value={[hexToHue(designSettings.baseColor)]}
+                            onValueChange={handleColorChange}
+                            max={360}
+                            step={1}
+                            className="w-full"
+                          />
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-8 h-8 rounded-full border-2 border-border"
+                              style={{ backgroundColor: designSettings.baseColor }}
+                            />
+                            <span className="text-xs text-muted-foreground">{designSettings.baseColor}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {!designMode && (
+                <div className="p-6 text-center text-muted-foreground">
+                  <p className="text-sm">Select Design or AI Design to get started</p>
+                </div>
+              )}
+            </div>
+            <input
+              ref={designUploadRef}
+              type="file"
+              accept="image/*"
+              onChange={handleDesignUpload}
+              className="hidden"
+            />
           </div>
         </div>
       </div>
