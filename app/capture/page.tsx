@@ -1106,6 +1106,75 @@ export default function CapturePage() {
                     </Button>
                   )}
 
+                  {/* Describe your style - Moved above Upload */}
+                  <div className="border-t pt-4">
+                    <h3 className="font-serif text-lg font-bold text-charcoal mb-2">Describe your style</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      AI will analyze your prompt and generate design options
+                    </p>
+
+                    <div className="space-y-3">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="e.g. minimalist floral with pink tones..."
+                          value={aiPrompt}
+                          onChange={(e) => setAiPrompt(e.target.value)}
+                          className="flex-1"
+                          onKeyDown={(e) => e.key === "Enter" && generateAIDesigns()}
+                        />
+                        <Button onClick={generateAIDesigns} disabled={isGenerating || !aiPrompt.trim()}>
+                          {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                        </Button>
+                      </div>
+
+                      {aiPrompt && (
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <label className="text-xs font-medium text-muted-foreground">Style Prompt</label>
+                            <span className="text-xs font-bold text-primary">{influenceWeights.stylePrompt}%</span>
+                          </div>
+                          <Slider
+                            value={[influenceWeights.stylePrompt]}
+                            onValueChange={(value) => handleStylePromptInfluence(value[0])}
+                            min={0}
+                            max={100}
+                            step={5}
+                            className="w-full"
+                          />
+                          <p className="text-[10px] text-muted-foreground mt-1">
+                            Base Color: {influenceWeights.baseColor}% {selectedDesignImage && `• Design Image: ${influenceWeights.designImage}%`}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {generatedDesigns.length > 0 && (
+                      <div className="space-y-3 mt-4">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                          Select a Design
+                        </p>
+                        <div className="grid grid-cols-3 gap-3">
+                          {generatedDesigns.map((design, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleDesignSelect(design)}
+                              className={`aspect-square relative rounded-lg overflow-hidden border-2 transition-all ${
+                                selectedDesignImage === design ? 'border-primary' : 'border-border'
+                              }`}
+                            >
+                              <Image
+                                src={design}
+                                alt={`Design ${index + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Upload Design Image */}
                   <Button 
                     variant="outline" 
@@ -1183,74 +1252,8 @@ export default function CapturePage() {
                     </div>
                   )}
 
+                  {/* Design Settings for AI Design */}
                   <div className="border-t pt-4">
-                    <h3 className="font-serif text-lg font-bold text-charcoal mb-2">Describe your style</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      AI will analyze your prompt and generate design options
-                    </p>
-
-                    <div className="space-y-3">
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="e.g. minimalist floral with pink tones..."
-                          value={aiPrompt}
-                          onChange={(e) => setAiPrompt(e.target.value)}
-                          className="flex-1"
-                          onKeyDown={(e) => e.key === "Enter" && generateAIDesigns()}
-                        />
-                        <Button onClick={generateAIDesigns} disabled={isGenerating || !aiPrompt.trim()}>
-                          {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                        </Button>
-                      </div>
-
-                      {aiPrompt && (
-                        <div className="p-3 bg-gray-50 rounded-lg">
-                          <div className="flex justify-between items-center mb-2">
-                            <label className="text-xs font-medium text-muted-foreground">Style Prompt</label>
-                            <span className="text-xs font-bold text-primary">{influenceWeights.stylePrompt}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.stylePrompt]}
-                            onValueChange={(value) => handleStylePromptInfluence(value[0])}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                          <p className="text-[10px] text-muted-foreground mt-1">
-                            Base Color: {influenceWeights.baseColor}% {selectedDesignImage && `• Design Image: ${influenceWeights.designImage}%`}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {generatedDesigns.length > 0 && (
-                      <div className="space-y-3 mb-4">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                          Select a Design
-                        </p>
-                        <div className="grid grid-cols-3 gap-3">
-                          {generatedDesigns.map((design, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleDesignSelect(design)}
-                              className={`aspect-square relative rounded-lg overflow-hidden border-2 transition-all ${
-                                selectedDesignImage === design ? 'border-primary' : 'border-border'
-                              }`}
-                            >
-                              <Image
-                                src={design}
-                                alt={`Design ${index + 1}`}
-                                fill
-                                className="object-cover"
-                              />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Design Settings for AI Design */}
                     <div className="space-y-2 p-3 bg-gray-50 rounded-lg">
                       <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Design Parameters</p>
                       
