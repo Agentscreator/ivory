@@ -301,3 +301,5 @@ MIT License - see [LICENSE](LICENSE) for details
 ---
 
 Made with 💅 by the Ivory team
+
+*Last updated: December 2024*
