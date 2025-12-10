@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Palette, Sparkles, Upload, Loader2, X } from "lucide-react"
+import { Palette, Sparkles, Upload, Loader2, X, Save } from "lucide-react"
 import Image from "next/image"
 import { Slider } from "@/components/ui/slider"
 
@@ -428,6 +428,47 @@ export default function CapturePage() {
     }
   }
 
+  const saveDesign = async () => {
+    if (!finalPreview) {
+      alert('Please generate a preview first')
+      return
+    }
+
+    try {
+      const userStr = localStorage.getItem("ivoryUser")
+      if (!userStr) {
+        router.push("/")
+        return
+      }
+
+      const user = JSON.parse(userStr)
+      
+      const response = await fetch('/api/looks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          title: `Design ${new Date().toLocaleDateString()}`,
+          imageUrl: finalPreview,
+          originalImageUrl: capturedImage,
+          designSettings,
+          aiPrompt: aiPrompt || null,
+          isPublic: false,
+        }),
+      })
+
+      if (response.ok) {
+        alert('Design saved successfully!')
+        router.push("/home")
+      } else {
+        alert('Failed to save design')
+      }
+    } catch (error) {
+      console.error('Error saving design:', error)
+      alert('An error occurred while saving')
+    }
+  }
+
   const proceedToEditor = () => {
     if (capturedImage) {
       localStorage.setItem("currentEditingImage", capturedImage)
@@ -514,10 +555,24 @@ export default function CapturePage() {
             <Upload className="w-4 h-4" />
             <span className="hidden sm:inline">Change Photo</span>
           </Button>
-          <div className="text-charcoal font-semibold text-lg">Design Your Nails</div>
-          <Button onClick={proceedToEditor} size="sm" disabled={!finalPreview && designMode === 'ai-design'}>
-            Continue
-          </Button>
+          <div className="text-charcoal font-semibold text-lg hidden sm:block">Design Your Nails</div>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={saveDesign} 
+              size="sm" 
+              variant="outline"
+              disabled={!finalPreview}
+            >
+              Save
+            </Button>
+            <Button 
+              onClick={proceedToEditor} 
+              size="sm" 
+              disabled={!finalPreview && designMode === 'ai-design'}
+            >
+              Continue
+            </Button>
+          </div>
         </div>
 
         {/* Image Preview - Side by Side */}
