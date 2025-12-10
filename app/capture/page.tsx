@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Palette, Sparkles, Upload, Loader2, X, Save } from "lucide-react"
+import { Palette, Sparkles, Upload, Loader2, X, Save, ChevronDown } from "lucide-react"
 import Image from "next/image"
 import { Slider } from "@/components/ui/slider"
 
@@ -41,6 +41,7 @@ export default function CapturePage() {
   const [selectedDesignImage, setSelectedDesignImage] = useState<string | null>(null)
   const [finalPreview, setFinalPreview] = useState<string | null>(null)
   const [colorLightness, setColorLightness] = useState(65) // 0-100 for lightness (matches initial color)
+  const [expandedSection, setExpandedSection] = useState<string | null>(null)
   
   const [designSettings, setDesignSettings] = useState<DesignSettings>({
     nailLength: 'medium',
@@ -711,60 +712,88 @@ export default function CapturePage() {
                   <div className="border-t pt-4">
                     <p className="text-xs font-semibold text-muted-foreground uppercase mb-4">Design Parameters</p>
 
-                    {/* Nail Length */}
-                    <div className="mb-4">
-                      <label className="text-sm font-semibold text-charcoal mb-2 block">Nail Length</label>
-                      <div className="grid grid-cols-4 gap-2">
-                        {[
-                          { value: 'short', label: 'Short', height: 'h-8' },
-                          { value: 'medium', label: 'Medium', height: 'h-12' },
-                          { value: 'long', label: 'Long', height: 'h-16' },
-                          { value: 'extra-long', label: 'Extra', height: 'h-20' }
-                        ].map((length) => (
-                          <button
-                            key={length.value}
-                            onClick={() => handleDesignSettingChange('nailLength', length.value)}
-                            className={`flex flex-col items-center justify-end p-3 rounded-xl border-2 transition-all ${
-                              designSettings.nailLength === length.value
-                                ? 'border-primary bg-primary/5'
-                                : 'border-border bg-white hover:border-primary/50'
-                            }`}
-                          >
-                            <div className={`w-6 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-2`} />
-                            <span className="text-xs font-medium text-charcoal">{length.label}</span>
-                          </button>
-                        ))}
-                      </div>
+                    {/* Nail Length - Collapsible */}
+                    <div className="mb-3">
+                      <button
+                        onClick={() => setExpandedSection(expandedSection === 'length' ? null : 'length')}
+                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-semibold text-charcoal">Nail Length</span>
+                          <span className="text-xs text-muted-foreground capitalize">{designSettings.nailLength.replace('-', ' ')}</span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'length' ? 'rotate-180' : ''}`} />
+                      </button>
+                      {expandedSection === 'length' && (
+                        <div className="mt-2 grid grid-cols-4 gap-2 p-2 bg-gray-50 rounded-lg">
+                          {[
+                            { value: 'short', label: 'Short', height: 'h-6' },
+                            { value: 'medium', label: 'Medium', height: 'h-10' },
+                            { value: 'long', label: 'Long', height: 'h-14' },
+                            { value: 'extra-long', label: 'Extra', height: 'h-16' }
+                          ].map((length) => (
+                            <button
+                              key={length.value}
+                              onClick={() => {
+                                handleDesignSettingChange('nailLength', length.value)
+                                setExpandedSection(null)
+                              }}
+                              className={`flex flex-col items-center justify-end p-2 rounded-lg border transition-all ${
+                                designSettings.nailLength === length.value
+                                  ? 'border-primary bg-white'
+                                  : 'border-border bg-white hover:border-primary/50'
+                              }`}
+                            >
+                              <div className={`w-4 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-1.5`} />
+                              <span className="text-[10px] font-medium text-charcoal">{length.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Nail Shape */}
-                    <div className="mb-4">
-                      <label className="text-sm font-semibold text-charcoal mb-2 block">Nail Shape</label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {[
-                          { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
-                          { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
-                          { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
-                          { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
-                          { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
-                          { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
-                        ].map((shape) => (
-                          <button
-                            key={shape.value}
-                            onClick={() => handleDesignSettingChange('nailShape', shape.value)}
-                            className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all ${
-                              designSettings.nailShape === shape.value
-                                ? 'border-primary bg-primary/5'
-                                : 'border-border bg-white hover:border-primary/50'
-                            }`}
-                          >
-                            <svg viewBox="0 0 24 24" className="w-8 h-12 mb-2">
-                              <path d={shape.path} fill="currentColor" className="text-primary" />
-                            </svg>
-                            <span className="text-xs font-medium text-charcoal">{shape.label}</span>
-                          </button>
-                        ))}
-                      </div>
+                    {/* Nail Shape - Collapsible */}
+                    <div className="mb-3">
+                      <button
+                        onClick={() => setExpandedSection(expandedSection === 'shape' ? null : 'shape')}
+                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-semibold text-charcoal">Nail Shape</span>
+                          <span className="text-xs text-muted-foreground capitalize">{designSettings.nailShape}</span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'shape' ? 'rotate-180' : ''}`} />
+                      </button>
+                      {expandedSection === 'shape' && (
+                        <div className="mt-2 grid grid-cols-3 gap-2 p-2 bg-gray-50 rounded-lg">
+                          {[
+                            { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
+                            { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
+                            { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
+                            { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
+                            { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
+                            { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
+                          ].map((shape) => (
+                            <button
+                              key={shape.value}
+                              onClick={() => {
+                                handleDesignSettingChange('nailShape', shape.value)
+                                setExpandedSection(null)
+                              }}
+                              className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                designSettings.nailShape === shape.value
+                                  ? 'border-primary bg-white'
+                                  : 'border-border bg-white hover:border-primary/50'
+                              }`}
+                            >
+                              <svg viewBox="0 0 24 24" className="w-6 h-10 mb-1">
+                                <path d={shape.path} fill="currentColor" className="text-primary" />
+                              </svg>
+                              <span className="text-[10px] font-medium text-charcoal">{shape.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Base Color Sliders */}
@@ -937,63 +966,91 @@ export default function CapturePage() {
                     )}
 
                     {/* Design Settings for AI Design */}
-                    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase">Design Parameters</p>
+                    <div className="space-y-2 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Design Parameters</p>
                       
-                      {/* Nail Length - Compact */}
+                      {/* Nail Length - Collapsible Compact */}
                       <div>
-                        <label className="text-xs font-semibold text-charcoal mb-2 block">Length</label>
-                        <div className="grid grid-cols-4 gap-1.5">
-                          {[
-                            { value: 'short', label: 'Short', height: 'h-6' },
-                            { value: 'medium', label: 'Med', height: 'h-8' },
-                            { value: 'long', label: 'Long', height: 'h-10' },
-                            { value: 'extra-long', label: 'XL', height: 'h-12' }
-                          ].map((length) => (
-                            <button
-                              key={length.value}
-                              onClick={() => handleDesignSettingChange('nailLength', length.value)}
-                              className={`flex flex-col items-center justify-end p-2 rounded-lg border transition-all ${
-                                designSettings.nailLength === length.value
-                                  ? 'border-primary bg-white'
-                                  : 'border-border bg-white/50 hover:border-primary/50'
-                              }`}
-                            >
-                              <div className={`w-4 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-1`} />
-                              <span className="text-[10px] font-medium text-charcoal">{length.label}</span>
-                            </button>
-                          ))}
-                        </div>
+                        <button
+                          onClick={() => setExpandedSection(expandedSection === 'ai-length' ? null : 'ai-length')}
+                          className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-charcoal">Length</span>
+                            <span className="text-[10px] text-muted-foreground capitalize">{designSettings.nailLength.replace('-', ' ')}</span>
+                          </div>
+                          <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-length' ? 'rotate-180' : ''}`} />
+                        </button>
+                        {expandedSection === 'ai-length' && (
+                          <div className="mt-1.5 grid grid-cols-4 gap-1.5 p-1.5 bg-white rounded-lg">
+                            {[
+                              { value: 'short', label: 'Short', height: 'h-5' },
+                              { value: 'medium', label: 'Med', height: 'h-7' },
+                              { value: 'long', label: 'Long', height: 'h-9' },
+                              { value: 'extra-long', label: 'XL', height: 'h-11' }
+                            ].map((length) => (
+                              <button
+                                key={length.value}
+                                onClick={() => {
+                                  handleDesignSettingChange('nailLength', length.value)
+                                  setExpandedSection(null)
+                                }}
+                                className={`flex flex-col items-center justify-end p-1.5 rounded border transition-all ${
+                                  designSettings.nailLength === length.value
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-border hover:border-primary/50'
+                                }`}
+                              >
+                                <div className={`w-3 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-1`} />
+                                <span className="text-[9px] font-medium text-charcoal">{length.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
-                      {/* Nail Shape - Compact */}
+                      {/* Nail Shape - Collapsible Compact */}
                       <div>
-                        <label className="text-xs font-semibold text-charcoal mb-2 block">Shape</label>
-                        <div className="grid grid-cols-3 gap-1.5">
-                          {[
-                            { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
-                            { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
-                            { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
-                            { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
-                            { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
-                            { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
-                          ].map((shape) => (
-                            <button
-                              key={shape.value}
-                              onClick={() => handleDesignSettingChange('nailShape', shape.value)}
-                              className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
-                                designSettings.nailShape === shape.value
-                                  ? 'border-primary bg-white'
-                                  : 'border-border bg-white/50 hover:border-primary/50'
-                              }`}
-                            >
-                              <svg viewBox="0 0 24 24" className="w-6 h-8 mb-1">
-                                <path d={shape.path} fill="currentColor" className="text-primary" />
-                              </svg>
-                              <span className="text-[10px] font-medium text-charcoal">{shape.label}</span>
-                            </button>
-                          ))}
-                        </div>
+                        <button
+                          onClick={() => setExpandedSection(expandedSection === 'ai-shape' ? null : 'ai-shape')}
+                          className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-charcoal">Shape</span>
+                            <span className="text-[10px] text-muted-foreground capitalize">{designSettings.nailShape}</span>
+                          </div>
+                          <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-shape' ? 'rotate-180' : ''}`} />
+                        </button>
+                        {expandedSection === 'ai-shape' && (
+                          <div className="mt-1.5 grid grid-cols-3 gap-1.5 p-1.5 bg-white rounded-lg">
+                            {[
+                              { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
+                              { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
+                              { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
+                              { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
+                              { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
+                              { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
+                            ].map((shape) => (
+                              <button
+                                key={shape.value}
+                                onClick={() => {
+                                  handleDesignSettingChange('nailShape', shape.value)
+                                  setExpandedSection(null)
+                                }}
+                                className={`flex flex-col items-center p-1.5 rounded border transition-all ${
+                                  designSettings.nailShape === shape.value
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-border hover:border-primary/50'
+                                }`}
+                              >
+                                <svg viewBox="0 0 24 24" className="w-5 h-7 mb-0.5">
+                                  <path d={shape.path} fill="currentColor" className="text-primary" />
+                                </svg>
+                                <span className="text-[9px] font-medium text-charcoal">{shape.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
