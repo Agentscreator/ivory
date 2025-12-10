@@ -41,7 +41,7 @@ async function uploadToR2(buffer: Buffer, filename: string): Promise<string> {
 export async function POST(request: NextRequest) {
   try {
     const openai = getOpenAIClient()
-    const { prompt, originalImage, selectedDesignImage } = await request.json()
+    const { prompt, originalImage, selectedDesignImage, influenceWeights } = await request.json()
 
     console.log('🔍 Received request for nail design generation')
 
@@ -55,6 +55,13 @@ export async function POST(request: NextRequest) {
     const nailLength = nailLengthMatch ? nailLengthMatch[1] : 'medium'
     const nailShape = nailShapeMatch ? nailShapeMatch[1] : 'oval'
 
+    // Default influence weights if not provided
+    const weights = influenceWeights || {
+      designImage: selectedDesignImage ? 100 : 0,
+      stylePrompt: 50,
+      manualParams: 100
+    }
+
     // Build enhanced prompt for nail design editing
     const enhancedPrompt = `Use the exact hand in the uploaded image. Do NOT add any extra hands, fingers, arms, bodies, props, or backgrounds. Do NOT change the pose, angle, lighting, skin tone, or environment unless I explicitly say so.
 
@@ -65,18 +72,20 @@ Your ONLY task is to:
 Nail Design Inputs:
 
 1. Design Image (Optional)
-${selectedDesignImage ? `Influence Weight: 100% - Controls how strongly the uploaded design image affects the final style.
-IMPORTANT: A reference design image was provided. Follow the image's color/pattern exactly. REPLICATE its exact style, colors, patterns, and fine details with MAXIMUM FIDELITY. Preserve all intricate design elements, textures, and color gradients from the reference. Apply the design with professional precision and clarity, maintaining sharp edges and high-resolution details. The nail art should look exactly like the reference design, just adapted to fit the natural nail shape and curvature.` : 'Influence Weight: 0% - No design image provided, ignore this input.'}
+${selectedDesignImage ? `Influence Weight: ${weights.designImage}% - Controls how strongly the uploaded design image affects the final style.
+${weights.designImage === 0 ? 'IGNORE the design image completely.' : 
+  weights.designImage === 100 ? 'Follow the image\'s color/pattern EXACTLY. REPLICATE its exact style, colors, patterns, and fine details with MAXIMUM FIDELITY. Preserve all intricate design elements, textures, and color gradients from the reference. Apply the design with professional precision and clarity, maintaining sharp edges and high-resolution details. The nail art should look exactly like the reference design, just adapted to fit the natural nail shape and curvature.' : 
+  `Blend the design image with other inputs at ${weights.designImage}% strength. Use it as inspiration while incorporating other design elements.`}` : 'Influence Weight: 0% - No design image provided, ignore this input.'}
 
 2. Smart Styling Prompt (Optional)
 Text: ${prompt}
-Influence Weight: 50% - Blend the text with all other inputs.
+Influence Weight: ${weights.stylePrompt}% - ${weights.stylePrompt === 0 ? 'IGNORE the text prompt completely.' : weights.stylePrompt === 100 ? 'Follow the written description with MAXIMUM priority.' : `Blend the text with all other inputs at ${weights.stylePrompt}% strength.`}
 
 3. Manual Design Parameters
 These are direct selections the user makes in the UI:
 - Nail Length: ${nailLength.toUpperCase()}
 - Nail Shape: ${nailShape.toUpperCase()}
-- Manual Parameter Influence Weight: 100% - Apply them with full priority over other inputs.
+- Manual Parameter Influence Weight: ${weights.manualParams}% - ${weights.manualParams === 0 ? 'IGNORE manual settings completely.' : weights.manualParams === 100 ? 'Apply them with FULL PRIORITY over other inputs.' : `Use them as general guidance at ${weights.manualParams}% strength.`}
 
 Rules:
 – Keep my hand exactly as it appears.

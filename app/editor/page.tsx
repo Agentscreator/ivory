@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Slider } from "@/components/ui/slider"
 import { ArrowLeft, Save, Palette, Sparkles, Upload, Loader2 } from "lucide-react"
 import Image from "next/image"
 
@@ -26,6 +27,12 @@ type DesignSettings = {
   patternType: string
   styleVibe: string
   accentColor: string
+}
+
+type InfluenceWeights = {
+  designImage: number
+  stylePrompt: number
+  manualParams: number
 }
 
 const baseColors = ["#FF6B9D", "#C44569", "#A8E6CF", "#FFD93D", "#6C5CE7", "#E17055", "#FDCB6E", "#74B9FF"]
@@ -54,6 +61,13 @@ export default function EditorPage() {
     patternType: 'solid',
     styleVibe: 'elegant',
     accentColor: '#FFFFFF'
+  })
+
+  // Influence weights (0-100%)
+  const [influenceWeights, setInfluenceWeights] = useState<InfluenceWeights>({
+    designImage: 100,
+    stylePrompt: 50,
+    manualParams: 100
   })
 
   useEffect(() => {
@@ -123,7 +137,8 @@ export default function EditorPage() {
         body: JSON.stringify({ 
           prompt, 
           originalImage: image,
-          selectedDesignImage: selectedImage || selectedDesignImage
+          selectedDesignImage: selectedImage || selectedDesignImage,
+          influenceWeights
         }),
       })
 
@@ -373,6 +388,78 @@ export default function EditorPage() {
             </TabsList>
 
             <TabsContent value="design" className="p-4 sm:p-6 space-y-4 max-h-80 overflow-y-auto">
+              {/* Influence Weights Section */}
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 space-y-4 border border-purple-200">
+                <h4 className="text-sm font-bold text-charcoal">Design Influence Controls</h4>
+                
+                {/* Design Image Weight */}
+                {selectedDesignImage && (
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-xs font-semibold text-charcoal">Design Image</label>
+                      <span className="text-xs font-bold text-primary">{influenceWeights.designImage}%</span>
+                    </div>
+                    <Slider
+                      value={[influenceWeights.designImage]}
+                      onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, designImage: value[0] }))}
+                      min={0}
+                      max={100}
+                      step={5}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      {influenceWeights.designImage === 0 ? 'Ignore uploaded image' : 
+                       influenceWeights.designImage === 100 ? 'Follow image exactly' : 
+                       'Blend with other inputs'}
+                    </p>
+                  </div>
+                )}
+
+                {/* Style Prompt Weight */}
+                {aiPrompt && (
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-xs font-semibold text-charcoal">Style Description</label>
+                      <span className="text-xs font-bold text-primary">{influenceWeights.stylePrompt}%</span>
+                    </div>
+                    <Slider
+                      value={[influenceWeights.stylePrompt]}
+                      onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, stylePrompt: value[0] }))}
+                      min={0}
+                      max={100}
+                      step={5}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      {influenceWeights.stylePrompt === 0 ? 'Ignore text prompt' : 
+                       influenceWeights.stylePrompt === 100 ? 'Follow description strongly' : 
+                       'Blend with other inputs'}
+                    </p>
+                  </div>
+                )}
+
+                {/* Manual Parameters Weight */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-xs font-semibold text-charcoal">Manual Settings</label>
+                    <span className="text-xs font-bold text-primary">{influenceWeights.manualParams}%</span>
+                  </div>
+                  <Slider
+                    value={[influenceWeights.manualParams]}
+                    onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, manualParams: value[0] }))}
+                    min={0}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    {influenceWeights.manualParams === 0 ? 'Ignore manual settings' : 
+                     influenceWeights.manualParams === 100 ? 'Full priority to settings' : 
+                     'Use as general guidance'}
+                  </p>
+                </div>
+              </div>
+
               {/* Nail Length */}
               <div>
                 <label className="text-xs sm:text-sm font-semibold text-charcoal mb-2 block">Nail Length</label>
