@@ -40,6 +40,7 @@ export default function CapturePage() {
   const [generatedDesigns, setGeneratedDesigns] = useState<string[]>([])
   const [selectedDesignImage, setSelectedDesignImage] = useState<string | null>(null)
   const [finalPreview, setFinalPreview] = useState<string | null>(null)
+  const [colorLightness, setColorLightness] = useState(65) // 0-100 for lightness (matches initial color)
   
   const [designSettings, setDesignSettings] = useState<DesignSettings>({
     nailLength: 'medium',
@@ -277,11 +278,11 @@ export default function CapturePage() {
     setDesignSettings(newSettings)
   }
 
-  // Convert hue (0-360) to hex color
-  const hueToHex = (hue: number) => {
+  // Convert hue (0-360) and lightness (0-100) to hex color
+  const hslToHex = (hue: number, lightness: number) => {
     const h = hue / 360
-    const s = 0.7
-    const l = 0.6
+    const s = 0.7 // Keep saturation constant
+    const l = lightness / 100
     
     const hue2rgb = (p: number, q: number, t: number) => {
       if (t < 0) t += 1
@@ -301,8 +302,8 @@ export default function CapturePage() {
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
   }
 
-  // Convert hex to hue (0-360)
-  const hexToHue = (hex: string) => {
+  // Convert hex to hue (0-360) and lightness (0-100)
+  const hexToHsl = (hex: string) => {
     const r = parseInt(hex.slice(1, 3), 16) / 255
     const g = parseInt(hex.slice(3, 5), 16) / 255
     const b = parseInt(hex.slice(5, 7), 16) / 255
@@ -311,25 +312,33 @@ export default function CapturePage() {
     const min = Math.min(r, g, b)
     const delta = max - min
     
-    if (delta === 0) return 0
-    
     let hue = 0
-    if (max === r) {
-      hue = ((g - b) / delta) % 6
-    } else if (max === g) {
-      hue = (b - r) / delta + 2
-    } else {
-      hue = (r - g) / delta + 4
+    if (delta !== 0) {
+      if (max === r) {
+        hue = ((g - b) / delta) % 6
+      } else if (max === g) {
+        hue = (b - r) / delta + 2
+      } else {
+        hue = (r - g) / delta + 4
+      }
+      hue = Math.round(hue * 60)
+      if (hue < 0) hue += 360
     }
     
-    hue = Math.round(hue * 60)
-    if (hue < 0) hue += 360
+    const lightness = Math.round(((max + min) / 2) * 100)
     
-    return hue
+    return { hue, lightness }
   }
 
-  const handleColorChange = (hue: number[]) => {
-    const hex = hueToHex(hue[0])
+  const handleHueChange = (hue: number[]) => {
+    const hex = hslToHex(hue[0], colorLightness)
+    handleDesignSettingChange('baseColor', hex)
+  }
+
+  const handleLightnessChange = (lightness: number[]) => {
+    setColorLightness(lightness[0])
+    const { hue } = hexToHsl(designSettings.baseColor)
+    const hex = hslToHex(hue, lightness[0])
     handleDesignSettingChange('baseColor', hex)
   }
 
@@ -681,17 +690,31 @@ export default function CapturePage() {
                       </Select>
                     </div>
 
-                    {/* Base Color Slider */}
+                    {/* Base Color Sliders */}
                     <div className="mb-4">
                       <label className="text-sm font-semibold text-charcoal mb-2 block">Base Color</label>
                       <div className="space-y-3">
-                        <Slider
-                          value={[hexToHue(designSettings.baseColor)]}
-                          onValueChange={handleColorChange}
-                          max={360}
-                          step={1}
-                          className="w-full"
-                        />
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1.5 block">Hue</label>
+                          <Slider
+                            value={[hexToHsl(designSettings.baseColor).hue]}
+                            onValueChange={handleHueChange}
+                            max={360}
+                            step={1}
+                            className="w-full"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1.5 block">Lightness</label>
+                          <Slider
+                            value={[colorLightness]}
+                            onValueChange={handleLightnessChange}
+                            max={100}
+                            min={10}
+                            step={1}
+                            className="w-full"
+                          />
+                        </div>
                         <div className="flex items-center gap-3">
                           <div 
                             className="w-12 h-12 rounded-full border-2 border-border"
@@ -906,17 +929,31 @@ export default function CapturePage() {
                         </div>
                       </div>
 
-                      {/* Base Color Slider */}
+                      {/* Base Color Sliders */}
                       <div>
                         <label className="text-xs font-semibold text-charcoal mb-2 block">Base Color</label>
                         <div className="space-y-2">
-                          <Slider
-                            value={[hexToHue(designSettings.baseColor)]}
-                            onValueChange={handleColorChange}
-                            max={360}
-                            step={1}
-                            className="w-full"
-                          />
+                          <div>
+                            <label className="text-[10px] text-muted-foreground mb-1 block">Hue</label>
+                            <Slider
+                              value={[hexToHsl(designSettings.baseColor).hue]}
+                              onValueChange={handleHueChange}
+                              max={360}
+                              step={1}
+                              className="w-full"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-muted-foreground mb-1 block">Lightness</label>
+                            <Slider
+                              value={[colorLightness]}
+                              onValueChange={handleLightnessChange}
+                              max={100}
+                              min={10}
+                              step={1}
+                              className="w-full"
+                            />
+                          </div>
                           <div className="flex items-center gap-2">
                             <div 
                               className="w-8 h-8 rounded-full border-2 border-border"
