@@ -91,12 +91,10 @@ Apply the design as if professionally painted. Respect natural nail curvature an
     }
     
     const imageBlob = await originalImageResponse.blob()
-    console.log('📥 Hand image blob size:', imageBlob.size, 'type:', imageBlob.type)
-    
-    // Convert Blob → ArrayBuffer → File
     const arrayBuffer = await imageBlob.arrayBuffer()
-    const handImage = new File([arrayBuffer], 'hand.jpg', { type: imageBlob.type })
-    console.log('📥 Hand image file created:', handImage.name, handImage.size, handImage.type)
+    const handBase64 = Buffer.from(arrayBuffer).toString('base64')
+    
+    console.log('📥 Hand image converted to base64, length:', handBase64.length)
     
     // Prepare content array for the request
     const contentArray: any[] = [
@@ -106,7 +104,7 @@ Apply the design as if professionally painted. Respect natural nail curvature an
       },
       {
         type: 'input_image',
-        image: handImage
+        image_base64: handBase64
       }
     ]
     
@@ -121,13 +119,13 @@ Apply the design as if professionally painted. Respect natural nail curvature an
       if (designImageResponse.ok) {
         const designBlob = await designImageResponse.blob()
         const designArrayBuffer = await designBlob.arrayBuffer()
-        const designImage = new File([designArrayBuffer], 'reference.jpg', { type: designBlob.type })
+        const designBase64 = Buffer.from(designArrayBuffer).toString('base64')
         
-        console.log('📥 Reference design file created:', designImage.name, designImage.size)
+        console.log('📥 Reference design converted to base64, length:', designBase64.length)
         
         contentArray.push({
           type: 'input_image',
-          image: designImage
+          image_base64: designBase64
         })
       } else {
         console.warn('⚠️ Failed to fetch reference design, continuing without it')

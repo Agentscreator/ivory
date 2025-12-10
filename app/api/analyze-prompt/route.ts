@@ -106,6 +106,8 @@ export async function POST(request: NextRequest) {
           
           console.log(`✅ Design concept ${i + 1} uploaded to R2`)
           designs.push(permanentUrl)
+        } else {
+          console.warn(`⚠️ No image returned for concept ${i + 1}`)
         }
       } catch (error) {
         console.error(`Error generating design variation ${i + 1}:`, error)
