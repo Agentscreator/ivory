@@ -625,6 +625,26 @@ export default function CapturePage() {
                     Upload Design Image
                   </Button>
 
+                  {/* Uploaded Design Preview */}
+                  {selectedDesignImage && (
+                    <div className="relative rounded-lg overflow-hidden border-2 border-primary">
+                      <div className="aspect-square relative bg-white">
+                        <Image src={selectedDesignImage} alt="Uploaded Design" fill className="object-cover" />
+                      </div>
+                      <div className="absolute top-2 right-2">
+                        <button
+                          onClick={() => setSelectedDesignImage(null)}
+                          className="bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 transition-all"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+                        Uploaded Design
+                      </div>
+                    </div>
+                  )}
+
                   <div className="border-t pt-4">
                     <p className="text-xs font-semibold text-muted-foreground uppercase mb-4">Design Parameters</p>
 
@@ -752,6 +772,26 @@ export default function CapturePage() {
                     <Upload className="w-4 h-4 mr-2" />
                     Upload Design Image
                   </Button>
+
+                  {/* Uploaded Design Preview */}
+                  {selectedDesignImage && !generatedDesigns.length && (
+                    <div className="relative rounded-lg overflow-hidden border-2 border-primary">
+                      <div className="aspect-square relative bg-white">
+                        <Image src={selectedDesignImage} alt="Uploaded Design" fill className="object-cover" />
+                      </div>
+                      <div className="absolute top-2 right-2">
+                        <button
+                          onClick={() => setSelectedDesignImage(null)}
+                          className="bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 transition-all"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+                        Uploaded Design
+                      </div>
+                    </div>
+                  )}
 
                   <div className="border-t pt-4">
                     <h3 className="font-serif text-lg font-bold text-charcoal mb-2">Describe your style</h3>
