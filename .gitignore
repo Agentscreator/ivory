@@ -27,7 +27,6 @@ yarn-error.log*
 .env*.local
 .env
 .env.development
-lib/config.ts
 
 # vercel
 .vercel
