@@ -839,38 +839,88 @@ export default function CapturePage() {
                       )}
                     </div>
 
-                    {/* Finish */}
-                    <div className="mb-4">
-                      <label className="text-sm font-semibold text-charcoal mb-2 block">Finish</label>
-                      <Select value={designSettings.finish} onValueChange={(v) => handleDesignSettingChange('finish', v)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="glossy">Glossy</SelectItem>
-                          <SelectItem value="matte">Matte</SelectItem>
-                          <SelectItem value="satin">Satin</SelectItem>
-                          <SelectItem value="metallic">Metallic</SelectItem>
-                          <SelectItem value="chrome">Chrome</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    {/* Finish - Collapsible */}
+                    <div className="mb-3">
+                      <button
+                        onClick={() => setExpandedSection(expandedSection === 'finish' ? null : 'finish')}
+                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-semibold text-charcoal">Finish</span>
+                          <span className="text-xs text-muted-foreground capitalize">{designSettings.finish}</span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'finish' ? 'rotate-180' : ''}`} />
+                      </button>
+                      {expandedSection === 'finish' && (
+                        <div className="mt-2 grid grid-cols-3 gap-2 p-2 bg-gray-50 rounded-lg">
+                          {[
+                            { value: 'glossy', label: 'Glossy', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
+                            { value: 'matte', label: 'Matte', gradient: 'bg-pink-400' },
+                            { value: 'satin', label: 'Satin', gradient: 'bg-gradient-to-b from-pink-300 to-pink-500' },
+                            { value: 'metallic', label: 'Metallic', gradient: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
+                            { value: 'chrome', label: 'Chrome', gradient: 'bg-gradient-to-br from-gray-300 via-pink-200 to-gray-300' }
+                          ].map((finish) => (
+                            <button
+                              key={finish.value}
+                              onClick={() => {
+                                handleDesignSettingChange('finish', finish.value)
+                                setExpandedSection(null)
+                              }}
+                              className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                designSettings.finish === finish.value
+                                  ? 'border-primary bg-white'
+                                  : 'border-border bg-white hover:border-primary/50'
+                              }`}
+                            >
+                              <div className={`w-full h-12 rounded-lg ${finish.gradient} mb-1.5 ${finish.value === 'glossy' ? 'shadow-lg' : ''}`} />
+                              <span className="text-[10px] font-medium text-charcoal">{finish.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Texture */}
-                    <div className="mb-4">
-                      <label className="text-sm font-semibold text-charcoal mb-2 block">Texture</label>
-                      <Select value={designSettings.texture} onValueChange={(v) => handleDesignSettingChange('texture', v)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="smooth">Smooth</SelectItem>
-                          <SelectItem value="glitter">Glitter</SelectItem>
-                          <SelectItem value="shimmer">Shimmer</SelectItem>
-                          <SelectItem value="textured">Textured</SelectItem>
-                          <SelectItem value="holographic">Holographic</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    {/* Texture - Collapsible */}
+                    <div className="mb-3">
+                      <button
+                        onClick={() => setExpandedSection(expandedSection === 'texture' ? null : 'texture')}
+                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-semibold text-charcoal">Texture</span>
+                          <span className="text-xs text-muted-foreground capitalize">{designSettings.texture}</span>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'texture' ? 'rotate-180' : ''}`} />
+                      </button>
+                      {expandedSection === 'texture' && (
+                        <div className="mt-2 grid grid-cols-3 gap-2 p-2 bg-gray-50 rounded-lg">
+                          {[
+                            { value: 'smooth', label: 'Smooth', pattern: 'bg-pink-400' },
+                            { value: 'glitter', label: 'Glitter', pattern: 'bg-gradient-to-br from-pink-300 via-pink-500 to-pink-300 bg-[length:4px_4px]' },
+                            { value: 'shimmer', label: 'Shimmer', pattern: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
+                            { value: 'textured', label: 'Textured', pattern: 'bg-pink-400' },
+                            { value: 'holographic', label: 'Holo', pattern: 'bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300' }
+                          ].map((texture) => (
+                            <button
+                              key={texture.value}
+                              onClick={() => {
+                                handleDesignSettingChange('texture', texture.value)
+                                setExpandedSection(null)
+                              }}
+                              className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                designSettings.texture === texture.value
+                                  ? 'border-primary bg-white'
+                                  : 'border-border bg-white hover:border-primary/50'
+                              }`}
+                            >
+                              <div className={`w-full h-12 rounded-lg ${texture.pattern} mb-1.5 ${texture.value === 'glitter' ? 'animate-pulse' : ''}`} 
+                                style={texture.value === 'textured' ? { backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px)' } : {}}
+                              />
+                              <span className="text-[10px] font-medium text-charcoal">{texture.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1061,39 +1111,88 @@ export default function CapturePage() {
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      {/* Finish - Collapsible Compact */}
+                      <div>
+                        <button
+                          onClick={() => setExpandedSection(expandedSection === 'ai-finish' ? null : 'ai-finish')}
+                          className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-charcoal">Finish</span>
+                            <span className="text-[10px] text-muted-foreground capitalize">{designSettings.finish}</span>
+                          </div>
+                          <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-finish' ? 'rotate-180' : ''}`} />
+                        </button>
+                        {expandedSection === 'ai-finish' && (
+                          <div className="mt-1.5 grid grid-cols-3 gap-1.5 p-1.5 bg-white rounded-lg">
+                            {[
+                              { value: 'glossy', label: 'Glossy', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
+                              { value: 'matte', label: 'Matte', gradient: 'bg-pink-400' },
+                              { value: 'satin', label: 'Satin', gradient: 'bg-gradient-to-b from-pink-300 to-pink-500' },
+                              { value: 'metallic', label: 'Metal', gradient: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
+                              { value: 'chrome', label: 'Chrome', gradient: 'bg-gradient-to-br from-gray-300 via-pink-200 to-gray-300' }
+                            ].map((finish) => (
+                              <button
+                                key={finish.value}
+                                onClick={() => {
+                                  handleDesignSettingChange('finish', finish.value)
+                                  setExpandedSection(null)
+                                }}
+                                className={`flex flex-col items-center p-1.5 rounded border transition-all ${
+                                  designSettings.finish === finish.value
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-border hover:border-primary/50'
+                                }`}
+                              >
+                                <div className={`w-full h-8 rounded ${finish.gradient} mb-1 ${finish.value === 'glossy' ? 'shadow-md' : ''}`} />
+                                <span className="text-[9px] font-medium text-charcoal">{finish.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-                        <div>
-                          <label className="text-xs font-semibold text-charcoal mb-1 block">Finish</label>
-                          <Select value={designSettings.finish} onValueChange={(v) => handleDesignSettingChange('finish', v)}>
-                            <SelectTrigger className="h-9">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="glossy">Glossy</SelectItem>
-                              <SelectItem value="matte">Matte</SelectItem>
-                              <SelectItem value="satin">Satin</SelectItem>
-                              <SelectItem value="metallic">Metallic</SelectItem>
-                              <SelectItem value="chrome">Chrome</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div>
-                          <label className="text-xs font-semibold text-charcoal mb-1 block">Texture</label>
-                          <Select value={designSettings.texture} onValueChange={(v) => handleDesignSettingChange('texture', v)}>
-                            <SelectTrigger className="h-9">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="smooth">Smooth</SelectItem>
-                              <SelectItem value="glitter">Glitter</SelectItem>
-                              <SelectItem value="shimmer">Shimmer</SelectItem>
-                              <SelectItem value="textured">Textured</SelectItem>
-                              <SelectItem value="holographic">Holographic</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                      {/* Texture - Collapsible Compact */}
+                      <div>
+                        <button
+                          onClick={() => setExpandedSection(expandedSection === 'ai-texture' ? null : 'ai-texture')}
+                          className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-charcoal">Texture</span>
+                            <span className="text-[10px] text-muted-foreground capitalize">{designSettings.texture}</span>
+                          </div>
+                          <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-texture' ? 'rotate-180' : ''}`} />
+                        </button>
+                        {expandedSection === 'ai-texture' && (
+                          <div className="mt-1.5 grid grid-cols-3 gap-1.5 p-1.5 bg-white rounded-lg">
+                            {[
+                              { value: 'smooth', label: 'Smooth', pattern: 'bg-pink-400' },
+                              { value: 'glitter', label: 'Glitter', pattern: 'bg-gradient-to-br from-pink-300 via-pink-500 to-pink-300' },
+                              { value: 'shimmer', label: 'Shimmer', pattern: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
+                              { value: 'textured', label: 'Texture', pattern: 'bg-pink-400' },
+                              { value: 'holographic', label: 'Holo', pattern: 'bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300' }
+                            ].map((texture) => (
+                              <button
+                                key={texture.value}
+                                onClick={() => {
+                                  handleDesignSettingChange('texture', texture.value)
+                                  setExpandedSection(null)
+                                }}
+                                className={`flex flex-col items-center p-1.5 rounded border transition-all ${
+                                  designSettings.texture === texture.value
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-border hover:border-primary/50'
+                                }`}
+                              >
+                                <div className={`w-full h-8 rounded ${texture.pattern} mb-1`} 
+                                  style={texture.value === 'textured' ? { backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px)' } : {}}
+                                />
+                                <span className="text-[9px] font-medium text-charcoal">{texture.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       {/* Base Color - Collapsible Compact */}
