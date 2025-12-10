@@ -56,17 +56,16 @@ export default function CapturePage() {
 
   // Influence weights for each input type
   // Nail Editor: designImage and baseColor are inversely linked (sum to 100)
-  // Smart Styling: stylePrompt, designImage, and baseColor share 100% (independent from Nail Editor)
+  // Smart Styling: stylePrompt and baseColor are inversely linked (sum to 100)
   const [influenceWeights, setInfluenceWeights] = useState({
     // Nail Editor weights
     nailEditor_designImage: 0,
     nailEditor_baseColor: 100,
     nailEditor_finish: 100,
     nailEditor_texture: 100,
-    // Smart Styling weights
-    smartStyling_stylePrompt: 33,
-    smartStyling_designImage: 33,
-    smartStyling_baseColor: 34,
+    // Smart Styling weights (no design image upload)
+    smartStyling_stylePrompt: 50,
+    smartStyling_baseColor: 50,
     smartStyling_finish: 100,
     smartStyling_texture: 100
   })
@@ -89,39 +88,20 @@ export default function CapturePage() {
   }
 
   // Smart Styling handlers - independent from Nail Editor
+  // Only stylePrompt and baseColor (inversely linked, sum to 100)
   const handleSmartStylingStylePromptInfluence = (value: number) => {
-    const remaining = 100 - value
-    const designImageShare = Math.round(remaining * (influenceWeights.smartStyling_designImage / (influenceWeights.smartStyling_designImage + influenceWeights.smartStyling_baseColor || 1)))
-    const baseColorShare = remaining - designImageShare
     setInfluenceWeights(prev => ({
       ...prev,
       smartStyling_stylePrompt: value,
-      smartStyling_designImage: designImageShare,
-      smartStyling_baseColor: baseColorShare
-    }))
-  }
-
-  const handleSmartStylingDesignImageInfluence = (value: number) => {
-    const remaining = 100 - value
-    const stylePromptShare = Math.round(remaining * (influenceWeights.smartStyling_stylePrompt / (influenceWeights.smartStyling_stylePrompt + influenceWeights.smartStyling_baseColor || 1)))
-    const baseColorShare = remaining - stylePromptShare
-    setInfluenceWeights(prev => ({
-      ...prev,
-      smartStyling_designImage: value,
-      smartStyling_stylePrompt: stylePromptShare,
-      smartStyling_baseColor: baseColorShare
+      smartStyling_baseColor: 100 - value
     }))
   }
 
   const handleSmartStylingBaseColorInfluence = (value: number) => {
-    const remaining = 100 - value
-    const stylePromptShare = Math.round(remaining * (influenceWeights.smartStyling_stylePrompt / (influenceWeights.smartStyling_stylePrompt + influenceWeights.smartStyling_designImage || 1)))
-    const designImageShare = remaining - stylePromptShare
     setInfluenceWeights(prev => ({
       ...prev,
       smartStyling_baseColor: value,
-      smartStyling_stylePrompt: stylePromptShare,
-      smartStyling_designImage: designImageShare
+      smartStyling_stylePrompt: 100 - value
     }))
   }
   
@@ -313,7 +293,7 @@ export default function CapturePage() {
       
       // Build weights based on current mode
       const weights = designMode === 'ai-design' ? {
-        designImage: influenceWeights.smartStyling_designImage,
+        designImage: 0, // No design image upload in Smart Styling
         stylePrompt: influenceWeights.smartStyling_stylePrompt,
         baseColor: influenceWeights.smartStyling_baseColor,
         finish: influenceWeights.smartStyling_finish,
@@ -479,10 +459,8 @@ export default function CapturePage() {
 
   const handleDesignSelect = (designUrl: string) => {
     setSelectedDesignImage(designUrl)
-    // When design image is selected in Smart Styling, set its influence to 100
-    if (designMode === 'ai-design') {
-      handleSmartStylingDesignImageInfluence(100)
-    } else {
+    // Only used in Nail Editor mode (not in Smart Styling)
+    if (designMode !== 'ai-design') {
       handleNailEditorDesignImageInfluence(100)
     }
   }
@@ -506,10 +484,8 @@ export default function CapturePage() {
         const { imageUrl } = data
         
         setSelectedDesignImage(imageUrl)
-        // When design image is uploaded, set its influence to 100
-        if (designMode === 'ai-design') {
-          handleSmartStylingDesignImageInfluence(100)
-        } else {
+        // Only used in Nail Editor mode (not in Smart Styling)
+        if (designMode !== 'ai-design') {
           handleNailEditorDesignImageInfluence(100)
         }
         // Don't auto-generate - user must click "Generate Preview"
@@ -1150,12 +1126,11 @@ export default function CapturePage() {
                           onChange={(e) => {
                             const value = e.target.value
                             setAiPrompt(value)
-                            // When user starts typing, set style prompt to 100% and others to 0%
+                            // When user starts typing, set style prompt to 100% and base color to 0%
                             if (value && influenceWeights.smartStyling_stylePrompt !== 100) {
                               setInfluenceWeights(prev => ({
                                 ...prev,
                                 smartStyling_stylePrompt: 100,
-                                smartStyling_designImage: 0,
                                 smartStyling_baseColor: 0
                               }))
                             }
@@ -1183,7 +1158,7 @@ export default function CapturePage() {
                             className="w-full"
                           />
                           <p className="text-[10px] text-muted-foreground mt-1">
-                            Base Color: {influenceWeights.smartStyling_baseColor}% {selectedDesignImage && `• Design Image: ${influenceWeights.smartStyling_designImage}%`}
+                            Base Color: {influenceWeights.smartStyling_baseColor}%
                           </p>
                         </div>
                       )}
@@ -1216,82 +1191,7 @@ export default function CapturePage() {
                     )}
                   </div>
 
-                  {/* Upload Design Image */}
-                  <Button 
-                    variant="outline" 
-                    onClick={() => designUploadRef.current?.click()}
-                    className="w-full"
-                    disabled={isGenerating}
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload Design Image
-                  </Button>
 
-                  {/* Uploaded Design Preview */}
-                  {selectedDesignImage && !generatedDesigns.length && (
-                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-border">
-                      <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-primary flex-shrink-0">
-                        <Image src={selectedDesignImage} alt="Uploaded Design" fill className="object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-charcoal">Uploaded Design</p>
-                        <p className="text-xs text-muted-foreground truncate">Ready to generate</p>
-                      </div>
-                      <button
-                        onClick={() => setSelectedDesignImage(null)}
-                        className="bg-gray-200 hover:bg-gray-300 text-charcoal rounded-full p-1.5 transition-all flex-shrink-0"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Uploaded Design Preview with Influence Control */}
-                  {selectedDesignImage && !generatedDesigns.length && (
-                    <div className="mb-3">
-                      <button
-                        onClick={() => setExpandedSection(expandedSection === 'ai-design-image' ? null : 'ai-design-image')}
-                        className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-primary flex-shrink-0">
-                            <Image src={selectedDesignImage} alt="Uploaded Design" fill className="object-cover" />
-                          </div>
-                          <div className="flex-1 min-w-0 text-left">
-                            <p className="text-sm font-semibold text-charcoal">Uploaded Design</p>
-                            <p className="text-xs text-muted-foreground">Tap to adjust influence</p>
-                          </div>
-                          <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">{influenceWeights.smartStyling_designImage}%</span>
-                        </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ml-2 ${expandedSection === 'ai-design-image' ? 'rotate-180' : ''}`} />
-                      </button>
-                      {expandedSection === 'ai-design-image' && (
-                        <div className="mt-2 p-3 bg-gray-50 rounded-lg space-y-2">
-                          <div className="flex justify-between items-center mb-2">
-                            <label className="text-xs font-medium text-muted-foreground">Design Image</label>
-                            <span className="text-xs font-bold text-primary">{influenceWeights.smartStyling_designImage}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.smartStyling_designImage]}
-                            onValueChange={(value) => handleSmartStylingDesignImageInfluence(value[0])}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                          <p className="text-[10px] text-muted-foreground">
-                            Base Color: {influenceWeights.smartStyling_baseColor}% • Style Prompt: {influenceWeights.smartStyling_stylePrompt}%
-                          </p>
-                          <button
-                            onClick={() => setSelectedDesignImage(null)}
-                            className="w-full mt-2 text-xs text-red-600 hover:text-red-700 font-medium"
-                          >
-                            Remove Design Image
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
 
                   {/* Design Settings for AI Design */}
                   <div className="border-t pt-4">
@@ -1550,7 +1450,7 @@ export default function CapturePage() {
                                 className="w-full"
                               />
                               <p className="text-[10px] text-muted-foreground mt-1">
-                                Style Prompt: {influenceWeights.smartStyling_stylePrompt}% {selectedDesignImage && `• Design Image: ${influenceWeights.smartStyling_designImage}%`}
+                                Style Prompt: {influenceWeights.smartStyling_stylePrompt}%
                               </p>
                             </div>
                           </div>
