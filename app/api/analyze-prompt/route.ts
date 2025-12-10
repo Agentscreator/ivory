@@ -79,19 +79,18 @@ export async function POST(request: NextRequest) {
         console.log(`🎨 Generating design concept ${i + 1}/3 with gpt-image-1...`)
         
         // Using gpt-image-1 for high-quality concept generation
-        // Future: Will migrate to responses.create() when it becomes publicly available
         const response = await openai.images.generate({
           model: 'gpt-image-1',
           prompt: designPrompt,
           n: 1,
           size: '1024x1024',
-          response_format: 'b64_json',
         })
 
-        const outputBase64 = response.data?.[0]?.b64_json
-        if (outputBase64) {
-          // Upload to R2 for permanent storage
-          const imageBuffer = Buffer.from(outputBase64, 'base64')
+        const outputUrl = response.data?.[0]?.url
+        if (outputUrl) {
+          // Download and upload to R2 for permanent storage
+          const imageResponse = await fetch(outputUrl)
+          const imageBuffer = Buffer.from(await imageResponse.arrayBuffer())
           const filename = `ai-design-${Date.now()}-${i}-${Math.random().toString(36).substring(2, 8)}.png`
           const permanentUrl = await uploadToR2(imageBuffer, filename)
           
