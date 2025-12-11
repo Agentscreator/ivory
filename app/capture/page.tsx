@@ -829,14 +829,21 @@ export default function CapturePage() {
                             <label className="text-xs font-medium text-muted-foreground">Design Image</label>
                             <span className="text-xs font-bold text-primary">{influenceWeights.nailEditor_designImage}%</span>
                           </div>
-                          <Slider
-                            value={[influenceWeights.nailEditor_designImage]}
-                            onValueChange={(value) => handleNailEditorDesignImageInfluence(value[0])}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-0 h-2 rounded-full" style={{
+                              background: 'linear-gradient(to right, #e0e0e0 0%, #9b59b6 50%, #8e44ad 100%)',
+                              top: '50%',
+                              transform: 'translateY(-50%)'
+                            }} />
+                            <Slider
+                              value={[influenceWeights.nailEditor_designImage]}
+                              onValueChange={(value) => handleNailEditorDesignImageInfluence(value[0])}
+                              min={0}
+                              max={100}
+                              step={5}
+                              className="w-full relative z-10"
+                            />
+                          </div>
                           <p className="text-[10px] text-muted-foreground">
                             Base Color: {influenceWeights.nailEditor_baseColor}%
                           </p>
@@ -959,38 +966,59 @@ export default function CapturePage() {
                         <div className="mt-2 space-y-3 p-3 bg-gray-50 rounded-lg">
                           <div>
                             <label className="text-xs text-muted-foreground mb-1.5 block">Hue</label>
-                            <Slider
-                              value={[hexToHsl(designSettings.baseColor).hue]}
-                              onValueChange={handleHueChange}
-                              max={360}
-                              step={1}
-                              className="w-full"
-                            />
+                            <div className="relative">
+                              <div className="absolute inset-0 h-2 rounded-full" style={{
+                                background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)',
+                                top: '50%',
+                                transform: 'translateY(-50%)'
+                              }} />
+                              <Slider
+                                value={[hexToHsl(designSettings.baseColor).hue]}
+                                onValueChange={handleHueChange}
+                                max={360}
+                                step={1}
+                                className="w-full relative z-10"
+                              />
+                            </div>
                           </div>
                           <div>
                             <label className="text-xs text-muted-foreground mb-1.5 block">Lightness</label>
-                            <Slider
-                              value={[colorLightness]}
-                              onValueChange={handleLightnessChange}
-                              max={100}
-                              min={10}
-                              step={1}
-                              className="w-full"
-                            />
+                            <div className="relative">
+                              <div className="absolute inset-0 h-2 rounded-full" style={{
+                                background: 'linear-gradient(to right, #1a1a1a 0%, #808080 50%, #ffffff 100%)',
+                                top: '50%',
+                                transform: 'translateY(-50%)'
+                              }} />
+                              <Slider
+                                value={[colorLightness]}
+                                onValueChange={handleLightnessChange}
+                                max={100}
+                                min={10}
+                                step={1}
+                                className="w-full relative z-10"
+                              />
+                            </div>
                           </div>
                           <div className="border-t pt-3">
                             <div className="flex justify-between items-center mb-2">
                               <label className="text-xs font-medium text-muted-foreground">Base Color</label>
                               <span className="text-xs font-bold text-primary">{influenceWeights.nailEditor_baseColor}%</span>
                             </div>
-                            <Slider
-                              value={[influenceWeights.nailEditor_baseColor]}
-                              onValueChange={(value) => handleNailEditorBaseColorInfluence(value[0])}
-                              min={0}
-                              max={100}
-                              step={5}
-                              className="w-full"
-                            />
+                            <div className="relative">
+                              <div className="absolute inset-0 h-2 rounded-full" style={{
+                                background: 'linear-gradient(to right, #e0e0e0 0%, #FF6B9D 50%, #FF1493 100%)',
+                                top: '50%',
+                                transform: 'translateY(-50%)'
+                              }} />
+                              <Slider
+                                value={[influenceWeights.nailEditor_baseColor]}
+                                onValueChange={(value) => handleNailEditorBaseColorInfluence(value[0])}
+                                min={0}
+                                max={100}
+                                step={5}
+                                className="w-full relative z-10"
+                              />
+                            </div>
                             <p className="text-[10px] text-muted-foreground mt-1">
                               {selectedDesignImage && `Design Image: ${influenceWeights.nailEditor_designImage}%`}
                             </p>
@@ -1041,14 +1069,21 @@ export default function CapturePage() {
                               <label className="text-xs font-medium text-muted-foreground">Influence</label>
                               <span className="text-xs font-bold text-primary">{influenceWeights.nailEditor_finish}%</span>
                             </div>
-                            <Slider
-                              value={[influenceWeights.nailEditor_finish]}
-                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailEditor_finish: value[0] }))}
-                              min={0}
-                              max={100}
-                              step={5}
-                              className="w-full"
-                            />
+                            <div className="relative">
+                              <div className="absolute inset-0 h-2 rounded-full" style={{
+                                background: 'linear-gradient(to right, #e0e0e0 0%, #f39c12 50%, #e67e22 100%)',
+                                top: '50%',
+                                transform: 'translateY(-50%)'
+                              }} />
+                              <Slider
+                                value={[influenceWeights.nailEditor_finish]}
+                                onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailEditor_finish: value[0] }))}
+                                min={0}
+                                max={100}
+                                step={5}
+                                className="w-full relative z-10"
+                              />
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1098,14 +1133,21 @@ export default function CapturePage() {
                               <label className="text-xs font-medium text-muted-foreground">Influence</label>
                               <span className="text-xs font-bold text-primary">{influenceWeights.nailEditor_texture}%</span>
                             </div>
-                            <Slider
-                              value={[influenceWeights.nailEditor_texture]}
-                              onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailEditor_texture: value[0] }))}
-                              min={0}
-                              max={100}
-                              step={5}
-                              className="w-full"
-                            />
+                            <div className="relative">
+                              <div className="absolute inset-0 h-2 rounded-full" style={{
+                                background: 'linear-gradient(to right, #e0e0e0 0%, #3498db 50%, #2980b9 100%)',
+                                top: '50%',
+                                transform: 'translateY(-50%)'
+                              }} />
+                              <Slider
+                                value={[influenceWeights.nailEditor_texture]}
+                                onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailEditor_texture: value[0] }))}
+                                min={0}
+                                max={100}
+                                step={5}
+                                className="w-full relative z-10"
+                              />
+                            </div>
                           </div>
                         </div>
                       )}
