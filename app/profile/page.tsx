@@ -20,9 +20,24 @@ export default function ProfilePage() {
     }
   }, [])
 
-  const handleLogout = () => {
-    localStorage.removeItem("ivoryUser")
-    router.push("/")
+  const handleLogout = async () => {
+    try {
+      // Call logout API to clear session cookie
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      })
+      
+      // Clear localStorage
+      localStorage.removeItem("ivoryUser")
+      
+      // Redirect to home
+      router.push("/")
+    } catch (error) {
+      console.error('Logout failed:', error)
+      // Still clear localStorage and redirect even if API call fails
+      localStorage.removeItem("ivoryUser")
+      router.push("/")
+    }
   }
 
   const startNewDesign = () => {
