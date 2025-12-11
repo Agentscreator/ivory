@@ -260,6 +260,24 @@ export default function LoginPage() {
               {isSignUp ? "Already have an account? Log in" : "Don't have an account? Sign up"}
             </button>
           </div>
+
+          <div className="mt-4 text-center text-xs text-muted-foreground space-x-3">
+            <button 
+              type="button"
+              onClick={() => router.push('/privacy-policy')}
+              className="hover:underline"
+            >
+              Privacy Policy
+            </button>
+            <span>•</span>
+            <button 
+              type="button"
+              onClick={() => router.push('/terms')}
+              className="hover:underline"
+            >
+              Terms of Service
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>
