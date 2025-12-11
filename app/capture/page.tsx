@@ -1037,11 +1037,10 @@ export default function CapturePage() {
                           <span className="text-sm font-light text-charcoal tracking-wide">Finish</span>
                           <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.finish}</span>
                         </div>
-                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.nailEditor_finish}%</span>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'finish' ? 'rotate-180' : ''}`} />
                       </button>
                       {expandedSection === 'finish' && (
-                        <div className="mt-2 space-y-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="mt-2 p-3 bg-gray-50 rounded-lg">
                           <div className="grid grid-cols-3 gap-2">
                             {[
                               { value: 'glossy', label: 'Glossy', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
@@ -1064,27 +1063,6 @@ export default function CapturePage() {
                               </button>
                             ))}
                           </div>
-                          <div className="border-t pt-3">
-                            <div className="flex justify-between items-center mb-2">
-                              <label className="text-xs font-medium text-muted-foreground">Influence</label>
-                              <span className="text-xs font-bold text-primary">{influenceWeights.nailEditor_finish}%</span>
-                            </div>
-                            <div className="relative">
-                              <div className="absolute inset-0 h-2 rounded-full" style={{
-                                background: 'linear-gradient(to right, #e0e0e0 0%, #f39c12 50%, #e67e22 100%)',
-                                top: '50%',
-                                transform: 'translateY(-50%)'
-                              }} />
-                              <Slider
-                                value={[influenceWeights.nailEditor_finish]}
-                                onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailEditor_finish: value[0] }))}
-                                min={0}
-                                max={100}
-                                step={5}
-                                className="w-full relative z-10"
-                              />
-                            </div>
-                          </div>
                         </div>
                       )}
                     </div>
@@ -1099,11 +1077,10 @@ export default function CapturePage() {
                           <span className="text-sm font-light text-charcoal tracking-wide">Texture</span>
                           <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.texture}</span>
                         </div>
-                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.nailEditor_texture}%</span>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'texture' ? 'rotate-180' : ''}`} />
                       </button>
                       {expandedSection === 'texture' && (
-                        <div className="mt-2 space-y-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="mt-2 p-3 bg-gray-50 rounded-lg">
                           <div className="grid grid-cols-3 gap-2">
                             {[
                               { value: 'smooth', label: 'Smooth', pattern: 'bg-pink-400' },
@@ -1127,27 +1104,6 @@ export default function CapturePage() {
                                 <span className="text-[10px] font-medium text-charcoal">{texture.label}</span>
                               </button>
                             ))}
-                          </div>
-                          <div className="border-t pt-3">
-                            <div className="flex justify-between items-center mb-2">
-                              <label className="text-xs font-medium text-muted-foreground">Influence</label>
-                              <span className="text-xs font-bold text-primary">{influenceWeights.nailEditor_texture}%</span>
-                            </div>
-                            <div className="relative">
-                              <div className="absolute inset-0 h-2 rounded-full" style={{
-                                background: 'linear-gradient(to right, #e0e0e0 0%, #3498db 50%, #2980b9 100%)',
-                                top: '50%',
-                                transform: 'translateY(-50%)'
-                              }} />
-                              <Slider
-                                value={[influenceWeights.nailEditor_texture]}
-                                onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, nailEditor_texture: value[0] }))}
-                                min={0}
-                                max={100}
-                                step={5}
-                                className="w-full relative z-10"
-                              />
-                            </div>
                           </div>
                         </div>
                       )}
