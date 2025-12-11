@@ -101,11 +101,13 @@ ${selectedDesignImage ? `IMAGE INPUTS:
 
 ` : ''}STRICT RULES:
 1. Use the EXACT hand shown in the image - same number of fingers, same pose, same angle
-2. DO NOT add, remove, or duplicate any fingers
-3. DO NOT change the hand position, pose, or angle
-4. DO NOT alter skin tone, lighting, background, or any other element
-5. DO NOT add extra hands, arms, bodies, or props
-6. ONLY modify the fingernail surfaces
+2. MAINTAIN THE EXACT ORIENTATION AND ROTATION of the original hand image - DO NOT rotate the image by any degree
+3. The output image MUST have the same orientation as the input image (if hand is horizontal, keep it horizontal; if vertical, keep it vertical)
+4. DO NOT add, remove, or duplicate any fingers
+5. DO NOT change the hand position, pose, or angle
+6. DO NOT alter skin tone, lighting, background, or any other element
+7. DO NOT add extra hands, arms, bodies, or props
+8. ONLY modify the fingernail surfaces
 
 NAIL DESIGN APPLICATION:
 ${selectedDesignImage ? `
@@ -134,10 +136,11 @@ QUALITY REQUIREMENTS:
 - Clean, crisp edges at nail boundaries
 - Consistent application across all visible nails
 - Natural lighting and shadows preserved
+- CRITICAL: Output image orientation MUST match input image orientation exactly (no rotation)
 ${weights.designImage === 100 ? `- ACCURACY IS PARAMOUNT: The result must be a faithful reproduction of the reference design
 - Every color, pattern, and detail from the reference must be present in the output` : ''}
 
-OUTPUT: Return ONE image with the same hand, same number of fingers, with nail art applied ONLY to the fingernail surfaces.${weights.designImage === 100 ? ' The nail design must be an EXACT REPLICA of the reference design provided.' : ''}`
+OUTPUT: Return ONE image with the same hand, same number of fingers, same orientation and rotation, with nail art applied ONLY to the fingernail surfaces.${weights.designImage === 100 ? ' The nail design must be an EXACT REPLICA of the reference design provided.' : ''}`
 
     console.log('🤖 Generating nail design preview with gpt-image-1...')
     console.log('📥 Fetching original hand image:', originalImage)
