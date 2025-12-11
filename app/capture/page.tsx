@@ -645,7 +645,7 @@ export default function CapturePage() {
         </div>
 
         {/* Image Preview - Side by Side */}
-        <div className="pt-20 pb-4 px-4 overflow-y-auto" style={{ height: 'calc(60vh - 80px)', minHeight: '350px' }}>
+        <div className="pt-20 pb-4 px-4 overflow-y-auto" style={{ height: 'calc(65vh - 80px)', minHeight: '400px' }}>
           <div className="max-w-2xl mx-auto h-full">
             <div className="grid grid-cols-2 gap-3 h-full">
               {/* Original Image */}
@@ -766,7 +766,7 @@ export default function CapturePage() {
         </div>
 
         {/* Bottom Drawer */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-border rounded-t-3xl shadow-2xl z-20 touch-action-pan-y" style={{ height: '40vh', minHeight: '350px', maxHeight: '500px' }}>
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-border rounded-t-3xl shadow-2xl z-20 touch-action-pan-y" style={{ height: '35vh', minHeight: '320px', maxHeight: '450px' }}>
           <div className="max-w-2xl mx-auto h-full flex flex-col">
             <div className="h-1 w-12 bg-border rounded-full mx-auto my-3 flex-shrink-0"></div>
 
@@ -776,7 +776,7 @@ export default function CapturePage() {
                   onClick={() => setDesignMode('design')}
                   className="flex-1 flex items-center justify-center transition-all border-b-2 border-primary text-primary"
                 >
-                  <span className="font-semibold">Nail Editor</span>
+                  <span className="font-light text-lg tracking-wide">Nail Editor</span>
                 </button>
               </div>
 
@@ -861,7 +861,7 @@ export default function CapturePage() {
                   )}
 
                   <div className="border-t pt-4">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase mb-4">Design Parameters</p>
+                    <p className="text-xs font-light text-muted-foreground uppercase tracking-widest mb-4">Design Parameters</p>
 
                     {/* Nail Length - Collapsible */}
                     <div className="mb-3">
@@ -870,8 +870,8 @@ export default function CapturePage() {
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-semibold text-charcoal">Nail Length</span>
-                          <span className="text-xs text-muted-foreground capitalize">{designSettings.nailLength.replace('-', ' ')}</span>
+                          <span className="text-sm font-light text-charcoal tracking-wide">Nail Length</span>
+                          <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.nailLength.replace('-', ' ')}</span>
                         </div>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'length' ? 'rotate-180' : ''}`} />
                       </button>
@@ -909,8 +909,8 @@ export default function CapturePage() {
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-semibold text-charcoal">Nail Shape</span>
-                          <span className="text-xs text-muted-foreground capitalize">{designSettings.nailShape}</span>
+                          <span className="text-sm font-light text-charcoal tracking-wide">Nail Shape</span>
+                          <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.nailShape}</span>
                         </div>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'shape' ? 'rotate-180' : ''}`} />
                       </button>
@@ -952,13 +952,13 @@ export default function CapturePage() {
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-semibold text-charcoal">Base Color</span>
+                          <span className="text-sm font-light text-charcoal tracking-wide">Base Color</span>
                           <div className="flex items-center gap-2">
                             <div 
                               className="w-6 h-6 rounded-full border-2 border-border"
                               style={{ backgroundColor: designSettings.baseColor }}
                             />
-                            <span className="text-xs text-muted-foreground">{designSettings.baseColor}</span>
+                            <span className="text-xs text-muted-foreground font-light">{designSettings.baseColor}</span>
                           </div>
                         </div>
                         <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.nailEditor_baseColor}%</span>
@@ -1015,8 +1015,8 @@ export default function CapturePage() {
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-semibold text-charcoal">Finish</span>
-                          <span className="text-xs text-muted-foreground capitalize">{designSettings.finish}</span>
+                          <span className="text-sm font-light text-charcoal tracking-wide">Finish</span>
+                          <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.finish}</span>
                         </div>
                         <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.nailEditor_finish}%</span>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'finish' ? 'rotate-180' : ''}`} />
@@ -1070,8 +1070,8 @@ export default function CapturePage() {
                         className="w-full flex items-center justify-between p-3 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-semibold text-charcoal">Texture</span>
-                          <span className="text-xs text-muted-foreground capitalize">{designSettings.texture}</span>
+                          <span className="text-sm font-light text-charcoal tracking-wide">Texture</span>
+                          <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.texture}</span>
                         </div>
                         <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.nailEditor_texture}%</span>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'texture' ? 'rotate-180' : ''}`} />
