@@ -54,23 +54,16 @@ export default function CapturePage() {
     accentColor: '#FFFFFF'
   })
 
-  // Influence weights for each input type
-  // Nail Editor: designImage and baseColor are inversely linked (sum to 100)
-  // Smart Styling: stylePrompt and baseColor are inversely linked (sum to 100)
+  // Influence weights for Nail Editor
+  // designImage and baseColor are inversely linked (sum to 100)
   const [influenceWeights, setInfluenceWeights] = useState({
-    // Nail Editor weights
     nailEditor_designImage: 0,
     nailEditor_baseColor: 100,
     nailEditor_finish: 100,
-    nailEditor_texture: 100,
-    // Smart Styling weights (no design image upload)
-    smartStyling_stylePrompt: 50,
-    smartStyling_baseColor: 50,
-    smartStyling_finish: 100,
-    smartStyling_texture: 100
+    nailEditor_texture: 100
   })
 
-  // Nail Editor handlers - independent from Smart Styling
+  // Nail Editor influence handlers
   const handleNailEditorDesignImageInfluence = (value: number) => {
     setInfluenceWeights(prev => ({
       ...prev,
@@ -84,24 +77,6 @@ export default function CapturePage() {
       ...prev,
       nailEditor_baseColor: value,
       nailEditor_designImage: 100 - value
-    }))
-  }
-
-  // Smart Styling handlers - independent from Nail Editor
-  // Only stylePrompt and baseColor (inversely linked, sum to 100)
-  const handleSmartStylingStylePromptInfluence = (value: number) => {
-    setInfluenceWeights(prev => ({
-      ...prev,
-      smartStyling_stylePrompt: value,
-      smartStyling_baseColor: 100 - value
-    }))
-  }
-
-  const handleSmartStylingBaseColorInfluence = (value: number) => {
-    setInfluenceWeights(prev => ({
-      ...prev,
-      smartStyling_baseColor: value,
-      smartStyling_stylePrompt: 100 - value
     }))
   }
   
@@ -291,16 +266,8 @@ export default function CapturePage() {
     try {
       const prompt = buildPrompt(settings)
       
-      // Build weights based on current mode
-      const weights = designMode === 'ai-design' ? {
-        designImage: 0, // No design image upload in Smart Styling
-        stylePrompt: influenceWeights.smartStyling_stylePrompt,
-        baseColor: influenceWeights.smartStyling_baseColor,
-        finish: influenceWeights.smartStyling_finish,
-        texture: influenceWeights.smartStyling_texture,
-        nailLength: 100,
-        nailShape: 100
-      } : {
+      // Build weights for Nail Editor
+      const weights = {
         designImage: influenceWeights.nailEditor_designImage,
         stylePrompt: 0, // Not used in Nail Editor
         baseColor: influenceWeights.nailEditor_baseColor,
@@ -414,13 +381,12 @@ export default function CapturePage() {
     handleDesignSettingChange('baseColor', hex)
   }
 
-  const toggleDesignMode = (mode: DesignMode) => {
-    if (designMode === mode) {
-      setDesignMode(null)
-    } else {
-      setDesignMode(mode)
+  // Auto-set design mode to 'design' on mount
+  useEffect(() => {
+    if (capturedImage && !designMode) {
+      setDesignMode('design')
     }
-  }
+  }, [capturedImage, designMode])
 
   const generateAIDesigns = async () => {
     if (!aiPrompt.trim()) return
@@ -459,10 +425,7 @@ export default function CapturePage() {
 
   const handleDesignSelect = (designUrl: string) => {
     setSelectedDesignImage(designUrl)
-    // Only used in Nail Editor mode (not in Smart Styling)
-    if (designMode !== 'ai-design') {
-      handleNailEditorDesignImageInfluence(100)
-    }
+    handleNailEditorDesignImageInfluence(100)
   }
 
   const handleDesignUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -484,10 +447,7 @@ export default function CapturePage() {
         const { imageUrl } = data
         
         setSelectedDesignImage(imageUrl)
-        // Only used in Nail Editor mode (not in Smart Styling)
-        if (designMode !== 'ai-design') {
-          handleNailEditorDesignImageInfluence(100)
-        }
+        handleNailEditorDesignImageInfluence(100)
         // Don't auto-generate - user must click "Generate Preview"
       }
     } catch (error) {
@@ -498,14 +458,7 @@ export default function CapturePage() {
   }
 
   const applyDesign = async () => {
-    if (designMode === 'design') {
-      await generateAIPreview(designSettings)
-    } else {
-      // AI Design mode - preview already generated
-      if (finalPreview) {
-        proceedToEditor()
-      }
-    }
+    await generateAIPreview(designSettings)
   }
 
   const saveDesign = async () => {
@@ -648,7 +601,7 @@ export default function CapturePage() {
             <Button 
               onClick={proceedToEditor} 
               size="sm" 
-              disabled={!finalPreview && designMode === 'ai-design'}
+              disabled={!finalPreview}
             >
               Continue
             </Button>
@@ -725,28 +678,14 @@ export default function CapturePage() {
             <div className="w-full">
               <div className="w-full flex px-6 bg-transparent border-b h-14 gap-2">
                 <button
-                  onClick={() => toggleDesignMode('design')}
-                  className={`flex-1 flex items-center justify-center transition-all border-b-2 ${
-                    designMode === 'design' 
-                      ? 'border-primary text-primary' 
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
+                  onClick={() => setDesignMode('design')}
+                  className="flex-1 flex items-center justify-center transition-all border-b-2 border-primary text-primary"
                 >
                   <span className="font-semibold">Nail Editor</span>
                 </button>
-                <button
-                  onClick={() => toggleDesignMode('ai-design')}
-                  className={`flex-1 flex items-center justify-center transition-all border-b-2 ${
-                    designMode === 'ai-design' 
-                      ? 'border-primary text-primary' 
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <span className="font-semibold">Smart Styling</span>
-                </button>
               </div>
 
-              {designMode === 'design' && (
+              {(designMode === 'design' || designMode === null) && (
                 <div className="p-6 space-y-4 max-h-[500px] overflow-y-auto overscroll-contain">
                   {/* Generate Preview Button */}
                   {!isGenerating ? (
@@ -1089,383 +1028,7 @@ export default function CapturePage() {
                 </div>
               )}
 
-              {designMode === 'ai-design' && (
-                <div className="p-6 max-h-[500px] overflow-y-auto overscroll-contain space-y-4">
-                  {/* Generate Preview Button */}
-                  {!isGenerating ? (
-                    <Button 
-                      onClick={() => generateAIPreview(designSettings)} 
-                      className="w-full"
-                    >
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Generate Preview
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={cancelGeneration}
-                      variant="destructive"
-                      className="w-full"
-                    >
-                      <X className="w-4 h-4 mr-2" />
-                      Cancel Generation
-                    </Button>
-                  )}
 
-                  {/* Describe your style - Moved above Upload */}
-                  <div className="border-t pt-4">
-                    <h3 className="font-serif text-lg font-bold text-charcoal mb-2">Describe your style</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      AI will analyze your prompt and generate design options
-                    </p>
-
-                    <div className="space-y-3">
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="e.g. minimalist floral with pink tones..."
-                          value={aiPrompt}
-                          onChange={(e) => {
-                            const value = e.target.value
-                            setAiPrompt(value)
-                            // When user starts typing, set style prompt to 100% and base color to 0%
-                            if (value && influenceWeights.smartStyling_stylePrompt !== 100) {
-                              setInfluenceWeights(prev => ({
-                                ...prev,
-                                smartStyling_stylePrompt: 100,
-                                smartStyling_baseColor: 0
-                              }))
-                            }
-                          }}
-                          className="flex-1"
-                          onKeyDown={(e) => e.key === "Enter" && generateAIDesigns()}
-                        />
-                        <Button onClick={generateAIDesigns} disabled={isGenerating || !aiPrompt.trim()}>
-                          {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                        </Button>
-                      </div>
-
-                      {aiPrompt && (
-                        <div className="p-3 bg-gray-50 rounded-lg">
-                          <div className="flex justify-between items-center mb-2">
-                            <label className="text-xs font-medium text-muted-foreground">Style Prompt</label>
-                            <span className="text-xs font-bold text-primary">{influenceWeights.smartStyling_stylePrompt}%</span>
-                          </div>
-                          <Slider
-                            value={[influenceWeights.smartStyling_stylePrompt]}
-                            onValueChange={(value) => handleSmartStylingStylePromptInfluence(value[0])}
-                            min={0}
-                            max={100}
-                            step={5}
-                            className="w-full"
-                          />
-                          <p className="text-[10px] text-muted-foreground mt-1">
-                            Base Color: {influenceWeights.smartStyling_baseColor}%
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {generatedDesigns.length > 0 && (
-                      <div className="space-y-3 mt-4">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                          Select a Design
-                        </p>
-                        <div className="grid grid-cols-3 gap-3">
-                          {generatedDesigns.map((design, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleDesignSelect(design)}
-                              className={`aspect-square relative rounded-lg overflow-hidden border-2 transition-all ${
-                                selectedDesignImage === design ? 'border-primary' : 'border-border'
-                              }`}
-                            >
-                              <Image
-                                src={design}
-                                alt={`Design ${index + 1}`}
-                                fill
-                                className="object-cover"
-                              />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-
-
-                  {/* Design Settings for AI Design */}
-                  <div className="border-t pt-4">
-                    <div className="space-y-2 p-3 bg-gray-50 rounded-lg">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Design Parameters</p>
-                      
-                      {/* Nail Length - Collapsible Compact */}
-                      <div>
-                        <button
-                          onClick={() => setExpandedSection(expandedSection === 'ai-length' ? null : 'ai-length')}
-                          className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-charcoal">Length</span>
-                            <span className="text-[10px] text-muted-foreground capitalize">{designSettings.nailLength.replace('-', ' ')}</span>
-                          </div>
-                          <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-length' ? 'rotate-180' : ''}`} />
-                        </button>
-                        {expandedSection === 'ai-length' && (
-                          <div className="mt-1.5 grid grid-cols-4 gap-1.5 p-1.5 bg-white rounded-lg">
-                            {[
-                              { value: 'short', label: 'Short', height: 'h-5' },
-                              { value: 'medium', label: 'Med', height: 'h-7' },
-                              { value: 'long', label: 'Long', height: 'h-9' },
-                              { value: 'extra-long', label: 'XL', height: 'h-11' }
-                            ].map((length) => (
-                              <button
-                                key={length.value}
-                                onClick={() => {
-                                  handleDesignSettingChange('nailLength', length.value)
-                                  setExpandedSection(null)
-                                }}
-                                className={`flex flex-col items-center justify-end p-1.5 rounded border transition-all ${
-                                  designSettings.nailLength === length.value
-                                    ? 'border-primary bg-primary/5'
-                                    : 'border-border hover:border-primary/50'
-                                }`}
-                              >
-                                <div className={`w-3 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-1`} />
-                                <span className="text-[9px] font-medium text-charcoal">{length.label}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Nail Shape - Collapsible Compact */}
-                      <div>
-                        <button
-                          onClick={() => setExpandedSection(expandedSection === 'ai-shape' ? null : 'ai-shape')}
-                          className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-charcoal">Shape</span>
-                            <span className="text-[10px] text-muted-foreground capitalize">{designSettings.nailShape}</span>
-                          </div>
-                          <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-shape' ? 'rotate-180' : ''}`} />
-                        </button>
-                        {expandedSection === 'ai-shape' && (
-                          <div className="mt-1.5 grid grid-cols-3 gap-1.5 p-1.5 bg-white rounded-lg">
-                            {[
-                              { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
-                              { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
-                              { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
-                              { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
-                              { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
-                              { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
-                            ].map((shape) => (
-                              <button
-                                key={shape.value}
-                                onClick={() => {
-                                  handleDesignSettingChange('nailShape', shape.value)
-                                  setExpandedSection(null)
-                                }}
-                                className={`flex flex-col items-center p-1.5 rounded border transition-all ${
-                                  designSettings.nailShape === shape.value
-                                    ? 'border-primary bg-primary/5'
-                                    : 'border-border hover:border-primary/50'
-                                }`}
-                              >
-                                <svg viewBox="0 0 24 24" className="w-5 h-7 mb-0.5">
-                                  <path d={shape.path} fill="currentColor" className="text-primary" />
-                                </svg>
-                                <span className="text-[9px] font-medium text-charcoal">{shape.label}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Finish - Collapsible Compact */}
-                      <div>
-                        <button
-                          onClick={() => setExpandedSection(expandedSection === 'ai-finish' ? null : 'ai-finish')}
-                          className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
-                        >
-                          <div className="flex items-center gap-2 flex-1">
-                            <span className="text-xs font-semibold text-charcoal">Finish</span>
-                            <span className="text-[10px] text-muted-foreground capitalize">{designSettings.finish}</span>
-                          </div>
-                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded mr-1">{influenceWeights.smartStyling_finish}%</span>
-                          <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-finish' ? 'rotate-180' : ''}`} />
-                        </button>
-                        {expandedSection === 'ai-finish' && (
-                          <div className="mt-1.5 space-y-2 p-1.5 bg-white rounded-lg">
-                            <div className="grid grid-cols-3 gap-1.5">
-                              {[
-                                { value: 'glossy', label: 'Glossy', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
-                                { value: 'matte', label: 'Matte', gradient: 'bg-pink-400' },
-                                { value: 'satin', label: 'Satin', gradient: 'bg-gradient-to-b from-pink-300 to-pink-500' },
-                                { value: 'metallic', label: 'Metal', gradient: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
-                                { value: 'chrome', label: 'Chrome', gradient: 'bg-gradient-to-br from-gray-300 via-pink-200 to-gray-300' }
-                              ].map((finish) => (
-                                <button
-                                  key={finish.value}
-                                  onClick={() => handleDesignSettingChange('finish', finish.value)}
-                                  className={`flex flex-col items-center p-1.5 rounded border transition-all ${
-                                    designSettings.finish === finish.value
-                                      ? 'border-primary bg-primary/5'
-                                      : 'border-border hover:border-primary/50'
-                                  }`}
-                                >
-                                  <div className={`w-full h-8 rounded ${finish.gradient} mb-1 ${finish.value === 'glossy' ? 'shadow-md' : ''}`} />
-                                  <span className="text-[9px] font-medium text-charcoal">{finish.label}</span>
-                                </button>
-                              ))}
-                            </div>
-                            <div className="border-t pt-2">
-                              <div className="flex justify-between items-center mb-1">
-                                <label className="text-[10px] font-medium text-muted-foreground">Influence</label>
-                                <span className="text-[10px] font-bold text-primary">{influenceWeights.smartStyling_finish}%</span>
-                              </div>
-                              <Slider
-                                value={[influenceWeights.smartStyling_finish]}
-                                onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, smartStyling_finish: value[0] }))}
-                                min={0}
-                                max={100}
-                                step={5}
-                                className="w-full"
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Texture - Collapsible Compact */}
-                      <div>
-                        <button
-                          onClick={() => setExpandedSection(expandedSection === 'ai-texture' ? null : 'ai-texture')}
-                          className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
-                        >
-                          <div className="flex items-center gap-2 flex-1">
-                            <span className="text-xs font-semibold text-charcoal">Texture</span>
-                            <span className="text-[10px] text-muted-foreground capitalize">{designSettings.texture}</span>
-                          </div>
-                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded mr-1">{influenceWeights.smartStyling_texture}%</span>
-                          <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-texture' ? 'rotate-180' : ''}`} />
-                        </button>
-                        {expandedSection === 'ai-texture' && (
-                          <div className="mt-1.5 space-y-2 p-1.5 bg-white rounded-lg">
-                            <div className="grid grid-cols-3 gap-1.5">
-                              {[
-                                { value: 'smooth', label: 'Smooth', pattern: 'bg-pink-400' },
-                                { value: 'glitter', label: 'Glitter', pattern: 'bg-gradient-to-br from-pink-300 via-pink-500 to-pink-300' },
-                                { value: 'shimmer', label: 'Shimmer', pattern: 'bg-gradient-to-r from-pink-300 via-pink-400 to-pink-300' },
-                                { value: 'textured', label: 'Texture', pattern: 'bg-pink-400' },
-                                { value: 'holographic', label: 'Holo', pattern: 'bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300' }
-                              ].map((texture) => (
-                                <button
-                                  key={texture.value}
-                                  onClick={() => handleDesignSettingChange('texture', texture.value)}
-                                  className={`flex flex-col items-center p-1.5 rounded border transition-all ${
-                                    designSettings.texture === texture.value
-                                      ? 'border-primary bg-primary/5'
-                                      : 'border-border hover:border-primary/50'
-                                  }`}
-                                >
-                                  <div className={`w-full h-8 rounded ${texture.pattern} mb-1`} 
-                                    style={texture.value === 'textured' ? { backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px)' } : {}}
-                                  />
-                                  <span className="text-[9px] font-medium text-charcoal">{texture.label}</span>
-                                </button>
-                              ))}
-                            </div>
-                            <div className="border-t pt-2">
-                              <div className="flex justify-between items-center mb-1">
-                                <label className="text-[10px] font-medium text-muted-foreground">Influence</label>
-                                <span className="text-[10px] font-bold text-primary">{influenceWeights.smartStyling_texture}%</span>
-                              </div>
-                              <Slider
-                                value={[influenceWeights.smartStyling_texture]}
-                                onValueChange={(value) => setInfluenceWeights(prev => ({ ...prev, smartStyling_texture: value[0] }))}
-                                min={0}
-                                max={100}
-                                step={5}
-                                className="w-full"
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Base Color - Collapsible Compact */}
-                      <div>
-                        <button
-                          onClick={() => setExpandedSection(expandedSection === 'ai-color' ? null : 'ai-color')}
-                          className="w-full flex items-center justify-between p-2 rounded-lg border border-border bg-white hover:border-primary/50 transition-all"
-                        >
-                          <div className="flex items-center gap-2 flex-1">
-                            <span className="text-xs font-semibold text-charcoal">Base Color</span>
-                            <div className="flex items-center gap-1.5">
-                              <div 
-                                className="w-5 h-5 rounded-full border-2 border-border"
-                                style={{ backgroundColor: designSettings.baseColor }}
-                              />
-                              <span className="text-[10px] text-muted-foreground">{designSettings.baseColor}</span>
-                            </div>
-                          </div>
-                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded mr-1">{influenceWeights.smartStyling_baseColor}%</span>
-                          <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expandedSection === 'ai-color' ? 'rotate-180' : ''}`} />
-                        </button>
-                        {expandedSection === 'ai-color' && (
-                          <div className="mt-1.5 space-y-2 p-2 bg-white rounded-lg">
-                            <div>
-                              <label className="text-[10px] text-muted-foreground mb-1 block">Hue</label>
-                              <Slider
-                                value={[hexToHsl(designSettings.baseColor).hue]}
-                                onValueChange={handleHueChange}
-                                max={360}
-                                step={1}
-                                className="w-full"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] text-muted-foreground mb-1 block">Lightness</label>
-                              <Slider
-                                value={[colorLightness]}
-                                onValueChange={handleLightnessChange}
-                                max={100}
-                                min={10}
-                                step={1}
-                                className="w-full"
-                              />
-                            </div>
-                            <div className="border-t pt-2">
-                              <div className="flex justify-between items-center mb-1">
-                                <label className="text-[10px] font-medium text-muted-foreground">Influence</label>
-                                <span className="text-[10px] font-bold text-primary">{influenceWeights.smartStyling_baseColor}%</span>
-                              </div>
-                              <Slider
-                                value={[influenceWeights.smartStyling_baseColor]}
-                                onValueChange={(value) => handleSmartStylingBaseColorInfluence(value[0])}
-                                min={0}
-                                max={100}
-                                step={5}
-                                className="w-full"
-                              />
-                              <p className="text-[10px] text-muted-foreground mt-1">
-                                Style Prompt: {influenceWeights.smartStyling_stylePrompt}%
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {!designMode && (
-                <div className="p-6 text-center text-muted-foreground">
-                  <p className="text-sm">Select Nail Editor or Smart Styling to get started</p>
-                </div>
-              )}
             </div>
             <input
               ref={designUploadRef}

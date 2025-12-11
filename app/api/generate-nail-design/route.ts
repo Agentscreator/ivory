@@ -67,52 +67,47 @@ export async function POST(request: NextRequest) {
     }
 
     // Build enhanced prompt for nail design editing
-    const enhancedPrompt = `Use the exact hand in the uploaded image. Do NOT add any extra hands, fingers, arms, bodies, props, or backgrounds. Do NOT change the pose, angle, lighting, skin tone, or environment unless I explicitly say so.
+    const enhancedPrompt = `CRITICAL INSTRUCTIONS - READ CAREFULLY:
 
-Your ONLY task is to:
-- Detect the fingernails on the hand in the image.
-- Apply the design strictly inside the nail boundaries while keeping everything else unchanged.
+You are editing a photo of a hand to apply nail art designs. Your ONLY task is to modify the fingernails while preserving everything else EXACTLY as it appears.
 
-Nail Design Inputs:
+STRICT RULES:
+1. Use the EXACT hand shown in the image - same number of fingers, same pose, same angle
+2. DO NOT add, remove, or duplicate any fingers
+3. DO NOT change the hand position, pose, or angle
+4. DO NOT alter skin tone, lighting, background, or any other element
+5. DO NOT add extra hands, arms, bodies, or props
+6. ONLY modify the fingernail surfaces
 
-1. Design Image (Optional)
-${selectedDesignImage ? `Influence Weight: ${weights.designImage}% - Controls how strongly the uploaded design image affects the final style.
-${weights.designImage === 0 ? 'IGNORE the design image completely.' : 
-  weights.designImage === 100 ? 'Follow the image\'s color/pattern EXACTLY. REPLICATE its exact style, colors, patterns, and fine details with MAXIMUM FIDELITY. Preserve all intricate design elements, textures, and color gradients from the reference. Apply the design with professional precision and clarity, maintaining sharp edges and high-resolution details. The nail art should look exactly like the reference design, just adapted to fit the natural nail shape and curvature.' : 
-  `Blend the design image with other inputs at ${weights.designImage}% strength. Use it as inspiration while incorporating other design elements.`}` : 'Influence Weight: 0% - No design image provided, ignore this input.'}
+NAIL DESIGN APPLICATION:
+${selectedDesignImage ? `
+DESIGN IMAGE PROVIDED (Influence: ${weights.designImage}%):
+${weights.designImage === 0 ? '- IGNORE the design image completely.' : 
+  weights.designImage === 100 ? `- Apply the design from the reference image DIRECTLY ONTO THE FINGERNAILS
+- The design should appear AS IF PAINTED ON THE NAIL SURFACE
+- Match the colors, patterns, and style from the reference image EXACTLY
+- Adapt the design to fit each nail's shape and curvature naturally
+- Maintain professional nail art quality with crisp edges and clear details
+- The design belongs ON THE NAILS, not on the background or skin` : 
+  `- Use the design image as ${weights.designImage}% inspiration, blending with other parameters`}
+` : '- No design image provided'}
 
-2. Smart Styling Prompt (Optional)
-Text: ${prompt}
-Influence Weight: ${weights.stylePrompt}% - ${weights.stylePrompt === 0 ? 'IGNORE the text prompt completely.' : weights.stylePrompt === 100 ? 'Follow the written description with MAXIMUM priority.' : `Blend the text with all other inputs at ${weights.stylePrompt}% strength.`}
+DESIGN PARAMETERS:
+- Nail Length: ${nailLength} (Weight: ${weights.nailLength}%)
+- Nail Shape: ${nailShape} (Weight: ${weights.nailShape}%)
+- Base Color: ${prompt.match(/Base color: (#[0-9A-Fa-f]{6})/)?.[1] || 'Not specified'} (Weight: ${weights.baseColor}%)
+- Finish: ${prompt.match(/Finish: (\w+)/)?.[1] || 'glossy'} (Weight: ${weights.finish}%)
+- Texture: ${prompt.match(/Texture: (\w+)/)?.[1] || 'smooth'} (Weight: ${weights.texture}%)
 
-3. Manual Design Parameters
-These are direct selections the user makes in the UI:
+QUALITY REQUIREMENTS:
+- Professional salon-quality nail art
+- Realistic nail polish appearance with proper reflections
+- Design follows natural nail curvature
+- Clean, crisp edges at nail boundaries
+- Consistent application across all visible nails
+- Natural lighting and shadows preserved
 
-- Nail Length: ${nailLength.toUpperCase()}
-  Influence Weight: ${weights.nailLength}% - ${weights.nailLength === 0 ? 'IGNORE nail length completely, use natural length.' : weights.nailLength === 100 ? 'Apply this length with FULL PRIORITY.' : `Consider this length at ${weights.nailLength}% strength.`}
-
-- Nail Shape: ${nailShape.toUpperCase()}
-  Influence Weight: ${weights.nailShape}% - ${weights.nailShape === 0 ? 'IGNORE nail shape completely, keep natural shape.' : weights.nailShape === 100 ? 'Apply this shape with FULL PRIORITY.' : `Consider this shape at ${weights.nailShape}% strength.`}
-
-- Base Color: ${prompt.match(/Base color: (#[0-9A-Fa-f]{6})/)?.[1] || 'Not specified'}
-  Influence Weight: ${weights.baseColor}% - ${weights.baseColor === 0 ? 'IGNORE base color completely.' : weights.baseColor === 100 ? 'Apply this color with FULL PRIORITY.' : `Consider this color at ${weights.baseColor}% strength.`}
-
-- Finish: ${prompt.match(/Finish: (\w+)/)?.[1] || 'Not specified'}
-  Influence Weight: ${weights.finish}% - ${weights.finish === 0 ? 'IGNORE finish completely.' : weights.finish === 100 ? 'Apply this finish with FULL PRIORITY.' : `Consider this finish at ${weights.finish}% strength.`}
-
-- Texture: ${prompt.match(/Texture: (\w+)/)?.[1] || 'Not specified'}
-  Influence Weight: ${weights.texture}% - ${weights.texture === 0 ? 'IGNORE texture completely.' : weights.texture === 100 ? 'Apply this texture with FULL PRIORITY.' : `Consider this texture at ${weights.texture}% strength.`}
-
-Rules:
-– Keep my hand exactly as it appears.
-– Do not generate a second hand.
-– Do not reposition or reshape my fingers.
-– Add no jewelry unless specified.
-– Apply the design as if professionally painted on my real nails.
-– Respect natural nail curvature and realistic lighting reflections.
-– No alterations to skin, background, or camera framing.
-
-Deliver only ONE edited version of the same hand.`
+OUTPUT: Return ONE image with the same hand, same number of fingers, with nail art applied ONLY to the fingernail surfaces.`
 
     console.log('🤖 Generating nail design preview with gpt-image-1...')
     console.log('📥 Fetching original hand image:', originalImage)
