@@ -90,7 +90,7 @@ Build and run the app on a real device (Universal Links don't work in simulator)
 
 1. Open Safari on your iPhone
 2. Type in the address bar: `ivory://`
-3. Should prompt to open the Ivory app
+3. Should prompt to open the Ivory's Choice app
 
 ### Test Universal Links
 

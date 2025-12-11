@@ -1,6 +1,6 @@
 # Capacitor iOS Setup Guide
 
-This guide will help you build and run the Ivory app on iOS using Capacitor.
+This guide will help you build and run the Ivory's Choice app on iOS using Capacitor.
 
 ## Prerequisites
 

@@ -1,6 +1,6 @@
 # Environment Configuration Guide
 
-This guide explains all environment variables used in the Ivory application.
+This guide explains all environment variables used in the Ivory's Choice application.
 
 ## Quick Start
 
