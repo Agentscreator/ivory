@@ -497,17 +497,17 @@ export default function CapturePage() {
     await generateAIPreview(designSettings)
   }
 
-  const saveDesign = async () => {
+  const saveDesign = async (redirectToHome = true) => {
     if (!finalPreview) {
       alert('Please generate a preview first')
-      return
+      return false
     }
 
     try {
       const userStr = localStorage.getItem("ivoryUser")
       if (!userStr) {
         router.push("/")
-        return
+        return false
       }
 
       const user = JSON.parse(userStr)
@@ -528,13 +528,18 @@ export default function CapturePage() {
 
       if (response.ok) {
         alert('Design saved successfully!')
-        router.push("/home")
+        if (redirectToHome) {
+          router.push("/home")
+        }
+        return true
       } else {
         alert('Failed to save design')
+        return false
       }
     } catch (error) {
       console.error('Error saving design:', error)
       alert('An error occurred while saving')
+      return false
     }
   }
 
@@ -627,15 +632,20 @@ export default function CapturePage() {
           <div className="text-charcoal font-semibold text-lg hidden sm:block">Design Your Nails</div>
           <div className="flex items-center gap-2">
             <Button 
-              onClick={saveDesign} 
+              onClick={() => saveDesign(true)} 
               size="sm" 
               variant="outline"
               disabled={!finalPreview}
             >
-              Save
+              Share
             </Button>
             <Button 
-              onClick={proceedToEditor} 
+              onClick={async () => {
+                const saved = await saveDesign(false)
+                if (saved) {
+                  proceedToEditor()
+                }
+              }} 
               size="sm" 
               disabled={!finalPreview}
             >
