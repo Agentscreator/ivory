@@ -72,9 +72,19 @@
 				<string>com.ivory.app</string>
 			</array>
 		</dict>
-
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Google Sign-In</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.87680335444-6arbuilc8506recr49muu0lvol5hrs7a</string>
+			</array>
+		</dict>
 	</array>
-
+	<key>GIDClientID</key>
+	<string>87680335444-6arbuilc8506recr49muu0lvol5hrs7a.apps.googleusercontent.com</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
