@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SignupRedirect() {
+function SignupRedirectContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -23,5 +23,17 @@ export default function SignupRedirect() {
     <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush flex items-center justify-center">
       <div className="text-charcoal">Redirecting...</div>
     </div>
+  );
+}
+
+export default function SignupRedirect() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush flex items-center justify-center">
+        <div className="text-charcoal">Loading...</div>
+      </div>
+    }>
+      <SignupRedirectContent />
+    </Suspense>
   );
 }
