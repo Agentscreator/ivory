@@ -15,7 +15,7 @@ export async function GET() {
     const user = await db
       .select({ referralCode: users.referralCode })
       .from(users)
-      .where(eq(users.id, session.userId));
+      .where(eq(users.id, session.id));
 
     if (user.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -25,7 +25,7 @@ export async function GET() {
     const userReferrals = await db
       .select()
       .from(referrals)
-      .where(eq(referrals.referrerId, session.userId));
+      .where(eq(referrals.referrerId, session.id));
 
     const totalReferrals = userReferrals.length;
     const awardedReferrals = userReferrals.filter(r => r.creditAwarded).length;

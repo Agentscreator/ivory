@@ -14,7 +14,7 @@ export async function GET() {
     const user = await db
       .select({ credits: users.credits })
       .from(users)
-      .where(eq(users.id, session.userId));
+      .where(eq(users.id, session.id));
 
     if (user.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });

@@ -14,7 +14,7 @@ export async function GET() {
     const transactions = await db
       .select()
       .from(creditTransactions)
-      .where(eq(creditTransactions.userId, session.userId))
+      .where(eq(creditTransactions.userId, session.id))
       .orderBy(desc(creditTransactions.createdAt))
       .limit(50);
 
