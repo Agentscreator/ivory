@@ -48,6 +48,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
 
+    // Check if profile already exists
+    const existing = await db
+      .select()
+      .from(techProfiles)
+      .where(eq(techProfiles.userId, parseInt(userId)))
+      .limit(1);
+
+    if (existing.length > 0) {
+      // Update existing profile
+      const updated = await db
+        .update(techProfiles)
+        .set({
+          businessName,
+          location,
+          bio,
+          phoneNumber,
+          website,
+          instagramHandle,
+          updatedAt: new Date(),
+        })
+        .where(eq(techProfiles.userId, parseInt(userId)))
+        .returning();
+
+      return NextResponse.json(updated[0], { status: 200 });
+    }
+
+    // Create new profile
     const newProfile = await db
       .insert(techProfiles)
       .values({
@@ -62,8 +89,9 @@ export async function POST(request: Request) {
       .returning();
 
     return NextResponse.json(newProfile[0], { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to create tech profile' }, { status: 500 });
+  } catch (error: any) {
+    console.error('Tech profile error:', error);
+    return NextResponse.json({ error: error?.message || 'Failed to create tech profile' }, { status: 500 });
   }
 }
 

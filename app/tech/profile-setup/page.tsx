@@ -194,7 +194,7 @@ export default function TechProfileSetupPage() {
         }),
       })
 
-      if (profileRes.ok) {
+      if (profileRes.ok || profileRes.status === 200 || profileRes.status === 201) {
         profileSaved = true
       } else if (profileRes.status === 404) {
         console.warn("Tech profiles API not deployed yet")
@@ -206,7 +206,9 @@ export default function TechProfileSetupPage() {
         }))
         profileSaved = true
       } else {
-        throw new Error("Failed to save profile")
+        const errorData = await profileRes.json().catch(() => ({}))
+        console.error("Profile save error:", errorData)
+        throw new Error(errorData.error || "Failed to save profile")
       }
 
       // Save services
