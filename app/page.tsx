@@ -117,29 +117,13 @@ export default function LoginPage() {
   }
 
   const handleSocialAuth = async (provider: string) => {
-    // For now, create a user with social provider
-    // In production, this would use OAuth flow
-    try {
-      const username = `${provider}_${Date.now()}`
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          username, 
-          email: `${username}@${provider}.oauth`,
-          password: '', 
-          authProvider: provider 
-        }),
-      })
-      
-      if (response.ok) {
-        const user = await response.json()
-        localStorage.setItem("ivoryUser", JSON.stringify(user))
-        router.push("/user-type")
-      }
-    } catch (error) {
-      console.error('Social auth error:', error)
-    }
+    // TODO: Implement proper OAuth flow
+    // This requires:
+    // 1. OAuth provider configuration (Google/Apple credentials)
+    // 2. OAuth callback endpoint
+    // 3. Token exchange and verification
+    // 4. Secure user creation/login
+    alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} authentication is not yet configured. Please use email/password login or contact support.`)
   }
 
   // Show loading state while checking session
