@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI, { toFile } from 'openai'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { config } from '@/lib/config'
+import { getSession } from '@/lib/auth'
+import { deductCredits } from '@/lib/credits'
 
 function getOpenAIClient() {
   const apiKey = config.OPENAI_API_KEY
@@ -40,10 +42,32 @@ async function uploadToR2(buffer: Buffer, filename: string): Promise<string> {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const session = await getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Deduct 1 credit for design generation
+    const creditResult = await deductCredits(
+      session.id,
+      1,
+      'design_generation',
+      'AI nail design generation'
+    )
+
+    if (!creditResult.success) {
+      return NextResponse.json(
+        { error: creditResult.error || 'Failed to deduct credits' },
+        { status: 400 }
+      )
+    }
+
     const openai = getOpenAIClient()
     const { prompt, originalImage, selectedDesignImage, influenceWeights } = await request.json()
 
     console.log('🔍 Received request for nail design generation')
+    console.log('💳 Credits deducted. New balance:', creditResult.newBalance)
 
     if (!prompt || !originalImage) {
       return NextResponse.json({ error: 'Prompt and original image are required' }, { status: 400 })
@@ -216,7 +240,10 @@ OUTPUT: Return ONE image with the same hand, same number of fingers, same orient
     
     console.log('✅ Uploaded to R2:', permanentUrl)
     
-    return NextResponse.json({ imageUrl: permanentUrl })
+    return NextResponse.json({ 
+      imageUrl: permanentUrl,
+      creditsRemaining: creditResult.newBalance
+    })
   } catch (error: any) {
     console.error('❌ Image generation error:', error)
     console.error('Error details:', {

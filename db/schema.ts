@@ -15,6 +15,9 @@ export const users = pgTable('users', {
   authProvider: authProviderEnum('auth_provider').default('email').notNull(),
   userType: userTypeEnum('user_type').notNull(),
   avatar: text('avatar'),
+  credits: integer('credits').default(8).notNull(), // Free credits on signup
+  referralCode: varchar('referral_code', { length: 50 }).unique(), // User's unique referral code
+  referredBy: integer('referred_by').references(() => users.id), // Who referred this user
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -156,6 +159,27 @@ export const notifications = pgTable('notifications', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Referrals tracking
+export const referrals = pgTable('referrals', {
+  id: serial('id').primaryKey(),
+  referrerId: integer('referrer_id').references(() => users.id).notNull(), // User who shared
+  referredUserId: integer('referred_user_id').references(() => users.id).notNull(), // New user who signed up
+  creditAwarded: boolean('credit_awarded').default(false), // Whether referrer got credit
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Credit transactions log
+export const creditTransactions = pgTable('credit_transactions', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  amount: integer('amount').notNull(), // Positive for credits added, negative for used
+  type: varchar('type', { length: 100 }).notNull(), // signup_bonus, referral_reward, design_generation, etc.
+  description: text('description'),
+  relatedId: integer('related_id'), // ID of related entity (referral, design, etc.)
+  balanceAfter: integer('balance_after').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   techProfile: one(techProfiles, {
@@ -169,6 +193,12 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   reviews: many(reviews),
   notifications: many(notifications),
   aiGenerations: many(aiGenerations),
+  referralsMade: many(referrals, { relationName: 'referrer' }),
+  creditTransactions: many(creditTransactions),
+  referrer: one(users, {
+    fields: [users.referredBy],
+    references: [users.id],
+  }),
 }));
 
 export const techProfilesRelations = relations(techProfiles, ({ one, many }) => ({
@@ -206,5 +236,23 @@ export const designRequestsRelations = relations(designRequests, ({ one }) => ({
   review: one(reviews, {
     fields: [designRequests.id],
     references: [reviews.designRequestId],
+  }),
+}));
+
+export const referralsRelations = relations(referrals, ({ one }) => ({
+  referrer: one(users, {
+    fields: [referrals.referrerId],
+    references: [users.id],
+  }),
+  referredUser: one(users, {
+    fields: [referrals.referredUserId],
+    references: [users.id],
+  }),
+}));
+
+export const creditTransactionsRelations = relations(creditTransactions, ({ one }) => ({
+  user: one(users, {
+    fields: [creditTransactions.userId],
+    references: [users.id],
   }),
 }));
