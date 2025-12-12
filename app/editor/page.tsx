@@ -72,6 +72,8 @@ export default function EditorPage() {
 
   useEffect(() => {
     const savedImage = localStorage.getItem("currentEditingImage")
+    const savedPreview = localStorage.getItem("generatedPreview")
+    
     if (savedImage) {
       // If it's a data URL, upload to R2 first
       if (savedImage.startsWith('data:')) {
@@ -80,6 +82,12 @@ export default function EditorPage() {
         // It's already a URL (from R2 or elsewhere)
         setImage(savedImage)
       }
+      
+      // Load the generated preview if available
+      if (savedPreview) {
+        setDalleImage(savedPreview)
+      }
+      
       setNails([
         { id: 1, x: 30, y: 40, selected: false, color: "#FF6B9D" },
         { id: 2, x: 45, y: 35, selected: false, color: "#FF6B9D" },
