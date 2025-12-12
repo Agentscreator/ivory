@@ -7,8 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
-import { ArrowLeft, Save, Palette, Sparkles, Upload, Loader2 } from "lucide-react"
+import { ArrowLeft, Save, Palette, Sparkles, Upload, Loader2, X } from "lucide-react"
 import Image from "next/image"
+import { CreditsDisplay } from "@/components/credits-display"
+import { useCredits } from "@/hooks/use-credits"
+import { toast } from "sonner"
 
 type Nail = {
   id: number
@@ -39,6 +42,7 @@ const baseColors = ["#FF6B9D", "#C44569", "#A8E6CF", "#FFD93D", "#6C5CE7", "#E17
 
 export default function EditorPage() {
   const router = useRouter()
+  const { credits, hasCredits, refresh: refreshCredits } = useCredits()
   const [image, setImage] = useState<string | null>(null)
   const [nails, setNails] = useState<Nail[]>([])
   const [aiPrompt, setAiPrompt] = useState("")
@@ -50,6 +54,8 @@ export default function EditorPage() {
   const [isGeneratingDalle, setIsGeneratingDalle] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const designUploadRef = useRef<HTMLInputElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
   
   // Design settings
   const [designSettings, setDesignSettings] = useState<DesignSettings>({
@@ -134,6 +140,23 @@ export default function EditorPage() {
   // This applies design settings to the user's actual hand image
   // Called from: Design tab (settings change), AI Designs tab (after selection), Upload tab (after upload)
   const generateAIPreview = async (settings: DesignSettings, selectedImage?: string) => {
+    if (!image) return
+    
+    // Check credits before generating
+    if (!hasCredits(1)) {
+      toast.error('Insufficient credits', {
+        description: 'You need 1 credit to generate a design. Refer friends to earn more!',
+        action: {
+          label: 'Get Credits',
+          onClick: () => router.push('/settings/credits'),
+        },
+      })
+      return
+    }
+    
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController()
+    
     setIsGeneratingDalle(true)
     try {
       const prompt = buildPrompt(settings)
@@ -148,15 +171,41 @@ export default function EditorPage() {
           selectedDesignImage: selectedImage || selectedDesignImage,
           influenceWeights
         }),
+        signal: abortControllerRef.current.signal
       })
 
       if (response.ok) {
-        const { imageUrl } = await response.json()
+        const { imageUrl, creditsRemaining } = await response.json()
         setDalleImage(imageUrl)
+        
+        // Refresh credits display
+        refreshCredits()
+        
+        // Show success message with remaining credits
+        toast.success('Design generated successfully!', {
+          description: `You have ${creditsRemaining} credit${creditsRemaining !== 1 ? 's' : ''} remaining.`,
+        })
+      } else {
+        const error = await response.json()
+        toast.error('Generation failed', {
+          description: error.error || 'Failed to generate design',
+        })
       }
-    } catch (error) {
-      console.error('Error generating AI preview:', error)
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.log('Generation cancelled by user')
+      } else {
+        console.error('Error generating AI preview:', error)
+      }
     } finally {
+      setIsGeneratingDalle(false)
+      abortControllerRef.current = null
+    }
+  }
+
+  const cancelGeneration = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
       setIsGeneratingDalle(false)
     }
   }
@@ -164,7 +213,43 @@ export default function EditorPage() {
   const handleDesignSettingChange = (key: keyof DesignSettings, value: string) => {
     const newSettings = { ...designSettings, [key]: value }
     setDesignSettings(newSettings)
-    generateAIPreview(newSettings)
+  }
+
+  const handleDesignUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsGenerating(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/analyze-design-image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const { imageUrl } = data
+        
+        setSelectedDesignImage(imageUrl)
+        toast.success('Design uploaded!', {
+          description: 'Click Generate Preview to apply it',
+        })
+      } else {
+        toast.error('Upload failed', {
+          description: 'Please try again',
+        })
+      }
+    } catch (error) {
+      console.error('Error uploading design:', error)
+      toast.error('Upload failed', {
+        description: 'Please try again',
+      })
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   // Generate AI design concepts using gpt-4o-mini + gpt-image-1
@@ -382,6 +467,100 @@ export default function EditorPage() {
           <div className="w-full">
 
             <div className="p-4 sm:p-6 space-y-4 max-h-80 overflow-y-auto">
+              {/* Low Credits Warning */}
+              {credits !== null && credits <= 2 && credits > 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-3 text-sm">
+                  <p className="text-yellow-800 font-medium">⚠️ Low on credits!</p>
+                  <p className="text-yellow-700 text-xs mt-1">
+                    You have {credits} credit{credits !== 1 ? 's' : ''} left. 
+                    <button 
+                      onClick={() => router.push('/settings/credits')}
+                      className="underline ml-1 font-medium"
+                    >
+                      Get more
+                    </button>
+                  </p>
+                </div>
+              )}
+
+              {/* No Credits Warning */}
+              {credits !== null && credits === 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-3 text-sm">
+                  <p className="text-red-800 font-medium">❌ No credits remaining</p>
+                  <p className="text-red-700 text-xs mt-1">
+                    Refer 3 friends to earn 1 free credit!
+                    <button 
+                      onClick={() => router.push('/settings/credits')}
+                      className="underline ml-1 font-medium"
+                    >
+                      Learn more
+                    </button>
+                  </p>
+                </div>
+              )}
+
+              {/* Generate Preview Button */}
+              {!isGeneratingDalle ? (
+                <Button 
+                  onClick={() => generateAIPreview(designSettings)} 
+                  className="w-full rounded-2xl"
+                  disabled={!hasCredits(1)}
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate Preview
+                  {credits !== null && (
+                    <span className="ml-2 text-xs opacity-70">
+                      (1 credit)
+                    </span>
+                  )}
+                </Button>
+              ) : (
+                <Button 
+                  onClick={cancelGeneration}
+                  variant="destructive"
+                  className="w-full rounded-2xl"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel Generation
+                </Button>
+              )}
+
+              {/* Upload Design Image */}
+              <Button 
+                variant="outline" 
+                onClick={() => designUploadRef.current?.click()}
+                className="w-full rounded-2xl"
+                disabled={isGenerating || isGeneratingDalle}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Design Image
+              </Button>
+
+              {/* Uploaded Design Preview */}
+              {selectedDesignImage && (
+                <div className="p-3 rounded-2xl border border-border bg-white">
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-primary flex-shrink-0">
+                      <Image src={selectedDesignImage} alt="Uploaded Design" fill className="object-cover" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-charcoal">Uploaded Design</p>
+                      <p className="text-xs text-muted-foreground">Ready to apply</p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedDesignImage(null)}
+                      className="text-xs text-red-600 hover:text-red-700 font-medium"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="border-t pt-4">
+                <p className="text-xs font-light text-muted-foreground uppercase tracking-widest mb-4">Design Parameters</p>
+              </div>
+
               {/* Influence Weights Section */}
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 space-y-4 border border-purple-200">
                 <h4 className="text-sm font-bold text-charcoal">Design Influence Controls</h4>
@@ -538,16 +717,15 @@ export default function EditorPage() {
                   </SelectContent>
                 </Select>
               </div>
-
-              <Button 
-                onClick={() => generateAIPreview(designSettings)} 
-                className="w-full"
-                disabled={isGeneratingDalle}
-              >
-                {isGeneratingDalle ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                Generate Preview
-              </Button>
             </div>
+
+            <input
+              ref={designUploadRef}
+              type="file"
+              accept="image/*"
+              onChange={handleDesignUpload}
+              className="hidden"
+            />
           </div>
         </div>
       </div>
