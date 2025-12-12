@@ -57,7 +57,7 @@ export function ReferralCard() {
 
   const shareReferralLink = async () => {
     const link = getReferralLink();
-    const text = `Join me on Ivory and get 8 free credits to create amazing nail designs! Use my referral link: ${link}`;
+    const text = `Join me on Ivory and get 5 free credits to create amazing nail designs! Use my referral link: ${link}`;
 
     if (navigator.share) {
       try {
@@ -150,7 +150,7 @@ export function ReferralCard() {
         </Button>
 
         <div className="text-xs text-muted-foreground space-y-1">
-          <p>• New users get 8 free credits when they sign up</p>
+          <p>• New users get 5 free credits when they sign up</p>
           <p>• You get 1 credit for every 3 people who sign up with your link</p>
           <p>• Credits can be used to generate AI nail designs</p>
         </div>

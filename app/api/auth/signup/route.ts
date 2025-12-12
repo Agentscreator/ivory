@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     // Generate unique referral code for new user
     const newReferralCode = nanoid(10);
 
-    // Create new user with 8 free credits
+    // Create new user with 5 free credits
     const newUser = await db
       .insert(users)
       .values({
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
         passwordHash: password, // In production, hash this with bcrypt
         authProvider,
         userType: 'client', // Default to client, can be changed
-        credits: 8, // Initial free credits
+        credits: 5, // Initial free credits
         referralCode: newReferralCode,
         referredBy: referrerId,
       })
@@ -73,10 +73,10 @@ export async function POST(request: Request) {
     // Log the signup bonus credit transaction
     await db.insert(creditTransactions).values({
       userId: newUser[0].id,
-      amount: 8,
+      amount: 5,
       type: 'signup_bonus',
-      description: 'Welcome bonus - 8 free credits',
-      balanceAfter: 8,
+      description: 'Welcome bonus - 5 free credits',
+      balanceAfter: 5,
     });
 
     // If user was referred, create referral record

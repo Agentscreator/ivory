@@ -158,7 +158,7 @@ export default function LoginPage() {
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="font-serif text-3xl sm:text-4xl font-bold text-charcoal mb-2">Ivory</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              {referralCode ? "🎉 You've been invited! Get 8 free credits" : isSignUp ? "Create your account" : "Welcome back"}
+              {referralCode ? "🎉 You've been invited! Get 5 free credits" : isSignUp ? "Create your account" : "Welcome back"}
             </p>
           </div>
 

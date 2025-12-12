@@ -94,7 +94,7 @@ export default function HomePage() {
                       Earn Free Credits! 🎉
                     </h3>
                     <p className="text-white/90 text-sm sm:text-base">
-                      Share with 3 friends and get <span className="font-bold">1 free credit</span> to create more designs
+                      Refer 3 friends and get <span className="font-bold">1 free credit</span> to create more designs
                     </p>
                   </div>
                 </div>
