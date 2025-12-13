@@ -723,24 +723,49 @@ export default function CapturePage() {
         {/* Image Preview - Side by Side or Grid */}
         <div className="pt-20 pb-4 px-4 overflow-y-auto" style={{ height: 'calc(65vh - 80px)', minHeight: '400px' }}>
           <div className="max-w-2xl mx-auto h-full">
-            <div className={`grid gap-3 h-full ${finalPreviews.length > 1 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-              {/* Original Image */}
-              <div className="relative overflow-hidden rounded-2xl border-2 border-border group h-full">
-                <div className="relative bg-white h-full">
-                  <Image src={capturedImage} alt="Original" fill className="object-contain" />
-                  {/* Change Photo Overlay */}
-                  <button
-                    onClick={changePhoto}
-                    className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
-                  >
-                    <div className="bg-white rounded-full p-3 shadow-lg">
-                      <Upload className="w-6 h-6 text-charcoal" />
+            <div className={`grid gap-3 ${finalPreviews.length > 0 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-2 h-full'}`}>
+              {/* Original Image - Full width when images are generated */}
+              {finalPreviews.length > 0 && (
+                <div className="col-span-1 sm:col-span-2">
+                  <div className="relative overflow-hidden rounded-2xl border-2 border-border group">
+                    <div className="relative bg-white aspect-[3/2]">
+                      <Image src={capturedImage} alt="Original" fill className="object-contain" />
+                      {/* Change Photo Overlay */}
+                      <button
+                        onClick={changePhoto}
+                        className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+                      >
+                        <div className="bg-white rounded-full p-3 shadow-lg">
+                          <Upload className="w-6 h-6 text-charcoal" />
+                        </div>
+                      </button>
                     </div>
-                  </button>
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+                      Original Hand Photo
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Preview Images */}
+              {/* Original Image - Side by side when no images */}
+              {finalPreviews.length === 0 && (
+                <div className="relative overflow-hidden rounded-2xl border-2 border-border group h-full">
+                  <div className="relative bg-white h-full">
+                    <Image src={capturedImage} alt="Original" fill className="object-contain" />
+                    {/* Change Photo Overlay */}
+                    <button
+                      onClick={changePhoto}
+                      className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+                    >
+                      <div className="bg-white rounded-full p-3 shadow-lg">
+                        <Upload className="w-6 h-6 text-charcoal" />
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Preview Images - 2x2 Grid */}
               {finalPreviews.length > 0 ? (
                 finalPreviews.map((imageUrl, index) => (
                   <div key={index} className="relative overflow-hidden rounded-2xl border-2 border-border h-full">

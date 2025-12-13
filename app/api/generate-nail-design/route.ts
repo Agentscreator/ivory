@@ -212,13 +212,13 @@ OUTPUT: Return ONE image with the same hand, same number of fingers, same orient
     // Use the correct images.edit() API for gpt-image-1
     // Note: gpt-image-1 always returns base64, no response_format parameter needed
     // Using 1536x1024 for higher quality (supported sizes: 1024x1024, 1024x1536, 1536x1024, auto)
-    // Generate 2 images per credit for better value
+    // Generate 4 images per credit for better value
     const response = await openai.images.edit({
       model: 'gpt-image-1',
       image: images,
       prompt: enhancedPrompt,
       size: '1536x1024',
-      n: 2
+      n: 4
     })
 
     console.log('✅ OpenAI response received')

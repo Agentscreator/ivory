@@ -413,24 +413,46 @@ export default function EditorPage() {
 
       {/* Main Canvas - Side by Side Images */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-[450px]">
-        <div className={`grid gap-3 mb-4 ${dalleImages.length > 1 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-          {/* Original Image */}
-          <button
-            onClick={() => setExpandedImage(expandedImage === 'original' ? null : 'original')}
-            className={`relative overflow-hidden rounded-2xl border-2 transition-all ${
-              expandedImage === 'original' ? 'border-primary shadow-xl' : 'border-border'
-            }`}
-          >
-            <div className="aspect-[3/4] relative bg-white">
-              <Image src={image} alt="Original" fill className="object-cover" />
-              <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+        <div className={`grid gap-3 mb-4 ${dalleImages.length > 0 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-2'}`}>
+          {/* Original Image - Full width when images are generated */}
+          {dalleImages.length > 0 && (
+            <div className="col-span-1 sm:col-span-2">
+              <button
+                onClick={() => setExpandedImage(expandedImage === 'original' ? null : 'original')}
+                className={`relative overflow-hidden rounded-2xl border-2 transition-all w-full ${
+                  expandedImage === 'original' ? 'border-primary shadow-xl' : 'border-border'
+                }`}
+              >
+                <div className="aspect-[3/2] relative bg-white">
+                  <Image src={image} alt="Original" fill className="object-cover" />
+                  <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+                  Original Hand Photo
+                </div>
+              </button>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
-              Original
-            </div>
-          </button>
+          )}
 
-          {/* DALL-E Generated Images */}
+          {/* Original Image - Side by side when no images */}
+          {dalleImages.length === 0 && (
+            <button
+              onClick={() => setExpandedImage(expandedImage === 'original' ? null : 'original')}
+              className={`relative overflow-hidden rounded-2xl border-2 transition-all ${
+                expandedImage === 'original' ? 'border-primary shadow-xl' : 'border-border'
+              }`}
+            >
+              <div className="aspect-[3/4] relative bg-white">
+                <Image src={image} alt="Original" fill className="object-cover" />
+                <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+                Original
+              </div>
+            </button>
+          )}
+
+          {/* DALL-E Generated Images - 2x2 Grid */}
           {dalleImages.length > 0 ? (
             dalleImages.map((imageUrl, index) => (
               <button
