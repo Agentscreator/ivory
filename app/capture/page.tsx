@@ -670,15 +670,6 @@ export default function CapturePage() {
       console.log(`Save results: ${successCount}/${finalPreviews.length} successful`)
 
       if (allSuccessful) {
-        // Clear session after successful save
-        localStorage.removeItem("currentEditingImage")
-        localStorage.removeItem("captureSession_finalPreviews")
-        localStorage.removeItem("captureSession_finalPreview")
-        localStorage.removeItem("captureSession_designSettings")
-        localStorage.removeItem("captureSession_aiPrompt")
-        localStorage.removeItem("captureSession_selectedDesignImage")
-        console.log('Cleared capture session after save')
-        
         toast.success(`${finalPreviews.length} design${finalPreviews.length > 1 ? 's' : ''} saved successfully! 🎉`, {
           description: redirectToHome ? 'Redirecting to your collection...' : 'You can now continue editing',
           duration: 3000,
@@ -744,16 +735,6 @@ export default function CapturePage() {
     setSelectedDesignImage(null)
     setGeneratedDesigns([])
     setDesignMode(null)
-    
-    // Clear session storage when starting fresh
-    localStorage.removeItem("currentEditingImage")
-    localStorage.removeItem("captureSession_finalPreviews")
-    localStorage.removeItem("captureSession_finalPreview")
-    localStorage.removeItem("captureSession_designSettings")
-    localStorage.removeItem("captureSession_aiPrompt")
-    localStorage.removeItem("captureSession_selectedDesignImage")
-    console.log('Cleared capture session')
-    
     startCamera()
   }
 
