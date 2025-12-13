@@ -868,20 +868,20 @@ export default function CapturePage() {
         {/* Image Modal */}
         {selectedImageModal && (
           <div 
-            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={() => setSelectedImageModal(null)}
           >
-            <div className="relative max-w-4xl w-full max-h-[90vh] flex flex-col">
+            <div className="relative max-w-5xl w-full max-h-[90vh]">
               {/* Close button */}
               <button
                 onClick={() => setSelectedImageModal(null)}
-                className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+                className="absolute -top-14 right-0 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-3 transition-all active:scale-95"
               >
-                <X className="w-8 h-8" />
+                <X className="w-6 h-6" />
               </button>
 
               {/* Image */}
-              <div className="relative flex-1 rounded-2xl overflow-hidden bg-white">
+              <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-white shadow-2xl">
                 <Image 
                   src={selectedImageModal} 
                   alt="Design Preview" 
@@ -891,70 +891,9 @@ export default function CapturePage() {
                 />
               </div>
 
-              {/* Action buttons */}
-              <div className="flex flex-col gap-2.5 mt-4" onClick={(e) => e.stopPropagation()}>
-                <Button
-                  onClick={async () => {
-                    // Set as the image to save
-                    setFinalPreview(selectedImageModal)
-                    
-                    // Auto-save the design
-                    const saved = await saveDesign(false)
-                    
-                    if (saved) {
-                      // Then share
-                      try {
-                        if (navigator.share) {
-                          await navigator.share({
-                            url: selectedImageModal,
-                            title: 'My Nail Design',
-                            text: 'Check out my nail design!'
-                          }).catch(err => {
-                            if (err.name !== 'AbortError') {
-                              window.open(selectedImageModal, '_blank')
-                            }
-                          })
-                        } else {
-                          window.open(selectedImageModal, '_blank')
-                        }
-                      } catch (error) {
-                        console.error('Share error:', error)
-                        window.open(selectedImageModal, '_blank')
-                      }
-                      
-                      setSelectedImageModal(null)
-                    }
-                  }}
-                  className="w-full"
-                  size="lg"
-                  disabled={!finalPreview && selectedImageModal !== finalPreview}
-                >
-                  <Share2 className="w-5 h-5 mr-2" />
-                  Share with Friends
-                </Button>
-                
-                <Button
-                  onClick={async () => {
-                    // Set as the image to save
-                    setFinalPreview(selectedImageModal)
-                    
-                    // Auto-save the design
-                    const saved = await saveDesign(false)
-                    
-                    if (saved) {
-                      toast.success('Design saved! Redirecting to send to tech...')
-                      // Close modal and redirect would happen here
-                      // For now, just close the modal
-                      setSelectedImageModal(null)
-                    }
-                  }}
-                  variant="outline"
-                  className="w-full"
-                  size="lg"
-                >
-                  <Save className="w-5 h-5 mr-2" />
-                  Send to Nail Tech
-                </Button>
+              {/* Image info */}
+              <div className="mt-4 text-center" onClick={(e) => e.stopPropagation()}>
+                <p className="text-white/80 text-sm font-medium">Tap outside to close</p>
               </div>
             </div>
           </div>
