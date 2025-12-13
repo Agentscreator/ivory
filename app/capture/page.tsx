@@ -719,18 +719,26 @@ export default function CapturePage() {
                       <Image src={capturedImage} alt="Original" fill className="object-cover" />
                       {/* Share Original Button */}
                       <button
-                        onClick={() => {
-                          if (navigator.share) {
-                            fetch(capturedImage)
-                              .then(res => res.blob())
-                              .then(blob => {
-                                const file = new File([blob], 'original.jpg', { type: 'image/jpeg' })
-                                navigator.share({
-                                  files: [file],
-                                  title: 'Original Hand Photo',
-                                })
+                        onClick={async () => {
+                          try {
+                            if (navigator.share) {
+                              // Try sharing URL directly first (works on most platforms)
+                              await navigator.share({
+                                url: capturedImage,
+                                title: 'Original Hand Photo',
+                                text: 'Check out my hand photo'
+                              }).catch(err => {
+                                // User canceled or share failed, silently ignore
+                                if (err.name !== 'AbortError') {
+                                  console.log('Share failed, opening in new tab')
+                                  window.open(capturedImage, '_blank')
+                                }
                               })
-                          } else {
+                            } else {
+                              window.open(capturedImage, '_blank')
+                            }
+                          } catch (error) {
+                            console.error('Share error:', error)
                             window.open(capturedImage, '_blank')
                           }
                         }}
@@ -756,19 +764,27 @@ export default function CapturePage() {
                   {finalPreviews.map((imageUrl, index) => (
                     <div key={index} className="relative overflow-hidden rounded-2xl border-2 border-border">
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           setFinalPreview(imageUrl)
-                          if (navigator.share) {
-                            fetch(imageUrl)
-                              .then(res => res.blob())
-                              .then(blob => {
-                                const file = new File([blob], `design-${index + 1}.jpg`, { type: 'image/jpeg' })
-                                navigator.share({
-                                  files: [file],
-                                  title: `Nail Design ${index + 1}`,
-                                })
+                          try {
+                            if (navigator.share) {
+                              // Try sharing URL directly first (works on most platforms)
+                              await navigator.share({
+                                url: imageUrl,
+                                title: `Nail Design ${index + 1}`,
+                                text: 'Check out my nail design!'
+                              }).catch(err => {
+                                // User canceled or share failed, silently ignore
+                                if (err.name !== 'AbortError') {
+                                  console.log('Share failed, opening in new tab')
+                                  window.open(imageUrl, '_blank')
+                                }
                               })
-                          } else {
+                            } else {
+                              window.open(imageUrl, '_blank')
+                            }
+                          } catch (error) {
+                            console.error('Share error:', error)
                             window.open(imageUrl, '_blank')
                           }
                         }}
