@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Plus, Home, Sparkles, User, Gift, Share2, X } from "lucide-react"
 import Image from "next/image"
 import { useCredits } from "@/hooks/use-credits"
+import { BottomNav } from "@/components/bottom-nav"
 
 type NailLook = {
   id: string
@@ -187,34 +188,7 @@ export default function HomePage() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-border safe-bottom z-20">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-around h-20 sm:h-24">
-            <button
-              onClick={() => router.push("/home")}
-              className="flex flex-col items-center justify-center gap-1 text-primary min-w-[60px] active:scale-95 transition-transform"
-            >
-              <Home className="w-6 h-6 sm:w-7 sm:h-7" />
-              <span className="text-xs sm:text-sm font-medium">Home</span>
-            </button>
-
-            <button
-              onClick={startNewDesign}
-              className="flex flex-col items-center justify-center -mt-8 sm:-mt-10 bg-gradient-to-br from-terracotta to-rose text-white rounded-full w-16 h-16 sm:w-20 sm:h-20 shadow-xl active:scale-95 transition-transform"
-            >
-              <Plus className="w-8 h-8 sm:w-10 sm:h-10" />
-            </button>
-
-            <button
-              onClick={() => router.push("/profile")}
-              className="flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground active:text-foreground transition-colors min-w-[60px] active:scale-95"
-            >
-              <User className="w-6 h-6 sm:w-7 sm:h-7" />
-              <span className="text-xs sm:text-sm font-medium">Profile</span>
-            </button>
-          </div>
-        </div>
-      </nav>
+      <BottomNav onCenterAction={startNewDesign} centerActionLabel="Create" />
     </div>
   )
 }

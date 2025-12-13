@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { ArrowLeft, LogOut, Settings, Home, Plus, User, Camera, Upload, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { useToast } from "@/components/ui/use-toast"
+import { BottomNav } from "@/components/bottom-nav"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -233,22 +234,31 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush pb-24">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10 safe-top">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="active:scale-95 transition-transform">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="font-serif text-lg sm:text-xl font-bold text-charcoal">Profile</h1>
+      <header className="bg-white/95 backdrop-blur-xl border-b border-border/50 sticky top-0 z-10 safe-top shadow-sm">
+        <div className="max-w-screen-xl mx-auto px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => router.back()} 
+              className="hover:bg-muted/50 active:scale-95 transition-all rounded-xl"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <h1 className="font-serif text-xl sm:text-2xl font-bold bg-gradient-to-r from-terracotta to-rose bg-clip-text text-transparent">
+              Profile
+            </h1>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-safe">
         {/* Profile Card */}
-        <Card className="p-6 sm:p-8 text-center mb-4 sm:mb-6 bg-white rounded-3xl shadow-lg">
-          <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 group">
+        <Card className="p-8 sm:p-10 text-center mb-5 sm:mb-6 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border-0">
+          <div className="relative w-28 h-28 sm:w-32 sm:h-32 mx-auto mb-5 sm:mb-6 group">
             {profileImage ? (
-              <div className="relative w-full h-full rounded-full overflow-hidden">
+              <div className="relative w-full h-full rounded-full overflow-hidden ring-4 ring-white shadow-2xl">
                 <Image
                   src={profileImage}
                   alt={username || 'User'}
@@ -257,8 +267,8 @@ export default function ProfilePage() {
                 />
               </div>
             ) : (
-              <div className="w-full h-full rounded-full bg-gradient-to-br from-terracotta to-rose flex items-center justify-center">
-                <span className="text-2xl sm:text-3xl font-bold text-white">
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-terracotta via-rose to-rose-600 flex items-center justify-center ring-4 ring-white shadow-2xl">
+                <span className="text-4xl sm:text-5xl font-bold text-white">
                   {username ? username.charAt(0).toUpperCase() : 'U'}
                 </span>
               </div>
@@ -268,19 +278,22 @@ export default function ProfilePage() {
             <button
               onClick={() => profileImageInputRef.current?.click()}
               disabled={uploadingProfile}
-              className="absolute inset-0 bg-black/0 hover:bg-black/40 active:bg-black/40 rounded-full transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 active:opacity-100 active:scale-95"
+              className="absolute inset-0 bg-black/0 hover:bg-black/50 active:bg-black/50 rounded-full transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 active:opacity-100 active:scale-95"
               aria-label="Change profile picture"
             >
               {uploadingProfile ? (
-                <Loader2 className="w-6 h-6 text-white animate-spin" />
+                <Loader2 className="w-7 h-7 text-white animate-spin" />
               ) : (
-                <Camera className="w-6 h-6 text-white" />
+                <div className="flex flex-col items-center gap-1">
+                  <Camera className="w-7 h-7 text-white drop-shadow-lg" />
+                  <span className="text-xs text-white font-medium hidden sm:block">Change</span>
+                </div>
               )}
             </button>
             
             {/* Mobile hint badge */}
-            <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-gradient-to-br from-terracotta to-rose rounded-full flex items-center justify-center shadow-lg sm:hidden">
-              <Camera className="w-4 h-4 text-white" />
+            <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-gradient-to-br from-terracotta to-rose rounded-full flex items-center justify-center shadow-xl sm:hidden ring-4 ring-white">
+              <Camera className="w-5 h-5 text-white" />
             </div>
             
             <input
@@ -293,33 +306,33 @@ export default function ProfilePage() {
           </div>
           
           {isEditingUsername ? (
-            <div className="space-y-3 w-full max-w-xs mx-auto">
+            <div className="space-y-4 w-full max-w-sm mx-auto">
               <input
                 type="text"
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 placeholder="Enter username"
-                className="w-full px-3 py-2 border border-border rounded-lg text-center font-serif text-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-3 border-2 border-border rounded-xl text-center font-serif text-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                 autoFocus
               />
               {usernameError && (
-                <p className="text-xs text-destructive">{usernameError}</p>
+                <p className="text-sm text-destructive font-medium">{usernameError}</p>
               )}
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Button
-                  size="sm"
+                  size="lg"
                   variant="outline"
                   onClick={handleUsernameCancel}
                   disabled={savingUsername}
-                  className="flex-1"
+                  className="flex-1 h-11 border-2 hover:bg-muted/50 rounded-xl"
                 >
                   Cancel
                 </Button>
                 <Button
-                  size="sm"
+                  size="lg"
                   onClick={handleUsernameSave}
                   disabled={savingUsername}
-                  className="flex-1"
+                  className="flex-1 h-11 bg-gradient-to-r from-terracotta to-rose hover:from-terracotta/90 hover:to-rose/90 shadow-md rounded-xl"
                 >
                   {savingUsername ? "Saving..." : "Save"}
                 </Button>
@@ -327,54 +340,66 @@ export default function ProfilePage() {
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <h2 className="font-serif text-xl sm:text-2xl font-bold text-charcoal">
+              <div className="flex items-center justify-center gap-2.5 mb-2">
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-charcoal">
                   {needsUsername ? 'Add Username' : username}
                 </h2>
                 <button
                   onClick={handleUsernameEdit}
-                  className="text-primary hover:text-primary/80 transition-colors"
+                  className="p-2 text-primary hover:text-primary/80 hover:bg-primary/10 rounded-lg transition-all active:scale-95"
                   aria-label="Edit username"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                   </svg>
                 </button>
               </div>
               {needsUsername && (
-                <p className="text-xs text-muted-foreground mb-2">Click the edit icon to set your username</p>
+                <p className="text-sm text-muted-foreground mb-3 px-4">Click the edit icon to set your username</p>
               )}
-              <p className="text-xs sm:text-sm text-muted-foreground capitalize">
-                {userType === "tech" ? "Nail Tech" : "User"}
-              </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-terracotta/10 to-rose/10 rounded-full">
+                {userType === "tech" && (
+                  <svg className="w-4 h-4 text-terracotta" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                )}
+                <span className="text-sm font-semibold text-charcoal capitalize">
+                  {userType === "tech" ? "Verified Nail Tech" : "Member"}
+                </span>
+              </div>
             </>
           )}
         </Card>
 
         {/* Portfolio Gallery for Tech Users */}
         {userType === "tech" && (
-          <Card className="p-4 sm:p-6 mb-4 sm:mb-6 bg-white rounded-3xl shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-serif text-lg sm:text-xl font-bold text-charcoal">Portfolio</h3>
+          <Card className="p-5 sm:p-6 mb-5 sm:mb-6 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border-0">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-charcoal mb-1">Portfolio</h3>
+                <p className="text-sm text-muted-foreground">
+                  {portfolioImages.length} {portfolioImages.length === 1 ? 'photo' : 'photos'}
+                </p>
+              </div>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => router.push("/tech/profile-setup")}
-                className="h-9 sm:h-10 active:scale-95 transition-transform"
+                className="h-10 sm:h-11 px-4 border-2 hover:bg-muted/50 active:scale-95 transition-all rounded-xl"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Manage
+                <span className="hidden sm:inline">Manage</span>
+                <span className="sm:hidden">Edit</span>
               </Button>
             </div>
 
             {portfolioImages.length > 0 ? (
-              <div className="grid grid-cols-3 gap-1 sm:gap-2">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {portfolioImages.slice(0, 9).map((url, index) => (
                   <div
                     key={url}
-                    className="relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover:opacity-90 transition-opacity"
+                    className="group relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 cursor-pointer shadow-md hover:shadow-xl transition-all duration-300"
                     onClick={() => {
-                      // Could open lightbox here
                       window.open(url, '_blank')
                     }}
                   >
@@ -382,32 +407,37 @@ export default function ProfilePage() {
                       src={url}
                       alt={`Portfolio ${index + 1}`}
                       fill
-                      className="object-cover"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                       sizes="(max-width: 640px) 33vw, 25vw"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                 ))}
                 
                 {portfolioImages.length > 9 && (
                   <div
-                    className="relative aspect-square rounded-lg overflow-hidden bg-black/60 flex items-center justify-center cursor-pointer hover:bg-black/70 transition-colors"
+                    className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-terracotta/80 to-rose/80 flex items-center justify-center cursor-pointer hover:from-terracotta hover:to-rose transition-all duration-300 shadow-md"
                     onClick={() => router.push("/tech/profile-setup")}
                   >
-                    <span className="text-white text-xl sm:text-2xl font-bold">
+                    <span className="text-white text-2xl sm:text-3xl font-bold drop-shadow-lg">
                       +{portfolioImages.length - 9}
                     </span>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
-                <Upload className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground mb-3">No portfolio images yet</p>
+              <div className="text-center py-10 sm:py-12 border-2 border-dashed border-border/50 rounded-2xl bg-gradient-to-br from-muted/20 to-muted/10">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-muted/40 to-muted/20 flex items-center justify-center">
+                  <Upload className="w-8 h-8 text-muted-foreground/60" />
+                </div>
+                <h4 className="font-serif text-lg font-bold text-charcoal mb-2">No Portfolio Yet</h4>
+                <p className="text-sm text-muted-foreground mb-4 px-4">Showcase your best work to attract clients</p>
                 <Button
                   size="sm"
                   onClick={() => router.push("/tech/profile-setup")}
-                  className="active:scale-95 transition-transform"
+                  className="h-10 px-6 bg-gradient-to-r from-terracotta to-rose hover:from-terracotta/90 hover:to-rose/90 shadow-md active:scale-95 transition-all rounded-xl"
                 >
+                  <Plus className="w-4 h-4 mr-2" />
                   Add Photos
                 </Button>
               </div>
@@ -416,74 +446,59 @@ export default function ProfilePage() {
         )}
 
         {/* Menu Options */}
-        <div className="space-y-3 sm:space-y-3 mb-4 sm:mb-6">
+        <div className="space-y-3 mb-5 sm:mb-6">
           {userType === "tech" && (
-            <Button
-              variant="outline"
-              className="w-full justify-start h-16 sm:h-18 text-left bg-white active:scale-95 transition-transform rounded-2xl shadow-sm"
+            <Card
+              className="p-5 bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl cursor-pointer active:scale-[0.98] transition-all duration-200 rounded-2xl"
               onClick={() => router.push("/tech/profile-setup")}
             >
-              <Settings className="w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm sm:text-base">Tech Profile Setup</div>
-                <div className="text-xs text-muted-foreground">Services, prices, and gallery</div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-terracotta/20 to-rose/20 flex items-center justify-center flex-shrink-0">
+                  <Settings className="w-6 h-6 text-terracotta" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-serif font-bold text-base sm:text-lg text-charcoal mb-0.5">Tech Profile Setup</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">Services, prices, and gallery</div>
+                </div>
+                <svg className="w-5 h-5 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </div>
-            </Button>
+            </Card>
           )}
 
-          <Button
-            variant="outline"
-            className="w-full justify-start h-16 sm:h-18 text-left bg-white active:scale-95 transition-transform rounded-2xl shadow-sm"
+          <Card
+            className="p-5 bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl cursor-pointer active:scale-[0.98] transition-all duration-200 rounded-2xl"
             onClick={() => router.push("/settings")}
           >
-            <Settings className="w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0" />
-            <div className="min-w-0">
-              <div className="font-semibold text-sm sm:text-base">Settings</div>
-              <div className="text-xs text-muted-foreground">Preferences and notifications</div>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-muted/40 to-muted/20 flex items-center justify-center flex-shrink-0">
+                <Settings className="w-6 h-6 text-charcoal/70" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-serif font-bold text-base sm:text-lg text-charcoal mb-0.5">Settings</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Preferences and notifications</div>
+              </div>
+              <svg className="w-5 h-5 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </div>
-          </Button>
+          </Card>
         </div>
 
         {/* Logout */}
         <Button
           variant="outline"
-          className="w-full h-12 sm:h-14 text-base text-destructive hover:text-destructive bg-transparent active:scale-95 transition-transform rounded-2xl"
+          className="w-full h-14 text-base font-semibold text-destructive hover:text-destructive hover:bg-destructive/5 border-2 border-destructive/20 hover:border-destructive/30 active:scale-[0.98] transition-all rounded-2xl"
           onClick={handleLogout}
         >
-          <LogOut className="w-5 h-5 mr-2" />
+          <LogOut className="w-5 h-5 mr-2.5" />
           Log Out
         </Button>
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-border safe-bottom z-20">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-around h-20 sm:h-24">
-            <button
-              onClick={() => router.push(userType === "tech" ? "/tech/dashboard" : "/home")}
-              className="flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground active:text-foreground transition-colors min-w-[60px] active:scale-95"
-            >
-              <Home className="w-6 h-6 sm:w-7 sm:h-7" />
-              <span className="text-xs sm:text-sm font-medium">Home</span>
-            </button>
-
-            <button
-              onClick={startNewDesign}
-              className="flex flex-col items-center justify-center -mt-8 sm:-mt-10 bg-gradient-to-br from-terracotta to-rose text-white rounded-full w-16 h-16 sm:w-20 sm:h-20 shadow-xl active:scale-95 transition-transform"
-            >
-              <Plus className="w-8 h-8 sm:w-10 sm:h-10" />
-            </button>
-
-            <button
-              onClick={() => router.push("/profile")}
-              className="flex flex-col items-center justify-center gap-1 text-primary min-w-[60px] active:scale-95 transition-transform"
-            >
-              <User className="w-6 h-6 sm:w-7 sm:h-7" />
-              <span className="text-xs sm:text-sm font-medium">Profile</span>
-            </button>
-          </div>
-        </div>
-      </nav>
+      <BottomNav onCenterAction={startNewDesign} centerActionLabel="Create" />
     </div>
   )
 }

@@ -13,6 +13,7 @@ import { Slider } from "@/components/ui/slider"
 import { CreditsDisplay } from "@/components/credits-display"
 import { useCredits } from "@/hooks/use-credits"
 import { toast } from "sonner"
+import { BottomNav } from "@/components/bottom-nav"
 
 type DesignMode = 'design' | 'ai-design' | null
 
@@ -1346,40 +1347,7 @@ export default function CapturePage() {
         </div>
 
         {/* Bottom Navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-border safe-bottom z-30">
-          <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center justify-around h-20 sm:h-24">
-              <button
-                onClick={() => router.push("/home")}
-                className="flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground active:text-foreground transition-colors min-w-[60px] active:scale-95"
-              >
-                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                <span className="text-xs sm:text-sm font-medium">Home</span>
-              </button>
-
-              <button
-                onClick={changePhoto}
-                className="flex flex-col items-center justify-center -mt-8 sm:-mt-10 bg-gradient-to-br from-terracotta to-rose text-white rounded-full w-16 h-16 sm:w-20 sm:h-20 shadow-xl active:scale-95 transition-transform"
-              >
-                <svg className="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-              </button>
-
-              <button
-                onClick={() => router.push("/profile")}
-                className="flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground active:text-foreground transition-colors min-w-[60px] active:scale-95"
-              >
-                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span className="text-xs sm:text-sm font-medium">Profile</span>
-              </button>
-            </div>
-          </div>
-        </nav>
+        <BottomNav onCenterAction={changePhoto} centerActionLabel="Capture" />
       </div>
     )
   }
