@@ -50,6 +50,7 @@ export default function EditorPage() {
   const [generatedDesigns, setGeneratedDesigns] = useState<string[]>([])
   const [selectedDesignImage, setSelectedDesignImage] = useState<string | null>(null)
   const [dalleImage, setDalleImage] = useState<string | null>(null)
+  const [dalleImages, setDalleImages] = useState<string[]>([])
   const [expandedImage, setExpandedImage] = useState<'original' | 'dalle' | null>(null)
   const [isGeneratingDalle, setIsGeneratingDalle] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -175,14 +176,17 @@ export default function EditorPage() {
       })
 
       if (response.ok) {
-        const { imageUrl, creditsRemaining } = await response.json()
-        setDalleImage(imageUrl)
+        const { imageUrl, imageUrls, creditsRemaining } = await response.json()
+        // Use imageUrls if available (new format), fallback to imageUrl for backward compatibility
+        const images = imageUrls || [imageUrl]
+        setDalleImages(images)
+        setDalleImage(images[0]) // Set first image as primary for backward compatibility
         
         // Refresh credits display
         refreshCredits()
         
         // Show success message with remaining credits
-        toast.success('Design generated successfully!', {
+        toast.success(`${images.length} design${images.length > 1 ? 's' : ''} generated successfully!`, {
           description: `You have ${creditsRemaining} credit${creditsRemaining !== 1 ? 's' : ''} remaining.`,
         })
       } else {
@@ -409,7 +413,7 @@ export default function EditorPage() {
 
       {/* Main Canvas - Side by Side Images */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-[450px]">
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className={`grid gap-3 mb-4 ${dalleImages.length > 1 ? 'grid-cols-3' : 'grid-cols-2'}`}>
           {/* Original Image */}
           <button
             onClick={() => setExpandedImage(expandedImage === 'original' ? null : 'original')}
@@ -426,32 +430,52 @@ export default function EditorPage() {
             </div>
           </button>
 
-          {/* DALL-E Generated Image */}
-          <button
-            onClick={() => setExpandedImage(expandedImage === 'dalle' ? null : 'dalle')}
-            className={`relative overflow-hidden rounded-2xl border-2 transition-all ${
-              expandedImage === 'dalle' ? 'border-primary shadow-xl' : 'border-border'
-            }`}
-          >
-            <div className="aspect-[3/4] relative bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-              {isGeneratingDalle ? (
-                <div className="text-center">
-                  <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin text-primary" />
-                  <p className="text-xs text-muted-foreground">Generating...</p>
+          {/* DALL-E Generated Images */}
+          {dalleImages.length > 0 ? (
+            dalleImages.map((imageUrl, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setDalleImage(imageUrl)
+                  setExpandedImage(expandedImage === `dalle-${index}` ? null : `dalle-${index}`)
+                }}
+                className={`relative overflow-hidden rounded-2xl border-2 transition-all ${
+                  expandedImage === `dalle-${index}` ? 'border-primary shadow-xl' : 'border-border'
+                } ${dalleImage === imageUrl ? 'ring-2 ring-primary ring-offset-2' : ''}`}
+              >
+                <div className="aspect-[3/4] relative bg-white">
+                  <Image src={imageUrl} alt={`AI Generated ${index + 1}`} fill className="object-cover" />
                 </div>
-              ) : dalleImage ? (
-                <Image src={dalleImage} alt="AI Generated" fill className="object-cover" />
-              ) : (
-                <div className="text-center px-4">
-                  <Sparkles className="w-8 h-8 mx-auto mb-2 text-primary" />
-                  <p className="text-xs text-muted-foreground">Configure design to generate AI preview</p>
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+                  Design {index + 1}
                 </div>
-              )}
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
-              AI Preview
-            </div>
-          </button>
+              </button>
+            ))
+          ) : (
+            <button
+              onClick={() => setExpandedImage(expandedImage === 'dalle' ? null : 'dalle')}
+              className={`relative overflow-hidden rounded-2xl border-2 transition-all ${
+                expandedImage === 'dalle' ? 'border-primary shadow-xl' : 'border-border'
+              }`}
+            >
+              <div className="aspect-[3/4] relative bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                {isGeneratingDalle ? (
+                  <div className="text-center">
+                    <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin text-primary" />
+                    <p className="text-xs text-muted-foreground">Generating...</p>
+                  </div>
+                ) : (
+                  <div className="text-center px-4">
+                    <Sparkles className="w-8 h-8 mx-auto mb-2 text-primary" />
+                    <p className="text-xs text-muted-foreground">Configure design to generate AI preview</p>
+                  </div>
+                )}
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+                AI Preview
+              </div>
+            </button>
+          )}
         </div>
 
         <p className="text-xs sm:text-sm text-center text-muted-foreground mb-4 px-4">

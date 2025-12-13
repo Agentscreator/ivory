@@ -45,6 +45,7 @@ export default function CapturePage() {
   const [generatedDesigns, setGeneratedDesigns] = useState<string[]>([])
   const [selectedDesignImage, setSelectedDesignImage] = useState<string | null>(null)
   const [finalPreview, setFinalPreview] = useState<string | null>(null)
+  const [finalPreviews, setFinalPreviews] = useState<string[]>([])
   const [colorLightness, setColorLightness] = useState(65) // 0-100 for lightness (matches initial color)
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
   
@@ -322,14 +323,17 @@ export default function CapturePage() {
 
       if (response.ok) {
         setGenerationProgress(100)
-        const { imageUrl, creditsRemaining } = await response.json()
-        setFinalPreview(imageUrl)
+        const { imageUrl, imageUrls, creditsRemaining } = await response.json()
+        // Use imageUrls if available (new format), fallback to imageUrl for backward compatibility
+        const images = imageUrls || [imageUrl]
+        setFinalPreviews(images)
+        setFinalPreview(images[0]) // Set first image as primary for backward compatibility
         
         // Refresh credits display
         refreshCredits()
         
         // Show success message with remaining credits
-        toast.success('Design generated successfully!', {
+        toast.success(`${images.length} design${images.length > 1 ? 's' : ''} generated successfully!`, {
           description: `You have ${creditsRemaining} credit${creditsRemaining !== 1 ? 's' : ''} remaining.`,
         })
       } else {
@@ -611,6 +615,7 @@ export default function CapturePage() {
   const changePhoto = () => {
     setCapturedImage(null)
     setFinalPreview(null)
+    setFinalPreviews([])
     setSelectedDesignImage(null)
     setGeneratedDesigns([])
     setDesignMode(null)
@@ -715,10 +720,10 @@ export default function CapturePage() {
           </div>
         </div>
 
-        {/* Image Preview - Side by Side */}
+        {/* Image Preview - Side by Side or Grid */}
         <div className="pt-20 pb-4 px-4 overflow-y-auto" style={{ height: 'calc(65vh - 80px)', minHeight: '400px' }}>
           <div className="max-w-2xl mx-auto h-full">
-            <div className="grid grid-cols-2 gap-3 h-full">
+            <div className={`grid gap-3 h-full ${finalPreviews.length > 1 ? 'grid-cols-3' : 'grid-cols-2'}`}>
               {/* Original Image */}
               <div className="relative overflow-hidden rounded-2xl border-2 border-border group h-full">
                 <div className="relative bg-white h-full">
@@ -735,10 +740,40 @@ export default function CapturePage() {
                 </div>
               </div>
 
-              {/* Preview Image */}
-              <div className="relative overflow-hidden rounded-2xl border-2 border-border h-full">
-                <div className="relative bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center h-full">
-                  {isGenerating ? (
+              {/* Preview Images */}
+              {finalPreviews.length > 0 ? (
+                finalPreviews.map((imageUrl, index) => (
+                  <div key={index} className="relative overflow-hidden rounded-2xl border-2 border-border h-full">
+                    <button
+                      onClick={() => {
+                        setFinalPreview(imageUrl)
+                        window.open(imageUrl, '_blank')
+                      }}
+                      className={`relative w-full h-full group cursor-pointer ${
+                        finalPreview === imageUrl ? 'ring-2 ring-primary ring-offset-2' : ''
+                      }`}
+                    >
+                      <div className="relative bg-white h-full">
+                        <Image src={imageUrl} alt={`AI Generated ${index + 1}`} fill className="object-contain" />
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                          <div className="bg-white/90 rounded-full p-3 shadow-lg">
+                            <svg className="w-6 h-6 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+                        Design {index + 1}
+                      </div>
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="relative overflow-hidden rounded-2xl border-2 border-border h-full">
+                  <div className="relative bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center h-full">
+                    {isGenerating ? (
                     <div className="absolute inset-0 flex items-center justify-center">
                       {/* Dimmed GIF Background */}
                       <div className="absolute inset-0 opacity-30">
@@ -820,21 +855,6 @@ export default function CapturePage() {
                         </div>
                       </div>
                     </div>
-                  ) : finalPreview ? (
-                    <button
-                      onClick={() => window.open(finalPreview, '_blank')}
-                      className="relative w-full h-full group cursor-pointer"
-                    >
-                      <Image src={finalPreview} alt="AI Generated" fill className="object-contain" />
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="bg-white/90 rounded-full p-3 shadow-lg">
-                          <svg className="w-6 h-6 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                          </svg>
-                        </div>
-                      </div>
-                    </button>
                   ) : (
                     <div className="text-center px-4">
                       <Sparkles className="w-8 h-8 mx-auto mb-2 text-primary" />
@@ -843,8 +863,9 @@ export default function CapturePage() {
                       </p>
                     </div>
                   )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
