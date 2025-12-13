@@ -70,14 +70,13 @@ export async function GET(request: Request) {
           .where(eq(users.id, user.id));
       }
     } else {
-      // Create new user
-      const username = googleUser.email.split('@')[0] + '_' + nanoid(6);
+      // Create new user without username (they'll set it later)
       const referralCode = nanoid(10);
 
       const newUser = await db
         .insert(users)
         .values({
-          username,
+          username: googleUser.email, // Use email as temporary username
           email: googleUser.email,
           authProvider: 'google',
           userType: 'client',
@@ -102,7 +101,8 @@ export async function GET(request: Request) {
     // Create session
     await createSession(user.id);
 
-    // Redirect based on user type
+    // Always redirect to user-type selection for new OAuth users
+    // or to their dashboard if they already have a type
     if (user.userType === 'tech') {
       return NextResponse.redirect(`${env.BASE_URL}/tech/dashboard`);
     } else if (user.userType === 'client') {

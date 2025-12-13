@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { ArrowLeft, LogOut, Settings, Home, Plus, User, Camera, Upload, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { useToast } from "@/components/ui/use-toast"
@@ -17,6 +18,10 @@ export default function ProfilePage() {
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [portfolioImages, setPortfolioImages] = useState<string[]>([])
   const [uploadingProfile, setUploadingProfile] = useState(false)
+  const [isEditingUsername, setIsEditingUsername] = useState(false)
+  const [newUsername, setNewUsername] = useState("")
+  const [usernameError, setUsernameError] = useState("")
+  const [savingUsername, setSavingUsername] = useState(false)
   const profileImageInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -163,6 +168,68 @@ export default function ProfilePage() {
     router.push("/capture")
   }
 
+  const handleUsernameEdit = () => {
+    setNewUsername(username || "")
+    setUsernameError("")
+    setIsEditingUsername(true)
+  }
+
+  const handleUsernameSave = async () => {
+    if (!newUsername.trim()) {
+      setUsernameError("Username cannot be empty")
+      return
+    }
+
+    // Validate username format
+    const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/
+    if (!usernameRegex.test(newUsername)) {
+      setUsernameError("Username must be 3-30 characters (letters, numbers, _, -)")
+      return
+    }
+
+    setSavingUsername(true)
+    setUsernameError("")
+
+    try {
+      const response = await fetch('/api/user/update-username', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: newUsername }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setUsernameError(data.error || 'Failed to update username')
+        return
+      }
+
+      // Update local state and localStorage
+      setUsername(data.username)
+      localStorage.setItem("ivoryUser", JSON.stringify(data))
+      setIsEditingUsername(false)
+
+      toast({
+        title: "Username updated",
+        description: "Your username has been changed successfully",
+      })
+    } catch (error) {
+      console.error('Error updating username:', error)
+      setUsernameError('Failed to update username')
+    } finally {
+      setSavingUsername(false)
+    }
+  }
+
+  const handleUsernameCancel = () => {
+    setIsEditingUsername(false)
+    setNewUsername("")
+    setUsernameError("")
+  }
+
+  // Check if username looks like an auto-generated one or email
+  const needsUsername = !username || username.includes('@') || username.includes('_176') || username.includes('google_') || username.includes('apple_')
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush pb-24">
       {/* Header */}
@@ -225,10 +292,63 @@ export default function ProfilePage() {
             />
           </div>
           
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-charcoal mb-1">{username || 'User'}</h2>
-          <p className="text-xs sm:text-sm text-muted-foreground capitalize">
-            {userType === "tech" ? "Nail Tech" : "User"}
-          </p>
+          {isEditingUsername ? (
+            <div className="space-y-3 w-full max-w-xs mx-auto">
+              <input
+                type="text"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                placeholder="Enter username"
+                className="w-full px-3 py-2 border border-border rounded-lg text-center font-serif text-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                autoFocus
+              />
+              {usernameError && (
+                <p className="text-xs text-destructive">{usernameError}</p>
+              )}
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleUsernameCancel}
+                  disabled={savingUsername}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleUsernameSave}
+                  disabled={savingUsername}
+                  className="flex-1"
+                >
+                  {savingUsername ? "Saving..." : "Save"}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <h2 className="font-serif text-xl sm:text-2xl font-bold text-charcoal">
+                  {needsUsername ? 'Add Username' : username}
+                </h2>
+                <button
+                  onClick={handleUsernameEdit}
+                  className="text-primary hover:text-primary/80 transition-colors"
+                  aria-label="Edit username"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                </button>
+              </div>
+              {needsUsername && (
+                <p className="text-xs text-muted-foreground mb-2">Click the edit icon to set your username</p>
+              )}
+              <p className="text-xs sm:text-sm text-muted-foreground capitalize">
+                {userType === "tech" ? "Nail Tech" : "User"}
+              </p>
+            </>
+          )}
         </Card>
 
         {/* Portfolio Gallery for Tech Users */}

@@ -64,14 +64,13 @@ export async function POST(request: Request) {
           .where(eq(users.id, user.id));
       }
     } else {
-      // Create new user
-      const username = appleUser.email.split('@')[0] + '_' + nanoid(6);
+      // Create new user without username (they'll set it later)
       const referralCode = nanoid(10);
 
       const newUser = await db
         .insert(users)
         .values({
-          username,
+          username: appleUser.email, // Use email as temporary username
           email: appleUser.email,
           authProvider: 'apple',
           userType: 'client',
