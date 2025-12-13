@@ -568,20 +568,26 @@ export default function CapturePage() {
       toast.dismiss(loadingToast)
 
       if (response.ok) {
+        const savedLook = await response.json()
+        console.log('Design saved successfully:', savedLook)
+        
         toast.success('Design saved successfully! 🎉', {
           description: redirectToHome ? 'Redirecting to your collection...' : 'You can now continue editing',
           duration: 3000,
         })
         if (redirectToHome) {
-          // Small delay to show the success message
+          // Small delay to show the success message, then force refresh
           setTimeout(() => {
             router.push("/home")
+            router.refresh()
           }, 1000)
         }
         return true
       } else {
+        const error = await response.json()
+        console.error('Failed to save design:', error)
         toast.error('Failed to save design', {
-          description: 'Please try again or contact support',
+          description: error.error || 'Please try again or contact support',
         })
         return false
       }
@@ -689,7 +695,7 @@ export default function CapturePage() {
           </div>
           <div className="flex items-center gap-2">
             <Button 
-              onClick={() => saveDesign(false)} 
+              onClick={() => saveDesign(true)} 
               size="sm" 
               variant="outline"
               disabled={!finalPreview}

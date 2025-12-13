@@ -39,10 +39,13 @@ export default function HomePage() {
           return
         }
 
-        const response = await fetch(`/api/looks?userId=${user.id}`)
+        const response = await fetch(`/api/looks?userId=${user.id}`, {
+          cache: 'no-store' // Prevent caching to always get fresh data
+        })
         
         if (response.ok) {
           const data = await response.json()
+          console.log('Loaded looks:', data)
           setLooks(data)
         }
       } catch (error) {
@@ -51,6 +54,19 @@ export default function HomePage() {
     }
 
     loadLooks()
+
+    // Reload looks when page becomes visible (user navigates back)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadLooks()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [router])
 
   const startNewDesign = () => {
