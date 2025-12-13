@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
-import { users, creditTransactions } from '@/db/schema';
+import { users, creditTransactions, referrals } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { createSession } from '@/lib/auth';
 import { env } from '@/lib/env';
@@ -13,6 +13,11 @@ export async function POST(request: Request) {
     const code = formData.get('code') as string;
     const idToken = formData.get('id_token') as string;
     const error = formData.get('error') as string;
+    
+    // Get referral code from cookie
+    const cookies = request.headers.get('cookie') || '';
+    const referralCodeMatch = cookies.match(/pendingReferralCode=([^;]+)/);
+    const referralCode = referralCodeMatch ? referralCodeMatch[1] : null;
 
     // Handle user denial or errors
     if (error || !code || !idToken) {
@@ -65,7 +70,20 @@ export async function POST(request: Request) {
       }
     } else {
       // Create new user without username and userType (they'll set both later)
-      const referralCode = nanoid(10);
+      const newReferralCode = nanoid(10);
+
+      // Check if referral code is valid
+      let referrerId: number | null = null;
+      if (referralCode) {
+        const referrer = await db
+          .select()
+          .from(users)
+          .where(eq(users.referralCode, referralCode));
+        
+        if (referrer.length > 0) {
+          referrerId = referrer[0].id;
+        }
+      }
 
       const newUser = await db
         .insert(users)
@@ -75,7 +93,8 @@ export async function POST(request: Request) {
           authProvider: 'apple',
           userType: 'client', // Default to client, but will be changed in user-type page
           credits: 5,
-          referralCode,
+          referralCode: newReferralCode,
+          referredBy: referrerId,
         })
         .returning();
 
@@ -90,22 +109,77 @@ export async function POST(request: Request) {
         balanceAfter: 5,
       });
 
+      // If user was referred, create referral record and award credits
+      if (referrerId) {
+        await db.insert(referrals).values({
+          referrerId: referrerId,
+          referredUserId: user.id,
+          creditAwarded: false, // Will be awarded after 3 referrals
+        });
+
+        // Check if referrer now has 3 or more successful referrals
+        const referrerReferrals = await db
+          .select()
+          .from(referrals)
+          .where(eq(referrals.referrerId, referrerId));
+
+        // Award credit for every 3 referrals
+        const unawardedReferrals = referrerReferrals.filter(r => !r.creditAwarded);
+        if (unawardedReferrals.length >= 3) {
+          // Get referrer's current credits
+          const referrerData = await db
+            .select()
+            .from(users)
+            .where(eq(users.id, referrerId));
+
+          const currentCredits = referrerData[0].credits;
+          const newCredits = currentCredits + 1;
+
+          // Update referrer's credits
+          await db
+            .update(users)
+            .set({ credits: newCredits })
+            .where(eq(users.id, referrerId));
+
+          // Mark the first 3 unawardedReferrals as awarded
+          for (let i = 0; i < 3; i++) {
+            await db
+              .update(referrals)
+              .set({ creditAwarded: true })
+              .where(eq(referrals.id, unawardedReferrals[i].id));
+          }
+
+          // Log the referral reward transaction
+          await db.insert(creditTransactions).values({
+            userId: referrerId,
+            amount: 1,
+            type: 'referral_reward',
+            description: 'Earned 1 credit for referring 3 new users',
+            balanceAfter: newCredits,
+          });
+        }
+      }
+
       // Create session
       await createSession(user.id);
 
-      // New users always go to user-type selection
-      return NextResponse.redirect(`${env.BASE_URL}/user-type`);
+      // Clear the referral code cookie
+      const response = NextResponse.redirect(`${env.BASE_URL}/user-type`);
+      response.cookies.set('pendingReferralCode', '', { maxAge: 0 });
+      return response;
     }
 
     // Create session for existing users
     await createSession(user.id);
-
-    // Existing users go to their dashboard based on their type
-    if (user.userType === 'tech') {
-      return NextResponse.redirect(`${env.BASE_URL}/tech/dashboard`);
-    } else {
-      return NextResponse.redirect(`${env.BASE_URL}/home`);
-    }
+    
+    // Clear the referral code cookie
+    const response = NextResponse.redirect(
+      user.userType === 'tech' 
+        ? `${env.BASE_URL}/tech/dashboard` 
+        : `${env.BASE_URL}/home`
+    );
+    response.cookies.set('pendingReferralCode', '', { maxAge: 0 });
+    return response;
   } catch (error) {
     console.error('Apple OAuth error:', error);
     return NextResponse.redirect(`${env.BASE_URL}/?error=oauth_failed`);

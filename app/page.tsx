@@ -26,6 +26,8 @@ export default function LoginPage() {
     if (refCode) {
       setReferralCode(refCode)
       setIsSignUp(true) // Auto-switch to signup mode if there's a referral code
+      // Store referral code in cookie for OAuth flow (expires in 10 minutes)
+      document.cookie = `pendingReferralCode=${refCode}; path=/; max-age=600; SameSite=Lax`
     }
 
     const checkSession = async () => {
@@ -117,6 +119,11 @@ export default function LoginPage() {
   }
 
   const handleSocialAuth = async (provider: string) => {
+    // Store referral code in cookie before OAuth redirect
+    if (referralCode) {
+      document.cookie = `pendingReferralCode=${referralCode}; path=/; max-age=600; SameSite=Lax`
+    }
+    
     const baseUrl = window.location.origin;
     const redirectUri = `${baseUrl}/api/auth/callback/${provider}`;
     
