@@ -779,13 +779,9 @@ export default function CapturePage() {
                                 <Sparkles className="w-5 h-5 text-terracotta" />
                               </div>
                             </div>
-                            <div className="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur-sm text-charcoal text-xs py-1.5 px-2 text-center font-semibold rounded-lg shadow-sm">
-                              Design {index + 1}
-                            </div>
                           </button>
                         ))}
                       </div>
-                      <div className="text-xs text-muted-foreground text-center font-medium">Tap to view & share</div>
                     </div>
                   ) : (
                     <div className="relative bg-gradient-to-br from-terracotta/10 via-rose/10 to-purple-100/50 flex items-center justify-center h-full">
