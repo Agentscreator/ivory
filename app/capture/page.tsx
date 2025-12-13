@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Palette, Sparkles, Upload, Loader2, X, Save, ChevronDown } from "lucide-react"
+import { Palette, Sparkles, Upload, Loader2, X, Save, ChevronDown, Share2 } from "lucide-react"
 import Image from "next/image"
 import { Slider } from "@/components/ui/slider"
 import { CreditsDisplay } from "@/components/credits-display"
@@ -706,35 +706,97 @@ export default function CapturePage() {
           </div>
         </div>
 
-        {/* Image Preview - Side by Side or Grid */}
+        {/* Image Preview - Generated images prominent, original smaller */}
         <div className="pt-20 pb-4 px-4 overflow-y-auto" style={{ height: 'calc(65vh - 80px)', minHeight: '400px' }}>
           <div className="max-w-2xl mx-auto h-full">
-            <div className={`grid gap-3 ${finalPreviews.length > 0 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-2 h-full'}`}>
-              {/* Original Image - Full width when images are generated */}
-              {finalPreviews.length > 0 && (
-                <div className="col-span-1 sm:col-span-2">
-                  <div className="relative overflow-hidden rounded-2xl border-2 border-border group">
-                    <div className="relative bg-white aspect-[3/2]">
-                      <Image src={capturedImage} alt="Original" fill className="object-contain" />
-                      {/* Change Photo Overlay */}
+            {finalPreviews.length > 0 ? (
+              /* Layout when images are generated: Small original + Large generated images */
+              <div className="flex flex-col gap-3 h-full">
+                {/* Small Original Image with Share Button */}
+                <div className="flex-shrink-0">
+                  <div className="relative overflow-hidden rounded-xl border border-border group">
+                    <div className="relative bg-white aspect-[4/1] sm:aspect-[5/1]">
+                      <Image src={capturedImage} alt="Original" fill className="object-cover" />
+                      {/* Share Original Button */}
                       <button
-                        onClick={changePhoto}
-                        className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+                        onClick={() => {
+                          if (navigator.share) {
+                            fetch(capturedImage)
+                              .then(res => res.blob())
+                              .then(blob => {
+                                const file = new File([blob], 'original.jpg', { type: 'image/jpeg' })
+                                navigator.share({
+                                  files: [file],
+                                  title: 'Original Hand Photo',
+                                })
+                              })
+                          } else {
+                            window.open(capturedImage, '_blank')
+                          }
+                        }}
+                        className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-all active:scale-95"
                       >
-                        <div className="bg-white rounded-full p-3 shadow-lg">
-                          <Upload className="w-6 h-6 text-charcoal" />
-                        </div>
+                        <Share2 className="w-4 h-4 text-charcoal" />
                       </button>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
-                      Original Hand Photo
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-1.5 px-3 flex items-center justify-between">
+                      <span className="font-semibold">Original</span>
+                      <button
+                        onClick={changePhoto}
+                        className="text-white/80 hover:text-white text-xs underline"
+                      >
+                        Change
+                      </button>
                     </div>
                   </div>
                 </div>
-              )}
 
-              {/* Original Image - Side by side when no images */}
-              {finalPreviews.length === 0 && (
+                {/* Large Generated Images Grid */}
+                <div className="flex-1 grid grid-cols-2 gap-3 min-h-0">
+                  {finalPreviews.map((imageUrl, index) => (
+                    <div key={index} className="relative overflow-hidden rounded-2xl border-2 border-border">
+                      <button
+                        onClick={() => {
+                          setFinalPreview(imageUrl)
+                          if (navigator.share) {
+                            fetch(imageUrl)
+                              .then(res => res.blob())
+                              .then(blob => {
+                                const file = new File([blob], `design-${index + 1}.jpg`, { type: 'image/jpeg' })
+                                navigator.share({
+                                  files: [file],
+                                  title: `Nail Design ${index + 1}`,
+                                })
+                              })
+                          } else {
+                            window.open(imageUrl, '_blank')
+                          }
+                        }}
+                        className={`relative w-full h-full group cursor-pointer ${
+                          finalPreview === imageUrl ? 'ring-2 ring-primary ring-offset-2' : ''
+                        }`}
+                      >
+                        <div className="relative bg-white h-full">
+                          <Image src={imageUrl} alt={`AI Generated ${index + 1}`} fill className="object-contain" />
+                          {/* Share Icon Overlay */}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <div className="bg-white/90 rounded-full p-3 shadow-lg">
+                              <Share2 className="w-6 h-6 text-charcoal" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
+                          Design {index + 1}
+                        </div>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* Layout before generation: Side by side */
+              <div className="grid grid-cols-2 gap-3 h-full">
+                {/* Original Image */}
                 <div className="relative overflow-hidden rounded-2xl border-2 border-border group h-full">
                   <div className="relative bg-white h-full">
                     <Image src={capturedImage} alt="Original" fill className="object-contain" />
@@ -749,39 +811,8 @@ export default function CapturePage() {
                     </button>
                   </div>
                 </div>
-              )}
 
-              {/* Preview Images - 2x2 Grid */}
-              {finalPreviews.length > 0 ? (
-                finalPreviews.map((imageUrl, index) => (
-                  <div key={index} className="relative overflow-hidden rounded-2xl border-2 border-border h-full">
-                    <button
-                      onClick={() => {
-                        setFinalPreview(imageUrl)
-                        window.open(imageUrl, '_blank')
-                      }}
-                      className={`relative w-full h-full group cursor-pointer ${
-                        finalPreview === imageUrl ? 'ring-2 ring-primary ring-offset-2' : ''
-                      }`}
-                    >
-                      <div className="relative bg-white h-full">
-                        <Image src={imageUrl} alt={`AI Generated ${index + 1}`} fill className="object-contain" />
-                        {/* Hover overlay */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <div className="bg-white/90 rounded-full p-3 shadow-lg">
-                            <svg className="w-6 h-6 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-2 text-center font-semibold">
-                        Design {index + 1}
-                      </div>
-                    </button>
-                  </div>
-                ))
-              ) : (
+                {/* Preview Placeholder */}
                 <div className="relative overflow-hidden rounded-2xl border-2 border-border h-full">
                   <div className="relative bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center h-full">
                     {isGenerating ? (
