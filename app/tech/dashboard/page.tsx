@@ -133,17 +133,8 @@ export default function TechDashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10 safe-top">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <Button variant="ghost" size="icon" onClick={() => router.back()} className="active:scale-95 transition-transform">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="font-serif text-lg sm:text-xl font-bold text-charcoal">Tech Dashboard</h1>
-          </div>
-          <Button variant="outline" onClick={() => router.push("/profile")} className="h-9 sm:h-10 active:scale-95 transition-transform">
-            <span className="hidden sm:inline">Profile</span>
-            <User className="w-4 h-4 sm:hidden" />
-          </Button>
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-charcoal">Ivory</h1>
         </div>
       </header>
 
@@ -408,7 +399,7 @@ export default function TechDashboardPage() {
               className="flex flex-col items-center justify-center gap-1 text-primary min-w-[60px] active:scale-95 transition-transform"
             >
               <LayoutDashboard className="w-6 h-6 sm:w-7 sm:h-7" />
-              <span className="text-xs sm:text-sm font-medium">Dashboard</span>
+              <span className="text-xs sm:text-sm font-medium">Home</span>
             </button>
 
             <button
