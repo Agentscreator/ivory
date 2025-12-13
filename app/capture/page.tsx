@@ -907,8 +907,8 @@ export default function CapturePage() {
                   )}
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
