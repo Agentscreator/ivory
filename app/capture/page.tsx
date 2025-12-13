@@ -880,45 +880,68 @@ export default function CapturePage() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex gap-3 mt-4" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col gap-2.5 mt-4" onClick={(e) => e.stopPropagation()}>
                 <Button
                   onClick={async () => {
-                    try {
-                      if (navigator.share) {
-                        await navigator.share({
-                          url: selectedImageModal,
-                          title: 'My Nail Design',
-                          text: 'Check out my nail design!'
-                        }).catch(err => {
-                          if (err.name !== 'AbortError') {
-                            window.open(selectedImageModal, '_blank')
-                          }
-                        })
-                      } else {
+                    // Set as the image to save
+                    setFinalPreview(selectedImageModal)
+                    
+                    // Auto-save the design
+                    const saved = await saveDesign(false)
+                    
+                    if (saved) {
+                      // Then share
+                      try {
+                        if (navigator.share) {
+                          await navigator.share({
+                            url: selectedImageModal,
+                            title: 'My Nail Design',
+                            text: 'Check out my nail design!'
+                          }).catch(err => {
+                            if (err.name !== 'AbortError') {
+                              window.open(selectedImageModal, '_blank')
+                            }
+                          })
+                        } else {
+                          window.open(selectedImageModal, '_blank')
+                        }
+                      } catch (error) {
+                        console.error('Share error:', error)
                         window.open(selectedImageModal, '_blank')
                       }
-                    } catch (error) {
-                      console.error('Share error:', error)
-                      window.open(selectedImageModal, '_blank')
+                      
+                      setSelectedImageModal(null)
                     }
                   }}
-                  className="flex-1"
+                  className="w-full"
                   size="lg"
+                  disabled={!finalPreview && selectedImageModal !== finalPreview}
                 >
                   <Share2 className="w-5 h-5 mr-2" />
-                  Share
+                  Share with Friends
                 </Button>
+                
                 <Button
-                  onClick={() => {
+                  onClick={async () => {
+                    // Set as the image to save
                     setFinalPreview(selectedImageModal)
-                    setSelectedImageModal(null)
+                    
+                    // Auto-save the design
+                    const saved = await saveDesign(false)
+                    
+                    if (saved) {
+                      toast.success('Design saved! Redirecting to send to tech...')
+                      // Close modal and redirect would happen here
+                      // For now, just close the modal
+                      setSelectedImageModal(null)
+                    }
                   }}
                   variant="outline"
-                  className="flex-1"
+                  className="w-full"
                   size="lg"
                 >
                   <Save className="w-5 h-5 mr-2" />
-                  Select for Save
+                  Send to Nail Tech
                 </Button>
               </div>
             </div>
