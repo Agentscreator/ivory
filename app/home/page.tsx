@@ -181,9 +181,6 @@ export default function HomePage() {
         ) : (
           <Card className="text-center py-16 sm:py-20 px-4 border-0 shadow-xl bg-white/60 backdrop-blur-sm rounded-3xl mb-6">
             <div className="max-w-md mx-auto">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-6 rounded-full bg-gradient-to-br from-terracotta via-rose to-rose-600 flex items-center justify-center shadow-2xl ring-4 ring-white">
-                <Sparkles className="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-lg" />
-              </div>
               <h3 className="font-serif text-2xl sm:text-3xl font-bold text-charcoal mb-3">No designs yet</h3>
               <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
                 Start creating your first stunning nail design with AI
