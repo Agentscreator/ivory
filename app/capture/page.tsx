@@ -102,6 +102,48 @@ export default function CapturePage() {
     if (existingImage) {
       // User already has an image, go straight to design page
       setCapturedImage(existingImage)
+      
+      // Restore session state
+      const savedPreviews = localStorage.getItem("captureSession_finalPreviews")
+      const savedPreview = localStorage.getItem("captureSession_finalPreview")
+      const savedSettings = localStorage.getItem("captureSession_designSettings")
+      const savedPrompt = localStorage.getItem("captureSession_aiPrompt")
+      const savedDesignImage = localStorage.getItem("captureSession_selectedDesignImage")
+      
+      if (savedPreviews) {
+        try {
+          const previews = JSON.parse(savedPreviews)
+          setFinalPreviews(previews)
+          console.log('Restored finalPreviews from session:', previews)
+        } catch (e) {
+          console.error('Error parsing saved previews:', e)
+        }
+      }
+      
+      if (savedPreview) {
+        setFinalPreview(savedPreview)
+        console.log('Restored finalPreview from session')
+      }
+      
+      if (savedSettings) {
+        try {
+          const settings = JSON.parse(savedSettings)
+          setDesignSettings(settings)
+          console.log('Restored design settings from session')
+        } catch (e) {
+          console.error('Error parsing saved settings:', e)
+        }
+      }
+      
+      if (savedPrompt) {
+        setAiPrompt(savedPrompt)
+        console.log('Restored AI prompt from session')
+      }
+      
+      if (savedDesignImage) {
+        setSelectedDesignImage(savedDesignImage)
+        console.log('Restored selected design image from session')
+      }
     } else {
       // No existing image, start camera
       startCamera()
@@ -114,6 +156,43 @@ export default function CapturePage() {
       }
     }
   }, [])
+
+  // Save session state whenever finalPreviews changes
+  useEffect(() => {
+    if (finalPreviews.length > 0) {
+      localStorage.setItem("captureSession_finalPreviews", JSON.stringify(finalPreviews))
+      console.log('Saved finalPreviews to session')
+    }
+  }, [finalPreviews])
+
+  // Save session state whenever finalPreview changes
+  useEffect(() => {
+    if (finalPreview) {
+      localStorage.setItem("captureSession_finalPreview", finalPreview)
+      console.log('Saved finalPreview to session')
+    }
+  }, [finalPreview])
+
+  // Save design settings whenever they change
+  useEffect(() => {
+    if (capturedImage) {
+      localStorage.setItem("captureSession_designSettings", JSON.stringify(designSettings))
+    }
+  }, [designSettings, capturedImage])
+
+  // Save AI prompt whenever it changes
+  useEffect(() => {
+    if (aiPrompt && capturedImage) {
+      localStorage.setItem("captureSession_aiPrompt", aiPrompt)
+    }
+  }, [aiPrompt, capturedImage])
+
+  // Save selected design image whenever it changes
+  useEffect(() => {
+    if (selectedDesignImage && capturedImage) {
+      localStorage.setItem("captureSession_selectedDesignImage", selectedDesignImage)
+    }
+  }, [selectedDesignImage, capturedImage])
 
   const startCamera = async () => {
     try {
@@ -591,6 +670,15 @@ export default function CapturePage() {
       console.log(`Save results: ${successCount}/${finalPreviews.length} successful`)
 
       if (allSuccessful) {
+        // Clear session after successful save
+        localStorage.removeItem("currentEditingImage")
+        localStorage.removeItem("captureSession_finalPreviews")
+        localStorage.removeItem("captureSession_finalPreview")
+        localStorage.removeItem("captureSession_designSettings")
+        localStorage.removeItem("captureSession_aiPrompt")
+        localStorage.removeItem("captureSession_selectedDesignImage")
+        console.log('Cleared capture session after save')
+        
         toast.success(`${finalPreviews.length} design${finalPreviews.length > 1 ? 's' : ''} saved successfully! 🎉`, {
           description: redirectToHome ? 'Redirecting to your collection...' : 'You can now continue editing',
           duration: 3000,
@@ -656,6 +744,16 @@ export default function CapturePage() {
     setSelectedDesignImage(null)
     setGeneratedDesigns([])
     setDesignMode(null)
+    
+    // Clear session storage when starting fresh
+    localStorage.removeItem("currentEditingImage")
+    localStorage.removeItem("captureSession_finalPreviews")
+    localStorage.removeItem("captureSession_finalPreview")
+    localStorage.removeItem("captureSession_designSettings")
+    localStorage.removeItem("captureSession_aiPrompt")
+    localStorage.removeItem("captureSession_selectedDesignImage")
+    console.log('Cleared capture session')
+    
     startCamera()
   }
 
