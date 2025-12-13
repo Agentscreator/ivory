@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Check, DollarSign, MessageCircle, User, Plus } from "lucide-react"
+import { ArrowLeft, Check, DollarSign, MessageCircle, User, Plus, LayoutDashboard, Sparkles } from "lucide-react"
 import Image from "next/image"
 
 type ClientRequest = {
@@ -148,7 +148,7 @@ export default function TechDashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-safe">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-28 sm:pb-32">
         <Tabs defaultValue="requests" className="w-full">
           <TabsList className="w-full mb-4 sm:mb-6 grid grid-cols-4 h-11 sm:h-12">
             <TabsTrigger value="requests" className="text-xs sm:text-sm whitespace-nowrap">
@@ -398,6 +398,36 @@ export default function TechDashboardPage() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-border safe-bottom z-20">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-around h-20 sm:h-24">
+            <button
+              onClick={() => router.push("/tech/dashboard")}
+              className="flex flex-col items-center justify-center gap-1 text-primary min-w-[60px] active:scale-95 transition-transform"
+            >
+              <LayoutDashboard className="w-6 h-6 sm:w-7 sm:h-7" />
+              <span className="text-xs sm:text-sm font-medium">Dashboard</span>
+            </button>
+
+            <button
+              onClick={() => router.push("/capture")}
+              className="flex flex-col items-center justify-center -mt-8 sm:-mt-10 bg-gradient-to-br from-terracotta to-rose text-white rounded-full w-16 h-16 sm:w-20 sm:h-20 shadow-xl active:scale-95 transition-transform"
+            >
+              <Plus className="w-8 h-8 sm:w-10 sm:h-10" />
+            </button>
+
+            <button
+              onClick={() => router.push("/profile")}
+              className="flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground active:text-foreground transition-colors min-w-[60px] active:scale-95"
+            >
+              <User className="w-6 h-6 sm:w-7 sm:h-7" />
+              <span className="text-xs sm:text-sm font-medium">Profile</span>
+            </button>
+          </div>
+        </div>
+      </nav>
     </div>
   )
 }
