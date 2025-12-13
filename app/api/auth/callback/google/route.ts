@@ -70,7 +70,7 @@ export async function GET(request: Request) {
           .where(eq(users.id, user.id));
       }
     } else {
-      // Create new user without username (they'll set it later)
+      // Create new user without username and userType (they'll set both later)
       const referralCode = nanoid(10);
 
       const newUser = await db
@@ -79,7 +79,7 @@ export async function GET(request: Request) {
           username: googleUser.email, // Use email as temporary username
           email: googleUser.email,
           authProvider: 'google',
-          userType: 'client',
+          userType: 'client', // Default to client, but will be changed in user-type page
           credits: 5,
           avatar: googleUser.picture,
           referralCode,
@@ -96,19 +96,22 @@ export async function GET(request: Request) {
         description: 'Welcome bonus - 5 free credits',
         balanceAfter: 5,
       });
+
+      // Create session
+      await createSession(user.id);
+
+      // New users always go to user-type selection
+      return NextResponse.redirect(`${env.BASE_URL}/user-type`);
     }
 
-    // Create session
+    // Create session for existing users
     await createSession(user.id);
 
-    // Always redirect to user-type selection for new OAuth users
-    // or to their dashboard if they already have a type
+    // Existing users go to their dashboard based on their type
     if (user.userType === 'tech') {
       return NextResponse.redirect(`${env.BASE_URL}/tech/dashboard`);
-    } else if (user.userType === 'client') {
-      return NextResponse.redirect(`${env.BASE_URL}/home`);
     } else {
-      return NextResponse.redirect(`${env.BASE_URL}/user-type`);
+      return NextResponse.redirect(`${env.BASE_URL}/home`);
     }
   } catch (error) {
     console.error('Google OAuth error:', error);
