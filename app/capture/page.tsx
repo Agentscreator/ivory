@@ -679,18 +679,20 @@ export default function CapturePage() {
     return (
       <div className="fixed inset-0 z-[100] bg-gradient-to-br from-ivory via-sand to-blush flex flex-col">
         {/* Header */}
-        <div className="absolute top-0 left-0 right-0 pt-14 px-5 pb-4 flex items-center justify-between z-10 bg-white/80 backdrop-blur-sm">
+        <div className="absolute top-0 left-0 right-0 pt-14 px-4 sm:px-6 pb-4 flex items-center justify-between z-10 bg-white/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
           <Button
             onClick={changePhoto}
             variant="outline"
             size="sm"
-            className="gap-2"
+            className="gap-2 h-10 px-3 sm:px-4 border-2 hover:bg-muted/50 rounded-xl active:scale-95 transition-all"
           >
             <Upload className="w-4 h-4" />
-            <span className="hidden sm:inline">Change Photo</span>
+            <span className="hidden sm:inline">Change</span>
           </Button>
-          <div className="flex items-center gap-3">
-            <div className="text-charcoal font-semibold text-lg hidden sm:block">Design Your Nails</div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h1 className="font-serif text-base sm:text-xl font-bold bg-gradient-to-r from-terracotta to-rose bg-clip-text text-transparent hidden xs:block">
+              Design Your Nails
+            </h1>
             <div className="flex items-center">
               <CreditsDisplay showLabel={true} credits={credits} />
             </div>
@@ -699,11 +701,11 @@ export default function CapturePage() {
             <Button 
               onClick={() => saveDesign(true)} 
               size="sm" 
-              variant="outline"
+              className="h-10 px-3 sm:px-4 bg-gradient-to-r from-terracotta to-rose hover:from-terracotta/90 hover:to-rose/90 shadow-md rounded-xl active:scale-95 transition-all"
               disabled={!finalPreview}
             >
-              <Save className="w-4 h-4 mr-1" />
-              Save
+              <Save className="w-4 h-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">Save</span>
             </Button>
           </div>
         </div>
@@ -711,52 +713,61 @@ export default function CapturePage() {
         {/* Image Preview - Original on left, generated thumbnails on right */}
         <div className="pt-20 pb-4 px-4 overflow-y-auto" style={{ height: 'calc(65vh - 80px)', minHeight: '400px' }}>
           <div className="max-w-2xl mx-auto h-full">
-            <div className="grid grid-cols-2 gap-3 h-full">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 h-full">
                 {/* Original Image */}
-                <div className="relative overflow-hidden rounded-2xl border-2 border-border group h-full">
-                  <div className="relative bg-white h-full">
+                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border-0 shadow-xl group h-full bg-white/80 backdrop-blur-sm">
+                  <div className="relative bg-gradient-to-br from-muted/20 to-muted/5 h-full">
                     <Image src={capturedImage} alt="Original" fill className="object-contain" />
                     {/* Change Photo Overlay */}
                     <button
                       onClick={changePhoto}
-                      className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+                      className="absolute inset-0 bg-black/0 hover:bg-black/50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 active:scale-95"
                     >
-                      <div className="bg-white rounded-full p-3 shadow-lg">
-                        <Upload className="w-6 h-6 text-charcoal" />
+                      <div className="bg-white rounded-full p-4 shadow-2xl">
+                        <Upload className="w-7 h-7 text-charcoal" />
                       </div>
                     </button>
+                    {/* Label */}
+                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md">
+                      <span className="text-xs font-semibold text-charcoal">Original</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Preview Placeholder or Generated Thumbnails */}
-                <div className="relative overflow-hidden rounded-2xl border-2 border-border h-full">
+                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border-0 shadow-xl h-full bg-white/80 backdrop-blur-sm">
                   {finalPreviews.length > 0 ? (
                     /* Show generated images as thumbnails */
-                    <div className="relative bg-white h-full p-3 flex flex-col gap-3">
-                      <div className="text-xs font-semibold text-charcoal mb-1">Generated Designs</div>
-                      <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+                    <div className="relative bg-gradient-to-br from-muted/10 to-muted/5 h-full p-4 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-bold text-charcoal">AI Designs</div>
+                        <div className="bg-gradient-to-r from-terracotta/20 to-rose/20 px-2.5 py-1 rounded-full">
+                          <span className="text-xs font-semibold text-terracotta">{finalPreviews.length}</span>
+                        </div>
+                      </div>
+                      <div className="flex-1 flex flex-col gap-2.5 overflow-y-auto">
                         {finalPreviews.map((imageUrl, index) => (
                           <button
                             key={index}
                             onClick={() => setSelectedImageModal(imageUrl)}
-                            className="relative overflow-hidden rounded-lg border-2 border-border hover:border-primary transition-all active:scale-95 aspect-[3/2] group"
+                            className="relative overflow-hidden rounded-xl border-0 shadow-md hover:shadow-xl transition-all active:scale-95 aspect-[3/2] group"
                           >
                             <Image src={imageUrl} alt={`Design ${index + 1}`} fill className="object-cover" />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center">
-                              <div className="bg-white/90 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Sparkles className="w-4 h-4 text-primary" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                              <div className="bg-white rounded-full p-2.5 shadow-lg">
+                                <Sparkles className="w-5 h-5 text-terracotta" />
                               </div>
                             </div>
-                            <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm text-white text-xs py-1 text-center font-semibold">
+                            <div className="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur-sm text-charcoal text-xs py-1.5 px-2 text-center font-semibold rounded-lg shadow-sm">
                               Design {index + 1}
                             </div>
                           </button>
                         ))}
                       </div>
-                      <div className="text-xs text-muted-foreground text-center">Tap to view & share</div>
+                      <div className="text-xs text-muted-foreground text-center font-medium">Tap to view & share</div>
                     </div>
                   ) : (
-                    <div className="relative bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center h-full">
+                    <div className="relative bg-gradient-to-br from-terracotta/10 via-rose/10 to-purple-100/50 flex items-center justify-center h-full">
                       {isGenerating ? (
                         <div className="absolute inset-0 flex items-center justify-center">
                       {/* Dimmed GIF Background */}
@@ -950,42 +961,56 @@ export default function CapturePage() {
         )}
 
         {/* Bottom Drawer */}
-        <div className="fixed left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-border rounded-t-3xl shadow-2xl z-20 touch-action-pan-y" style={{ bottom: '80px', height: 'calc(35vh - 80px)', minHeight: '240px', maxHeight: '370px' }}>
+        <div className="fixed left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-border/50 rounded-t-3xl shadow-2xl z-20 touch-action-pan-y" style={{ bottom: '80px', height: 'calc(35vh - 80px)', minHeight: '240px', maxHeight: '370px' }}>
           <div className="max-w-2xl mx-auto h-full flex flex-col">
-            <div className="h-1 w-12 bg-border rounded-full mx-auto my-3 flex-shrink-0"></div>
+            <div className="h-1.5 w-16 bg-gradient-to-r from-terracotta/30 via-rose/30 to-terracotta/30 rounded-full mx-auto my-3 flex-shrink-0"></div>
 
             <div className="w-full flex-1 flex flex-col overflow-hidden">
               {(designMode === 'design' || designMode === null) && (
                 <div className="p-6 space-y-4 overflow-y-auto overscroll-contain flex-1">
                   {/* Low Credits Warning */}
                   {credits !== null && credits <= 2 && credits > 0 && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-3 text-sm">
-                      <p className="text-yellow-800 font-medium">⚠️ Low on credits!</p>
-                      <p className="text-yellow-700 text-xs mt-1">
-                        You have {credits} credit{credits !== 1 ? 's' : ''} left. 
-                        <button 
-                          onClick={() => router.push('/settings/credits')}
-                          className="underline ml-1 font-medium"
-                        >
-                          Get more
-                        </button>
-                      </p>
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200/50 rounded-2xl p-4 text-sm shadow-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-lg">⚠️</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-yellow-900 font-bold mb-1">Low on credits!</p>
+                          <p className="text-yellow-800 text-xs leading-relaxed">
+                            You have {credits} credit{credits !== 1 ? 's' : ''} left. 
+                            <button 
+                              onClick={() => router.push('/settings/credits')}
+                              className="underline ml-1 font-semibold hover:text-yellow-900"
+                            >
+                              Get more
+                            </button>
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
 
                   {/* No Credits Warning */}
                   {credits !== null && credits === 0 && (
-                    <div className="bg-red-50 border border-red-200 rounded-2xl p-3 text-sm">
-                      <p className="text-red-800 font-medium">❌ No credits remaining</p>
-                      <p className="text-red-700 text-xs mt-1">
-                        Refer 3 friends to earn 1 free credit!
-                        <button 
-                          onClick={() => router.push('/settings/credits')}
-                          className="underline ml-1 font-medium"
-                        >
-                          Learn more
-                        </button>
-                      </p>
+                    <div className="bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200/50 rounded-2xl p-4 text-sm shadow-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-lg">❌</span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-red-900 font-bold mb-1">No credits remaining</p>
+                          <p className="text-red-800 text-xs leading-relaxed">
+                            Refer 3 friends to earn 1 free credit!
+                            <button 
+                              onClick={() => router.push('/settings/credits')}
+                              className="underline ml-1 font-semibold hover:text-red-900"
+                            >
+                              Learn more
+                            </button>
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -993,13 +1018,13 @@ export default function CapturePage() {
                   {!isGenerating ? (
                     <Button 
                       onClick={() => generateAIPreview(designSettings)} 
-                      className="w-full rounded-2xl"
+                      className="w-full h-12 rounded-2xl bg-gradient-to-r from-terracotta to-rose hover:from-terracotta/90 hover:to-rose/90 shadow-lg hover:shadow-xl active:scale-95 transition-all font-semibold"
                       disabled={!hasCredits(1)}
                     >
-                      <Sparkles className="w-4 h-4 mr-2" />
+                      <Sparkles className="w-5 h-5 mr-2" />
                       Generate Preview
                       {credits !== null && (
-                        <span className="ml-2 text-xs opacity-70">
+                        <span className="ml-2 text-xs opacity-80 font-normal">
                           (1 credit)
                         </span>
                       )}
@@ -1008,9 +1033,9 @@ export default function CapturePage() {
                     <Button 
                       onClick={cancelGeneration}
                       variant="destructive"
-                      className="w-full rounded-2xl"
+                      className="w-full h-12 rounded-2xl shadow-lg active:scale-95 transition-all font-semibold"
                     >
-                      <X className="w-4 h-4 mr-2" />
+                      <X className="w-5 h-5 mr-2" />
                       Cancel Generation
                     </Button>
                   )}
@@ -1019,7 +1044,7 @@ export default function CapturePage() {
                   <Button 
                     variant="outline" 
                     onClick={() => designUploadRef.current?.click()}
-                    className="w-full rounded-2xl"
+                    className="w-full h-11 rounded-2xl border-2 hover:bg-muted/50 active:scale-95 transition-all font-medium"
                     disabled={isGenerating}
                   >
                     <Upload className="w-4 h-4 mr-2" />
@@ -1031,19 +1056,19 @@ export default function CapturePage() {
                     <div className="mb-3">
                       <button
                         onClick={() => setExpandedSection(expandedSection === 'design-image' ? null : 'design-image')}
-                        className="w-full flex items-center justify-between p-3 rounded-2xl border border-border bg-white hover:border-primary/50 transition-all"
+                        className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-border bg-white/80 backdrop-blur-sm hover:border-primary/50 hover:shadow-md active:scale-[0.98] transition-all"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-primary flex-shrink-0">
+                          <div className="relative w-14 h-14 rounded-xl overflow-hidden border-2 border-primary shadow-sm flex-shrink-0">
                             <Image src={selectedDesignImage} alt="Uploaded Design" fill className="object-cover" />
                           </div>
                           <div className="flex-1 min-w-0 text-left">
-                            <p className="text-sm font-semibold text-charcoal">Uploaded Design</p>
+                            <p className="text-sm font-bold text-charcoal mb-0.5">Uploaded Design</p>
                             <p className="text-xs text-muted-foreground">Tap to adjust influence</p>
                           </div>
-                          <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded">{influenceWeights.nailEditor_designImage}%</span>
+                          <span className="text-sm font-bold text-white bg-gradient-to-r from-terracotta to-rose px-3 py-1.5 rounded-full shadow-sm">{influenceWeights.nailEditor_designImage}%</span>
                         </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ml-2 ${expandedSection === 'design-image' ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ml-2 ${expandedSection === 'design-image' ? 'rotate-180' : ''}`} />
                       </button>
                       {expandedSection === 'design-image' && (
                         <div className="mt-2 p-3 bg-gray-50 rounded-lg space-y-2">
