@@ -66,19 +66,30 @@ export async function POST(request: NextRequest) {
 
     let profileId = techProfileId
 
-    // If userId provided, get tech profile
+    // If userId provided, get or create tech profile
     if (!profileId && userId) {
-      const [profile] = await db
+      let [profile] = await db
         .select()
         .from(techProfiles)
         .where(eq(techProfiles.userId, parseInt(userId)))
         .limit(1)
 
+      // If profile doesn't exist, create it automatically
       if (!profile) {
-        return NextResponse.json(
-          { error: 'Tech profile not found' },
-          { status: 404 }
-        )
+        console.log(`Creating tech profile for user ${userId} during portfolio image upload`)
+        const [newProfile] = await db
+          .insert(techProfiles)
+          .values({
+            userId: parseInt(userId),
+            businessName: null,
+            bio: null,
+            location: null,
+            rating: 0,
+            reviewCount: 0,
+          })
+          .returning()
+        
+        profile = newProfile
       }
 
       profileId = profile.id
