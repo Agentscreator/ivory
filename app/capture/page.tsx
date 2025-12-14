@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Palette, Sparkles, Upload, Loader2, X, Save, ChevronDown, Share2 } from "lucide-react"
+import { Palette, Sparkles, Upload, Loader2, X, ChevronDown, Share2 } from "lucide-react"
 import Image from "next/image"
 import { Slider } from "@/components/ui/slider"
 import { CreditsDisplay } from "@/components/credits-display"
@@ -420,10 +420,8 @@ export default function CapturePage() {
         // Refresh credits display
         refreshCredits()
         
-        // Show success message with remaining credits
-        toast.success(`${images.length} design${images.length > 1 ? 's' : ''} generated successfully!`, {
-          description: `You have ${creditsRemaining} credit${creditsRemaining !== 1 ? 's' : ''} remaining.`,
-        })
+        // Auto-save the designs
+        await autoSaveDesigns(images)
       } else {
         const error = await response.json()
         toast.error('Generation failed', {
@@ -618,15 +616,12 @@ export default function CapturePage() {
     await generateAIPreview(designSettings)
   }
 
-  const saveDesign = async (redirectToHome = true) => {
-    console.log('saveDesign called with finalPreviews:', finalPreviews)
-    console.log('saveDesign called with capturedImage:', capturedImage)
+  const autoSaveDesigns = async (images: string[]) => {
+    console.log('autoSaveDesigns called with images:', images)
+    console.log('autoSaveDesigns called with capturedImage:', capturedImage)
     
-    if (!finalPreview || finalPreviews.length === 0) {
+    if (!images || images.length === 0) {
       console.error('No designs available to save')
-      toast.error('Please generate a preview first', {
-        description: 'You need to generate a design before saving',
-      })
       return false
     }
 
@@ -639,16 +634,16 @@ export default function CapturePage() {
       }
 
       const user = JSON.parse(userStr)
-      console.log(`Saving ${finalPreviews.length} design(s) for user:`, user.id)
+      console.log(`Auto-saving ${images.length} design(s) for user:`, user.id)
       
       // Show loading toast
-      const loadingToast = toast.loading(`Saving ${finalPreviews.length} design${finalPreviews.length > 1 ? 's' : ''}...`)
+      const loadingToast = toast.loading(`Saving ${images.length} design${images.length > 1 ? 's' : ''}...`)
       
       // Save all designs
-      const savePromises = finalPreviews.map((imageUrl, index) => {
+      const savePromises = images.map((imageUrl, index) => {
         const payload = {
           userId: user.id,
-          title: `Design ${new Date().toLocaleDateString()}${finalPreviews.length > 1 ? ` (${index + 1})` : ''}`,
+          title: `Design ${new Date().toLocaleDateString()}${images.length > 1 ? ` (${index + 1})` : ''}`,
           imageUrl: imageUrl,
           originalImageUrl: capturedImage,
           designSettings,
@@ -674,37 +669,33 @@ export default function CapturePage() {
       const allSuccessful = responses.every(response => response.ok)
       const successCount = responses.filter(response => response.ok).length
 
-      console.log(`Save results: ${successCount}/${finalPreviews.length} successful`)
+      console.log(`Save results: ${successCount}/${images.length} successful`)
 
       if (allSuccessful) {
-        toast.success(`${finalPreviews.length} design${finalPreviews.length > 1 ? 's' : ''} saved successfully! 🎉`, {
-          description: redirectToHome ? 'Redirecting to your collection...' : 'You can now continue editing',
-          duration: 3000,
+        toast.success(`${images.length} design${images.length > 1 ? 's' : ''} saved! 🎉`, {
+          description: 'Redirecting to your collection...',
+          duration: 2000,
         })
-        if (redirectToHome) {
-          // Small delay to show the success message, then force refresh
-          setTimeout(() => {
-            router.push("/home")
-            router.refresh()
-          }, 1000)
-        }
+        // Small delay to show the success message, then redirect
+        setTimeout(() => {
+          router.push("/home")
+          router.refresh()
+        }, 1500)
         return true
       } else if (successCount > 0) {
-        toast.success(`${successCount} of ${finalPreviews.length} designs saved`, {
-          description: 'Some designs could not be saved',
+        toast.success(`${successCount} of ${images.length} designs saved`, {
+          description: 'Redirecting to your collection...',
         })
-        if (redirectToHome) {
-          setTimeout(() => {
-            router.push("/home")
-            router.refresh()
-          }, 1000)
-        }
+        setTimeout(() => {
+          router.push("/home")
+          router.refresh()
+        }, 1500)
         return true
       } else {
         const error = await responses[0].json()
         console.error('Failed to save designs:', error)
         toast.error('Failed to save designs', {
-          description: error.error || 'Please try again or contact support',
+          description: error.error || 'Please try again',
         })
         return false
       }
@@ -804,33 +795,13 @@ export default function CapturePage() {
             <Upload className="w-4 h-4" />
             <span className="hidden sm:inline">Change</span>
           </Button>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 ml-auto">
             <h1 className="font-serif text-base sm:text-xl font-bold bg-gradient-to-r from-terracotta to-rose bg-clip-text text-transparent hidden xs:block">
               Design Your Nails
             </h1>
             <div className="flex items-center">
               <CreditsDisplay showLabel={true} credits={credits} />
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                console.log('Save button clicked, finalPreview:', finalPreview)
-                saveDesign(true)
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-              }}
-              size="sm" 
-              className="h-10 px-3 sm:px-4 bg-gradient-to-r from-terracotta to-rose hover:from-terracotta/90 hover:to-rose/90 shadow-md rounded-xl active:scale-95 transition-all"
-              disabled={!finalPreview}
-            >
-              <Save className="w-4 h-4 sm:mr-1.5" />
-              <span className="hidden sm:inline">Save</span>
-            </Button>
           </div>
         </div>
 
