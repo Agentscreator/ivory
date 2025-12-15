@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 export default function LandingPage() {
@@ -97,11 +98,17 @@ export default function LandingPage() {
             
             {/* Image */}
             <div className="relative order-1 lg:order-2">
-              <div className="aspect-[3/4] sm:aspect-[4/5] overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-br from-[#F5F1ED] via-[#E8E3DD] to-[#D4CFC9] relative">
-                  {/* Subtle overlay pattern */}
-                  <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_50%_50%,_#1A1A1A_1px,_transparent_1px)] bg-[length:20px_20px]" />
-                </div>
+              <div className="aspect-[3/4] sm:aspect-[4/5] overflow-hidden relative group">
+                <Image 
+                  src="/elegant-french-manicure-nails.jpg" 
+                  alt="Elegant nail design showcasing artisanal craftsmanship"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                />
+                {/* Subtle overlay for sophistication */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
               </div>
             </div>
           </div>
