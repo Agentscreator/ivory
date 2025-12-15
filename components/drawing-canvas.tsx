@@ -1,9 +1,7 @@
 "use client"
 
 import React, { useRef, useState, useEffect, useCallback } from 'react'
-import { Button } from '@/components/ui/button'
 import { Undo, Redo, Trash2, Palette, X } from 'lucide-react'
-import Image from 'next/image'
 
 interface DrawingCanvasProps {
   imageUrl: string
@@ -337,31 +335,28 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
   }
 
   return (
-    <div className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-sm flex flex-col">
+    <div className="fixed inset-0 z-[200] bg-white flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-white/10 backdrop-blur-md border-b border-white/20">
-        <Button
+      <div className="flex items-center justify-between p-4 bg-white border-b border-[#E8E8E8]">
+        <button
           onClick={onClose}
-          variant="ghost"
-          size="sm"
-          className="text-white hover:bg-white/20"
+          className="w-10 h-10 border border-[#E8E8E8] text-[#1A1A1A] hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center"
         >
-          <X className="w-5 h-5" />
-        </Button>
-        <h2 className="text-white font-semibold text-lg">Draw on Image</h2>
-        <Button
+          <X className="w-5 h-5" strokeWidth={1} />
+        </button>
+        <h2 className="font-serif text-lg font-light text-[#1A1A1A] tracking-tight">Draw on Image</h2>
+        <button
           onClick={handleSave}
-          size="sm"
-          className="bg-gradient-to-r from-terracotta to-rose hover:from-terracotta/90 hover:to-rose/90"
+          className="h-10 px-4 bg-[#1A1A1A] text-white font-light text-xs tracking-wider uppercase hover:bg-[#1A1A1A]/90 active:scale-95 transition-all duration-300"
         >
           Save
-        </Button>
+        </button>
       </div>
 
       {/* Canvas Container */}
       <div 
         ref={containerRef}
-        className="flex-1 flex items-center justify-center p-4 overflow-hidden"
+        className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-[#F8F7F5]"
       >
         <canvas
           ref={canvasRef}
@@ -372,7 +367,7 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
           onTouchStart={startDrawing}
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
-          className="touch-none max-w-full max-h-full rounded-lg shadow-2xl"
+          className="touch-none max-w-full max-h-full border border-[#E8E8E8]"
           style={{
             width: canvasDimensions.width,
             height: canvasDimensions.height,
@@ -382,39 +377,33 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
       </div>
 
       {/* Controls */}
-      <div className="p-4 bg-white/10 backdrop-blur-md border-t border-white/20 space-y-3">
+      <div className="p-4 bg-white border-t border-[#E8E8E8] space-y-3">
         {/* Action Buttons */}
         <div className="flex items-center justify-center gap-2">
-          <Button
+          <button
             onClick={undo}
             disabled={lines.length === 0}
-            variant="outline"
-            size="sm"
-            className="bg-white/20 border-white/30 text-white hover:bg-white/30 disabled:opacity-30"
+            className="h-10 px-4 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            <Undo className="w-4 h-4 mr-1" />
+            <Undo className="w-4 h-4" strokeWidth={1} />
             Undo
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={redo}
             disabled={undoneLines.length === 0}
-            variant="outline"
-            size="sm"
-            className="bg-white/20 border-white/30 text-white hover:bg-white/30 disabled:opacity-30"
+            className="h-10 px-4 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            <Redo className="w-4 h-4 mr-1" />
+            <Redo className="w-4 h-4" strokeWidth={1} />
             Redo
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={clear}
             disabled={lines.length === 0}
-            variant="outline"
-            size="sm"
-            className="bg-white/20 border-white/30 text-white hover:bg-white/30 disabled:opacity-30"
+            className="h-10 px-4 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            <Trash2 className="w-4 h-4 mr-1" />
+            <Trash2 className="w-4 h-4" strokeWidth={1} />
             Clear
-          </Button>
+          </button>
         </div>
 
         {/* Color Picker */}
@@ -425,20 +414,20 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
               setShowBrushPicker(false)
               setShowTexturePicker(false)
             }}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-all"
+            className="w-full flex items-center justify-between p-3 border border-[#E8E8E8] bg-white hover:border-[#8B7355] transition-all duration-300"
           >
             <div className="flex items-center gap-3">
-              <Palette className="w-5 h-5 text-white" />
-              <span className="text-white font-medium">Color</span>
+              <Palette className="w-5 h-5 text-[#1A1A1A]" strokeWidth={1} />
+              <span className="text-[#1A1A1A] font-light tracking-wider uppercase text-sm">Color</span>
             </div>
             <div 
-              className="w-8 h-8 rounded-full border-2 border-white shadow-lg"
+              className="w-8 h-8 border-2 border-[#E8E8E8]"
               style={{ backgroundColor: currentColor }}
             />
           </button>
           
           {showColorPicker && (
-            <div className="grid grid-cols-5 gap-2 p-3 bg-white/10 rounded-xl">
+            <div className="grid grid-cols-5 gap-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
               {COLORS.map(color => (
                 <button
                   key={color}
@@ -446,8 +435,8 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
                     setCurrentColor(color)
                     setShowColorPicker(false)
                   }}
-                  className={`w-full aspect-square rounded-full border-2 transition-all active:scale-95 ${
-                    currentColor === color ? 'border-white scale-110' : 'border-white/30'
+                  className={`w-full aspect-square border-2 transition-all active:scale-95 ${
+                    currentColor === color ? 'border-[#8B7355] scale-110' : 'border-[#E8E8E8]'
                   }`}
                   style={{ backgroundColor: color }}
                 />
@@ -464,19 +453,19 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
               setShowColorPicker(false)
               setShowBrushPicker(false)
             }}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-all"
+            className="w-full flex items-center justify-between p-3 border border-[#E8E8E8] bg-white hover:border-[#8B7355] transition-all duration-300"
           >
             <div className="flex items-center gap-3">
-              <span className="text-white text-xl">
+              <span className="text-[#1A1A1A] text-xl">
                 {BRUSH_TEXTURES.find(t => t.value === brushTexture)?.icon}
               </span>
-              <span className="text-white font-medium">Texture</span>
+              <span className="text-[#1A1A1A] font-light tracking-wider uppercase text-sm">Texture</span>
             </div>
-            <span className="text-white text-sm capitalize">{brushTexture}</span>
+            <span className="text-[#6B6B6B] text-sm capitalize font-light">{brushTexture}</span>
           </button>
           
           {showTexturePicker && (
-            <div className="grid grid-cols-5 gap-2 p-3 bg-white/10 rounded-xl">
+            <div className="grid grid-cols-5 gap-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
               {BRUSH_TEXTURES.map(texture => (
                 <button
                   key={texture.value}
@@ -484,12 +473,12 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
                     setBrushTexture(texture.value)
                     setShowTexturePicker(false)
                   }}
-                  className={`flex flex-col items-center p-2 rounded-lg transition-all active:scale-95 ${
-                    brushTexture === texture.value ? 'bg-white/30 scale-110' : 'bg-white/10'
+                  className={`flex flex-col items-center p-2 border transition-all active:scale-95 ${
+                    brushTexture === texture.value ? 'border-[#8B7355] bg-white scale-110' : 'border-[#E8E8E8] bg-white'
                   }`}
                 >
-                  <span className="text-white text-2xl mb-1">{texture.icon}</span>
-                  <span className="text-white text-[9px]">{texture.label}</span>
+                  <span className="text-[#1A1A1A] text-2xl mb-1">{texture.icon}</span>
+                  <span className="text-[#1A1A1A] text-[9px] font-light">{texture.label}</span>
                 </button>
               ))}
             </div>
@@ -504,20 +493,20 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
               setShowColorPicker(false)
               setShowTexturePicker(false)
             }}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-all"
+            className="w-full flex items-center justify-between p-3 border border-[#E8E8E8] bg-white hover:border-[#8B7355] transition-all duration-300"
           >
             <div className="flex items-center gap-3">
               <div 
-                className="rounded-full bg-white"
-                style={{ width: Math.min(brushSize + 8, 24), height: Math.min(brushSize + 8, 24) }}
+                className="bg-[#1A1A1A]"
+                style={{ width: Math.min(brushSize + 8, 24), height: Math.min(brushSize + 8, 24), borderRadius: '50%' }}
               />
-              <span className="text-white font-medium">Brush Size</span>
+              <span className="text-[#1A1A1A] font-light tracking-wider uppercase text-sm">Brush Size</span>
             </div>
-            <span className="text-white font-semibold">{brushSize}px</span>
+            <span className="text-[#6B6B6B] font-light">{brushSize}px</span>
           </button>
           
           {showBrushPicker && (
-            <div className="grid grid-cols-4 gap-2 p-3 bg-white/10 rounded-xl">
+            <div className="grid grid-cols-4 gap-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
               {BRUSH_SIZES.map(size => (
                 <button
                   key={size}
@@ -525,13 +514,13 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
                     setBrushSize(size)
                     setShowBrushPicker(false)
                   }}
-                  className={`w-full aspect-square rounded-lg flex items-center justify-center transition-all active:scale-95 ${
-                    brushSize === size ? 'bg-white/30 scale-110' : 'bg-white/10'
+                  className={`w-full aspect-square border flex items-center justify-center transition-all active:scale-95 ${
+                    brushSize === size ? 'border-[#8B7355] bg-white scale-110' : 'border-[#E8E8E8] bg-white'
                   }`}
                 >
                   <div 
-                    className="rounded-full bg-white"
-                    style={{ width: Math.min(size, 20), height: Math.min(size, 20) }}
+                    className="bg-[#1A1A1A]"
+                    style={{ width: Math.min(size, 20), height: Math.min(size, 20), borderRadius: '50%' }}
                   />
                 </button>
               ))}
