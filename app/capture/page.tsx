@@ -900,20 +900,18 @@ export default function CapturePage() {
 
   if (capturedImage) {
     return (
-      <div className="fixed inset-0 z-[100] bg-gradient-to-br from-ivory via-sand to-blush flex flex-col">
+      <div className="fixed inset-0 z-[100] bg-white flex flex-col">
         {/* Header */}
-        <div className="absolute top-0 left-0 right-0 pt-14 px-4 sm:px-6 pb-4 flex items-center justify-between z-10 bg-white/95 backdrop-blur-xl border-b border-border/50 shadow-sm">
-          <Button
+        <div className="absolute top-0 left-0 right-0 pt-14 px-4 sm:px-6 pb-4 flex items-center justify-between z-10 bg-white border-b border-[#E8E8E8]">
+          <button
             onClick={changePhoto}
-            variant="outline"
-            size="sm"
-            className="gap-2 h-10 px-3 sm:px-4 border-2 hover:bg-muted/50 rounded-xl active:scale-95 transition-all"
+            className="h-10 px-3 sm:px-4 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center gap-2"
           >
-            <Upload className="w-4 h-4" />
+            <Upload className="w-4 h-4" strokeWidth={1} />
             <span className="hidden sm:inline">Change</span>
-          </Button>
+          </button>
           <div className="flex items-center gap-2 sm:gap-3 ml-auto">
-            <h1 className="font-serif text-base sm:text-xl font-bold bg-gradient-to-r from-terracotta to-rose bg-clip-text text-transparent hidden xs:block">
+            <h1 className="font-serif text-base sm:text-xl font-light text-[#1A1A1A] tracking-tight hidden xs:block">
               Design Your Nails
             </h1>
             <div className="flex items-center">
@@ -927,46 +925,46 @@ export default function CapturePage() {
           <div className="max-w-2xl mx-auto h-full">
             <div className="grid grid-cols-2 gap-3 sm:gap-4 h-full">
                 {/* Original Image */}
-                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border-0 shadow-xl group h-full bg-white/80 backdrop-blur-sm">
-                  <div className="relative bg-gradient-to-br from-muted/20 to-muted/5 h-full">
+                <div className="relative overflow-hidden border border-[#E8E8E8] group h-full bg-white">
+                  <div className="relative bg-[#F8F7F5] h-full">
                     <Image src={capturedImage} alt="Original" fill className="object-contain" />
                     {/* Change Photo Overlay */}
                     <button
                       onClick={changePhoto}
                       className="absolute inset-0 bg-black/0 hover:bg-black/50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 active:scale-95"
                     >
-                      <div className="bg-white rounded-full p-4 shadow-2xl">
-                        <Upload className="w-7 h-7 text-charcoal" />
+                      <div className="bg-white p-4">
+                        <Upload className="w-7 h-7 text-[#1A1A1A]" strokeWidth={1} />
                       </div>
                     </button>
                     {/* Label */}
-                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md">
-                      <span className="text-xs font-semibold text-charcoal">Original</span>
+                    <div className="absolute top-3 left-3 bg-white border border-[#E8E8E8] px-3 py-1.5">
+                      <span className="text-xs font-light tracking-wider uppercase text-[#1A1A1A]">Original</span>
                     </div>
                     {/* Draw Button */}
                     <button
                       onClick={() => setShowDrawingCanvas(true)}
-                      className={`absolute bottom-3 right-3 text-white rounded-full p-3 shadow-lg active:scale-95 transition-all ${
+                      className={`absolute bottom-3 right-3 text-white p-3 active:scale-95 transition-all ${
                         drawingImageUrl 
-                          ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' 
-                          : 'bg-gradient-to-r from-terracotta to-rose hover:from-terracotta/90 hover:to-rose/90'
+                          ? 'bg-[#2D7A4F] hover:bg-[#2D7A4F]/90' 
+                          : 'bg-[#1A1A1A] hover:bg-[#1A1A1A]/90'
                       }`}
                       title={drawingImageUrl ? 'Drawing added - click to edit' : 'Draw on image'}
                     >
-                      <Pencil className="w-5 h-5" />
+                      <Pencil className="w-5 h-5" strokeWidth={1} />
                     </button>
                   </div>
                 </div>
 
                 {/* Preview Placeholder or Generated Thumbnails */}
-                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border-0 shadow-xl h-full bg-white/80 backdrop-blur-sm">
+                <div className="relative overflow-hidden border border-[#E8E8E8] h-full bg-white">
                   {finalPreviews.length > 0 ? (
                     /* Show generated images as thumbnails */
-                    <div className="relative bg-gradient-to-br from-muted/10 to-muted/5 h-full p-4 flex flex-col gap-3">
+                    <div className="relative bg-[#F8F7F5] h-full p-4 flex flex-col gap-3">
                       <div className="flex items-center justify-between">
-                        <div className="text-sm font-bold text-charcoal">AI Designs</div>
-                        <div className="bg-gradient-to-r from-terracotta/20 to-rose/20 px-2.5 py-1 rounded-full">
-                          <span className="text-xs font-semibold text-terracotta">{finalPreviews.length}</span>
+                        <div className="text-sm font-light tracking-wider uppercase text-[#1A1A1A]">AI Designs</div>
+                        <div className="bg-white border border-[#E8E8E8] px-2.5 py-1">
+                          <span className="text-xs font-light text-[#1A1A1A]">{finalPreviews.length}</span>
                         </div>
                       </div>
                       <div className="flex-1 flex flex-col gap-2.5 overflow-y-auto">
@@ -974,12 +972,12 @@ export default function CapturePage() {
                           <button
                             key={index}
                             onClick={() => setSelectedImageModal(imageUrl)}
-                            className="relative overflow-hidden rounded-xl border-0 shadow-md hover:shadow-xl transition-all active:scale-95 aspect-[3/2] group"
+                            className="relative overflow-hidden border border-[#E8E8E8] hover:border-[#8B7355] transition-all active:scale-95 aspect-[3/2] group"
                           >
                             <Image src={imageUrl} alt={`Design ${index + 1}`} fill className="object-cover" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
-                              <div className="bg-white rounded-full p-2.5 shadow-lg">
-                                <Sparkles className="w-5 h-5 text-terracotta" />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                              <div className="bg-white p-2.5 border border-[#E8E8E8]">
+                                <Sparkles className="w-5 h-5 text-[#8B7355]" strokeWidth={1} />
                               </div>
                             </div>
                           </button>
@@ -987,7 +985,7 @@ export default function CapturePage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="relative bg-gradient-to-br from-terracotta/10 via-rose/10 to-purple-100/50 flex items-center justify-center h-full">
+                    <div className="relative bg-[#F8F7F5] flex items-center justify-center h-full">
                       {isGenerating ? (
                         <div className="absolute inset-0 flex items-center justify-center">
                       {/* Dimmed GIF Background */}
@@ -1072,8 +1070,8 @@ export default function CapturePage() {
                     </div>
                       ) : (
                         <div className="text-center px-4">
-                          <Sparkles className="w-8 h-8 mx-auto mb-2 text-primary" />
-                          <p className="text-xs text-muted-foreground">
+                          <Sparkles className="w-8 h-8 mx-auto mb-2 text-[#8B7355]" strokeWidth={1} />
+                          <p className="text-xs text-[#6B6B6B] font-light tracking-wider uppercase">
                             Configure design below
                           </p>
                         </div>
@@ -1120,27 +1118,27 @@ export default function CapturePage() {
         )}
 
         {/* Bottom Drawer */}
-        <div className="fixed left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-border/50 rounded-t-3xl shadow-2xl z-20 touch-action-pan-y" style={{ bottom: '80px', height: 'calc(35vh - 80px)', minHeight: '240px', maxHeight: '370px' }}>
+        <div className="fixed left-0 right-0 bg-white border-t border-[#E8E8E8] z-20 touch-action-pan-y" style={{ bottom: '80px', height: 'calc(35vh - 80px)', minHeight: '240px', maxHeight: '370px' }}>
           <div className="max-w-2xl mx-auto h-full flex flex-col">
-            <div className="h-1.5 w-16 bg-gradient-to-r from-terracotta/30 via-rose/30 to-terracotta/30 rounded-full mx-auto my-3 flex-shrink-0"></div>
+            <div className="h-1 w-16 bg-[#E8E8E8] mx-auto my-3 flex-shrink-0"></div>
 
             <div className="w-full flex-1 flex flex-col overflow-hidden">
               {(designMode === 'design' || designMode === null) && (
                 <div className="p-6 space-y-4 overflow-y-auto overscroll-contain flex-1">
                   {/* Low Credits Warning */}
                   {credits !== null && credits <= 2 && credits > 0 && (
-                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200/50 rounded-2xl p-4 text-sm shadow-sm">
+                    <div className="bg-[#FFF9E6] border border-[#E8E8E8] p-4 text-sm">
                       <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 border border-[#E8E8E8] bg-white flex items-center justify-center flex-shrink-0">
                           <span className="text-lg">⚠️</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-yellow-900 font-bold mb-1">Low on credits!</p>
-                          <p className="text-yellow-800 text-xs leading-relaxed">
+                          <p className="text-[#1A1A1A] font-light tracking-wider uppercase mb-1 text-xs">Low on credits!</p>
+                          <p className="text-[#6B6B6B] text-xs leading-relaxed font-light">
                             You have {credits} credit{credits !== 1 ? 's' : ''} left. 
                             <button 
                               onClick={() => router.push('/settings/credits')}
-                              className="underline ml-1 font-semibold hover:text-yellow-900"
+                              className="underline ml-1 hover:text-[#1A1A1A]"
                             >
                               Get more
                             </button>
@@ -1152,18 +1150,18 @@ export default function CapturePage() {
 
                   {/* No Credits Warning */}
                   {credits !== null && credits === 0 && (
-                    <div className="bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200/50 rounded-2xl p-4 text-sm shadow-sm">
+                    <div className="bg-[#FFF0F0] border border-[#E8E8E8] p-4 text-sm">
                       <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 border border-[#E8E8E8] bg-white flex items-center justify-center flex-shrink-0">
                           <span className="text-lg">❌</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-red-900 font-bold mb-1">No credits remaining</p>
-                          <p className="text-red-800 text-xs leading-relaxed">
+                          <p className="text-[#1A1A1A] font-light tracking-wider uppercase mb-1 text-xs">No credits remaining</p>
+                          <p className="text-[#6B6B6B] text-xs leading-relaxed font-light">
                             Refer 3 friends to earn 1 free credit!
                             <button 
                               onClick={() => router.push('/settings/credits')}
-                              className="underline ml-1 font-semibold hover:text-red-900"
+                              className="underline ml-1 hover:text-[#1A1A1A]"
                             >
                               Learn more
                             </button>
@@ -1175,63 +1173,61 @@ export default function CapturePage() {
 
                   {/* Generate Preview Button */}
                   {!isGenerating ? (
-                    <Button 
+                    <button 
                       onClick={() => generateAIPreview(designSettings)} 
-                      className="w-full h-12 rounded-2xl bg-gradient-to-r from-terracotta to-rose hover:from-terracotta/90 hover:to-rose/90 shadow-lg hover:shadow-xl active:scale-95 transition-all font-semibold"
+                      className="w-full h-12 bg-[#1A1A1A] text-white font-light text-sm tracking-wider uppercase hover:bg-[#1A1A1A]/90 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
                       disabled={!hasCredits(1)}
                     >
-                      <Sparkles className="w-5 h-5 mr-2" />
+                      <Sparkles className="w-5 h-5" strokeWidth={1} />
                       Generate Preview
                       {credits !== null && (
-                        <span className="ml-2 text-xs opacity-80 font-normal">
+                        <span className="ml-2 text-xs opacity-80 font-light">
                           (1 credit)
                         </span>
                       )}
-                    </Button>
+                    </button>
                   ) : (
-                    <Button 
+                    <button 
                       onClick={cancelGeneration}
-                      variant="destructive"
-                      className="w-full h-12 rounded-2xl shadow-lg active:scale-95 transition-all font-semibold"
+                      className="w-full h-12 border border-[#E8E8E8] text-[#1A1A1A] font-light text-sm tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
                     >
-                      <X className="w-5 h-5 mr-2" />
+                      <X className="w-5 h-5" strokeWidth={1} />
                       Cancel Generation
-                    </Button>
+                    </button>
                   )}
 
                   {/* Drawing Status */}
                   {drawingImageUrl && (
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200/50 rounded-2xl p-4 text-sm shadow-sm">
+                    <div className="bg-[#F0FFF4] border border-[#E8E8E8] p-4 text-sm">
                       <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                          <Pencil className="w-4 h-4 text-green-600" />
+                        <div className="w-8 h-8 border border-[#E8E8E8] bg-white flex items-center justify-center flex-shrink-0">
+                          <Pencil className="w-4 h-4 text-[#2D7A4F]" strokeWidth={1} />
                         </div>
                         <div className="flex-1">
-                          <p className="text-green-900 font-bold mb-1">Drawing added</p>
-                          <p className="text-green-800 text-xs leading-relaxed">
+                          <p className="text-[#1A1A1A] font-light tracking-wider uppercase mb-1 text-xs">Drawing added</p>
+                          <p className="text-[#6B6B6B] text-xs leading-relaxed font-light">
                             Your drawing will guide the AI to create designs following your outline
                           </p>
                         </div>
                         <button
                           onClick={() => setDrawingImageUrl(null)}
-                          className="text-green-600 hover:text-green-700"
+                          className="text-[#6B6B6B] hover:text-[#1A1A1A]"
                         >
-                          <X className="w-5 h-5" />
+                          <X className="w-5 h-5" strokeWidth={1} />
                         </button>
                       </div>
                     </div>
                   )}
 
                   {/* Upload Design Image */}
-                  <Button 
-                    variant="outline" 
+                  <button 
                     onClick={() => designUploadRef.current?.click()}
-                    className="w-full h-11 rounded-2xl border-2 hover:bg-muted/50 active:scale-95 transition-all font-medium"
+                    className="w-full h-11 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
                     disabled={isGenerating || selectedDesignImages.length >= 5}
                   >
-                    <Upload className="w-4 h-4 mr-2" />
+                    <Upload className="w-4 h-4" strokeWidth={1} />
                     Upload Design Images ({selectedDesignImages.length}/5)
-                  </Button>
+                  </button>
 
                   {/* Uploaded Design Previews with Influence Control */}
                   {selectedDesignImages.length > 0 && (
@@ -1312,23 +1308,23 @@ export default function CapturePage() {
                     </div>
                   )}
 
-                  <div className="border-t pt-4">
-                    <p className="text-xs font-light text-muted-foreground uppercase tracking-widest mb-4">Design Parameters</p>
+                  <div className="border-t border-[#E8E8E8] pt-4">
+                    <p className="text-xs font-light text-[#6B6B6B] uppercase tracking-widest mb-4">Design Parameters</p>
 
                     {/* Nail Length - Collapsible */}
                     <div className="mb-3">
                       <button
                         onClick={() => setExpandedSection(expandedSection === 'length' ? null : 'length')}
-                        className="w-full flex items-center justify-between p-3 rounded-2xl border border-border bg-white hover:border-primary/50 transition-all"
+                        className="w-full flex items-center justify-between p-3 border border-[#E8E8E8] bg-white hover:border-[#8B7355] transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-light text-charcoal tracking-wide">Nail Length</span>
-                          <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.nailLength.replace('-', ' ')}</span>
+                          <span className="text-sm font-light text-[#1A1A1A] tracking-wide">Nail Length</span>
+                          <span className="text-xs text-[#6B6B6B] capitalize font-light">{designSettings.nailLength.replace('-', ' ')}</span>
                         </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'length' ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-4 h-4 text-[#6B6B6B] transition-transform ${expandedSection === 'length' ? 'rotate-180' : ''}`} strokeWidth={1} />
                       </button>
                       {expandedSection === 'length' && (
-                        <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                        <div className="mt-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
                           <div className="grid grid-cols-4 gap-2">
                             {[
                               { value: 'short', label: 'Short', height: 'h-6' },
@@ -1339,14 +1335,14 @@ export default function CapturePage() {
                               <button
                                 key={length.value}
                                 onClick={() => handleDesignSettingChange('nailLength', length.value)}
-                                className={`flex flex-col items-center justify-end p-2 rounded-lg border transition-all ${
+                                className={`flex flex-col items-center justify-end p-2 border transition-all ${
                                   designSettings.nailLength === length.value
-                                    ? 'border-primary bg-white'
-                                    : 'border-border bg-white hover:border-primary/50'
+                                    ? 'border-[#8B7355] bg-white'
+                                    : 'border-[#E8E8E8] bg-white hover:border-[#8B7355]'
                                 }`}
                               >
-                                <div className={`w-4 ${length.height} bg-gradient-to-t from-primary to-primary/60 rounded-t-full mb-1.5`} />
-                                <span className="text-[10px] font-medium text-charcoal">{length.label}</span>
+                                <div className={`w-4 ${length.height} bg-[#8B7355] mb-1.5`} />
+                                <span className="text-[10px] font-light text-[#1A1A1A]">{length.label}</span>
                               </button>
                             ))}
                           </div>
@@ -1358,16 +1354,16 @@ export default function CapturePage() {
                     <div className="mb-3">
                       <button
                         onClick={() => setExpandedSection(expandedSection === 'shape' ? null : 'shape')}
-                        className="w-full flex items-center justify-between p-3 rounded-2xl border border-border bg-white hover:border-primary/50 transition-all"
+                        className="w-full flex items-center justify-between p-3 border border-[#E8E8E8] bg-white hover:border-[#8B7355] transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-light text-charcoal tracking-wide">Nail Shape</span>
-                          <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.nailShape}</span>
+                          <span className="text-sm font-light text-[#1A1A1A] tracking-wide">Nail Shape</span>
+                          <span className="text-xs text-[#6B6B6B] capitalize font-light">{designSettings.nailShape}</span>
                         </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'shape' ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-4 h-4 text-[#6B6B6B] transition-transform ${expandedSection === 'shape' ? 'rotate-180' : ''}`} strokeWidth={1} />
                       </button>
                       {expandedSection === 'shape' && (
-                        <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                        <div className="mt-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
                           <div className="grid grid-cols-3 gap-2">
                             {[
                               { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
@@ -1380,16 +1376,16 @@ export default function CapturePage() {
                               <button
                                 key={shape.value}
                                 onClick={() => handleDesignSettingChange('nailShape', shape.value)}
-                                className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                className={`flex flex-col items-center p-2 border transition-all ${
                                   designSettings.nailShape === shape.value
-                                    ? 'border-primary bg-white'
-                                    : 'border-border bg-white hover:border-primary/50'
+                                    ? 'border-[#8B7355] bg-white'
+                                    : 'border-[#E8E8E8] bg-white hover:border-[#8B7355]'
                                 }`}
                               >
                                 <svg viewBox="0 0 24 24" className="w-6 h-10 mb-1">
-                                  <path d={shape.path} fill="currentColor" className="text-primary" />
+                                  <path d={shape.path} fill="currentColor" className="text-[#8B7355]" />
                                 </svg>
-                                <span className="text-[10px] font-medium text-charcoal">{shape.label}</span>
+                                <span className="text-[10px] font-light text-[#1A1A1A]">{shape.label}</span>
                               </button>
                             ))}
                           </div>
@@ -1401,25 +1397,25 @@ export default function CapturePage() {
                     <div className="mb-3">
                       <button
                         onClick={() => setExpandedSection(expandedSection === 'color' ? null : 'color')}
-                        className="w-full flex items-center justify-between p-3 rounded-2xl border border-border bg-white hover:border-primary/50 transition-all"
+                        className="w-full flex items-center justify-between p-3 border border-[#E8E8E8] bg-white hover:border-[#8B7355] transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-light text-charcoal tracking-wide">Base Color</span>
+                          <span className="text-sm font-light text-[#1A1A1A] tracking-wide">Base Color</span>
                           <div className="flex items-center gap-2">
                             <div 
-                              className="w-6 h-6 rounded-full border-2 border-border"
+                              className="w-6 h-6 border border-[#E8E8E8]"
                               style={{ backgroundColor: designSettings.baseColor }}
                             />
-                            <span className="text-xs text-muted-foreground font-light">{designSettings.baseColor}</span>
+                            <span className="text-xs text-[#6B6B6B] font-light">{designSettings.baseColor}</span>
                           </div>
                         </div>
-                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded mr-2">{influenceWeights.nailEditor_baseColor}%</span>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'color' ? 'rotate-180' : ''}`} />
+                        <span className="text-xs font-light text-[#1A1A1A] bg-[#F8F7F5] border border-[#E8E8E8] px-2 py-1 mr-2">{influenceWeights.nailEditor_baseColor}%</span>
+                        <ChevronDown className={`w-4 h-4 text-[#6B6B6B] transition-transform ${expandedSection === 'color' ? 'rotate-180' : ''}`} strokeWidth={1} />
                       </button>
                       {expandedSection === 'color' && (
-                        <div className="mt-2 space-y-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="mt-2 space-y-3 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
                           <div>
-                            <label className="text-xs text-muted-foreground mb-1.5 block">Hue</label>
+                            <label className="text-xs text-[#6B6B6B] font-light tracking-wider uppercase mb-1.5 block">Hue</label>
                             <div className="relative">
                               <div className="absolute inset-0 h-2 rounded-full" style={{
                                 background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)',
@@ -1436,7 +1432,7 @@ export default function CapturePage() {
                             </div>
                           </div>
                           <div>
-                            <label className="text-xs text-muted-foreground mb-1.5 block">Lightness</label>
+                            <label className="text-xs text-[#6B6B6B] font-light tracking-wider uppercase mb-1.5 block">Lightness</label>
                             <div className="relative">
                               <div className="absolute inset-0 h-2 rounded-full" style={{
                                 background: 'linear-gradient(to right, #1a1a1a 0%, #808080 50%, #ffffff 100%)',
@@ -1453,10 +1449,10 @@ export default function CapturePage() {
                               />
                             </div>
                           </div>
-                          <div className="border-t pt-3">
+                          <div className="border-t border-[#E8E8E8] pt-3">
                             <div className="flex justify-between items-center mb-2">
-                              <label className="text-xs font-medium text-muted-foreground">Base Color</label>
-                              <span className="text-xs font-bold text-primary">{influenceWeights.nailEditor_baseColor}%</span>
+                              <label className="text-xs font-light tracking-wider uppercase text-[#6B6B6B]">Base Color</label>
+                              <span className="text-xs font-light text-[#1A1A1A]">{influenceWeights.nailEditor_baseColor}%</span>
                             </div>
                             <div className="relative">
                               <div className="absolute inset-0 h-2 rounded-full" style={{
@@ -1473,7 +1469,7 @@ export default function CapturePage() {
                                 className="w-full relative z-10"
                               />
                             </div>
-                            <p className="text-[10px] text-muted-foreground mt-1">
+                            <p className="text-[10px] text-[#6B6B6B] font-light mt-1">
                               {selectedDesignImages.length > 0 && `Design Images: ${influenceWeights.nailEditor_designImage}%`}
                             </p>
                           </div>
@@ -1485,16 +1481,16 @@ export default function CapturePage() {
                     <div className="mb-3">
                       <button
                         onClick={() => setExpandedSection(expandedSection === 'finish' ? null : 'finish')}
-                        className="w-full flex items-center justify-between p-3 rounded-2xl border border-border bg-white hover:border-primary/50 transition-all"
+                        className="w-full flex items-center justify-between p-3 border border-[#E8E8E8] bg-white hover:border-[#8B7355] transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-light text-charcoal tracking-wide">Finish</span>
-                          <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.finish}</span>
+                          <span className="text-sm font-light text-[#1A1A1A] tracking-wide">Finish</span>
+                          <span className="text-xs text-[#6B6B6B] capitalize font-light">{designSettings.finish}</span>
                         </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'finish' ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-4 h-4 text-[#6B6B6B] transition-transform ${expandedSection === 'finish' ? 'rotate-180' : ''}`} strokeWidth={1} />
                       </button>
                       {expandedSection === 'finish' && (
-                        <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                        <div className="mt-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
                           <div className="grid grid-cols-3 gap-2">
                             {[
                               { value: 'glossy', label: 'Glossy', gradient: 'bg-gradient-to-br from-pink-400 to-pink-600' },
@@ -1506,14 +1502,14 @@ export default function CapturePage() {
                               <button
                                 key={finish.value}
                                 onClick={() => handleDesignSettingChange('finish', finish.value)}
-                                className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                className={`flex flex-col items-center p-2 border transition-all ${
                                   designSettings.finish === finish.value
-                                    ? 'border-primary bg-white'
-                                    : 'border-border bg-white hover:border-primary/50'
+                                    ? 'border-[#8B7355] bg-white'
+                                    : 'border-[#E8E8E8] bg-white hover:border-[#8B7355]'
                                 }`}
                               >
-                                <div className={`w-full h-12 rounded-lg ${finish.gradient} mb-1.5 ${finish.value === 'glossy' ? 'shadow-lg' : ''}`} />
-                                <span className="text-[10px] font-medium text-charcoal">{finish.label}</span>
+                                <div className={`w-full h-12 ${finish.gradient} mb-1.5`} />
+                                <span className="text-[10px] font-light text-[#1A1A1A]">{finish.label}</span>
                               </button>
                             ))}
                           </div>
@@ -1525,16 +1521,16 @@ export default function CapturePage() {
                     <div className="mb-3">
                       <button
                         onClick={() => setExpandedSection(expandedSection === 'texture' ? null : 'texture')}
-                        className="w-full flex items-center justify-between p-3 rounded-2xl border border-border bg-white hover:border-primary/50 transition-all"
+                        className="w-full flex items-center justify-between p-3 border border-[#E8E8E8] bg-white hover:border-[#8B7355] transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <span className="text-sm font-light text-charcoal tracking-wide">Texture</span>
-                          <span className="text-xs text-muted-foreground capitalize font-light">{designSettings.texture}</span>
+                          <span className="text-sm font-light text-[#1A1A1A] tracking-wide">Texture</span>
+                          <span className="text-xs text-[#6B6B6B] capitalize font-light">{designSettings.texture}</span>
                         </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSection === 'texture' ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-4 h-4 text-[#6B6B6B] transition-transform ${expandedSection === 'texture' ? 'rotate-180' : ''}`} strokeWidth={1} />
                       </button>
                       {expandedSection === 'texture' && (
-                        <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                        <div className="mt-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
                           <div className="grid grid-cols-3 gap-2">
                             {[
                               { value: 'smooth', label: 'Smooth', pattern: 'bg-pink-400' },
@@ -1546,16 +1542,16 @@ export default function CapturePage() {
                               <button
                                 key={texture.value}
                                 onClick={() => handleDesignSettingChange('texture', texture.value)}
-                                className={`flex flex-col items-center p-2 rounded-lg border transition-all ${
+                                className={`flex flex-col items-center p-2 border transition-all ${
                                   designSettings.texture === texture.value
-                                    ? 'border-primary bg-white'
-                                    : 'border-border bg-white hover:border-primary/50'
+                                    ? 'border-[#8B7355] bg-white'
+                                    : 'border-[#E8E8E8] bg-white hover:border-[#8B7355]'
                                 }`}
                               >
-                                <div className={`w-full h-12 rounded-lg ${texture.pattern} mb-1.5 ${texture.value === 'glitter' ? 'animate-pulse' : ''}`} 
+                                <div className={`w-full h-12 ${texture.pattern} mb-1.5 ${texture.value === 'glitter' ? 'animate-pulse' : ''}`} 
                                   style={texture.value === 'textured' ? { backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.05) 2px, rgba(0,0,0,.05) 4px)' } : {}}
                                 />
-                                <span className="text-[10px] font-medium text-charcoal">{texture.label}</span>
+                                <span className="text-[10px] font-light text-[#1A1A1A]">{texture.label}</span>
                               </button>
                             ))}
                           </div>
