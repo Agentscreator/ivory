@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Sparkles, Scissors } from "lucide-react"
 
 export default function UserTypePage() {
@@ -41,49 +40,60 @@ export default function UserTypePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-2xl">
-        <div className="text-center mb-8 sm:mb-12 px-4">
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal mb-2 sm:mb-3">Welcome to Ivory</h1>
-          <p className="text-base sm:text-lg text-foreground/70">How would you like to use the app?</p>
+    <div className="min-h-screen bg-white flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-4xl">
+        <div className="text-center mb-12 sm:mb-16 px-4">
+          <p className="text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-4 sm:mb-6 font-light">Welcome</p>
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-[#1A1A1A] mb-4 sm:mb-6 tracking-tight">
+            Choose Your Experience
+          </h1>
+          <p className="text-sm sm:text-base text-[#6B6B6B] font-light max-w-xl mx-auto leading-relaxed">
+            Select how you'd like to experience Ivory's Choice
+          </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-          <Card
-            className="border-2 border-border hover:border-primary active:border-primary hover:shadow-xl active:scale-95 transition-all cursor-pointer bg-white/95 backdrop-blur"
+        <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+          {/* Client Option */}
+          <div
+            className="border border-[#E8E8E8] hover:border-[#8B7355] transition-all duration-500 cursor-pointer group"
             onClick={() => selectUserType("client")}
           >
-            <CardContent className="p-6 sm:p-8 text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-terracotta to-rose flex items-center justify-center">
-                <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+            <div className="p-8 sm:p-12 text-center">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 sm:mb-8 border border-[#E8E8E8] group-hover:border-[#8B7355] transition-colors duration-500 flex items-center justify-center">
+                <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-[#1A1A1A] group-hover:text-[#8B7355] transition-colors duration-500" strokeWidth={1} />
               </div>
-              <h2 className="font-serif text-xl sm:text-2xl font-bold text-charcoal mb-2 sm:mb-3">Design My Nails</h2>
-              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
-                Create stunning nail designs with AI, share with friends, and connect with nail techs
+              <h2 className="text-xs tracking-[0.2em] uppercase text-[#1A1A1A] mb-4 font-light">
+                For Clients
+              </h2>
+              <p className="text-sm sm:text-base text-[#6B6B6B] mb-8 font-light leading-relaxed">
+                Create bespoke nail designs with AI, curate your collection, and connect with master artisans
               </p>
-              <Button className="w-full h-11 sm:h-12 text-base font-semibold" size="lg">
-                Get Started
+              <Button className="w-full h-12 sm:h-14 bg-[#1A1A1A] text-white hover:bg-[#8B7355] transition-all duration-500 text-xs tracking-widest uppercase rounded-none font-light">
+                Begin Journey
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card
-            className="border-2 border-border hover:border-primary active:border-primary hover:shadow-xl active:scale-95 transition-all cursor-pointer bg-white/95 backdrop-blur"
+          {/* Tech Option */}
+          <div
+            className="border border-[#E8E8E8] hover:border-[#8B7355] transition-all duration-500 cursor-pointer group"
             onClick={() => selectUserType("tech")}
           >
-            <CardContent className="p-6 sm:p-8 text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br from-charcoal to-primary flex items-center justify-center">
-                <Scissors className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+            <div className="p-8 sm:p-12 text-center">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 sm:mb-8 border border-[#E8E8E8] group-hover:border-[#8B7355] transition-colors duration-500 flex items-center justify-center">
+                <Scissors className="w-10 h-10 sm:w-12 sm:h-12 text-[#1A1A1A] group-hover:text-[#8B7355] transition-colors duration-500" strokeWidth={1} />
               </div>
-              <h2 className="font-serif text-xl sm:text-2xl font-bold text-charcoal mb-2 sm:mb-3">I'm a Nail Tech</h2>
-              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
-                Receive client designs, manage appointments, and showcase your portfolio
+              <h2 className="text-xs tracking-[0.2em] uppercase text-[#1A1A1A] mb-4 font-light">
+                For Artisans
+              </h2>
+              <p className="text-sm sm:text-base text-[#6B6B6B] mb-8 font-light leading-relaxed">
+                Receive client designs, curate your portfolio, and showcase your exceptional craftsmanship
               </p>
-              <Button className="w-full h-11 sm:h-12 text-base font-semibold bg-transparent" size="lg" variant="outline">
-                Get Started
+              <Button className="w-full h-12 sm:h-14 border border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all duration-500 text-xs tracking-widest uppercase rounded-none font-light">
+                Begin Journey
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
