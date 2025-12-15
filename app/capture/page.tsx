@@ -32,6 +32,16 @@ type DesignSettings = {
 
 const baseColors = ["#FF6B9D", "#C44569", "#A8E6CF", "#FFD93D", "#6C5CE7", "#E17055", "#FDCB6E", "#74B9FF"]
 
+type DesignTab = {
+  id: string
+  name: string
+  finalPreviews: string[]
+  designSettings: DesignSettings
+  selectedDesignImages: string[]
+  drawingImageUrl: string | null
+  aiPrompt: string
+}
+
 export default function CapturePage() {
   const router = useRouter()
   const { credits, hasCredits, refresh: refreshCredits } = useCredits()
@@ -54,6 +64,29 @@ export default function CapturePage() {
   const [selectedImageModal, setSelectedImageModal] = useState<string | null>(null)
   const [showDrawingCanvas, setShowDrawingCanvas] = useState(false)
   const [drawingImageUrl, setDrawingImageUrl] = useState<string | null>(null)
+  
+  // Tabs for multiple designs
+  const [designTabs, setDesignTabs] = useState<DesignTab[]>([
+    {
+      id: '1',
+      name: 'Design 1',
+      finalPreviews: [],
+      designSettings: {
+        nailLength: 'medium',
+        nailShape: 'oval',
+        baseColor: '#FF6B9D',
+        finish: 'glossy',
+        texture: 'smooth',
+        patternType: 'solid',
+        styleVibe: 'elegant',
+        accentColor: '#FFFFFF'
+      },
+      selectedDesignImages: [],
+      drawingImageUrl: null,
+      aiPrompt: ''
+    }
+  ])
+  const [activeTabId, setActiveTabId] = useState('1')
   
   const [designSettings, setDesignSettings] = useState<DesignSettings>({
     nailLength: 'medium',
@@ -98,6 +131,73 @@ export default function CapturePage() {
   const designUploadRef = useRef<HTMLInputElement>(null)
   const lastTouchDistanceRef = useRef<number>(0)
   const zoomIndicatorTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  
+  // Get active tab
+  const activeTab = designTabs.find(tab => tab.id === activeTabId) || designTabs[0]
+  
+  // Sync current state with active tab
+  useEffect(() => {
+    if (activeTab) {
+      setFinalPreviews(activeTab.finalPreviews)
+      setDesignSettings(activeTab.designSettings)
+      setSelectedDesignImages(activeTab.selectedDesignImages)
+      setDrawingImageUrl(activeTab.drawingImageUrl)
+      setAiPrompt(activeTab.aiPrompt)
+    }
+  }, [activeTabId])
+  
+  // Update active tab when state changes
+  useEffect(() => {
+    setDesignTabs(tabs => tabs.map(tab => 
+      tab.id === activeTabId 
+        ? {
+            ...tab,
+            finalPreviews,
+            designSettings,
+            selectedDesignImages,
+            drawingImageUrl,
+            aiPrompt
+          }
+        : tab
+    ))
+  }, [finalPreviews, designSettings, selectedDesignImages, drawingImageUrl, aiPrompt, activeTabId])
+  
+  // Add new tab
+  const addNewTab = () => {
+    const newId = String(designTabs.length + 1)
+    const newTab: DesignTab = {
+      id: newId,
+      name: `Design ${newId}`,
+      finalPreviews: [],
+      designSettings: {
+        nailLength: 'medium',
+        nailShape: 'oval',
+        baseColor: '#FF6B9D',
+        finish: 'glossy',
+        texture: 'smooth',
+        patternType: 'solid',
+        styleVibe: 'elegant',
+        accentColor: '#FFFFFF'
+      },
+      selectedDesignImages: [],
+      drawingImageUrl: null,
+      aiPrompt: ''
+    }
+    setDesignTabs([...designTabs, newTab])
+    setActiveTabId(newId)
+  }
+  
+  // Remove tab
+  const removeTab = (tabId: string) => {
+    if (designTabs.length === 1) return // Don't remove last tab
+    
+    const newTabs = designTabs.filter(tab => tab.id !== tabId)
+    setDesignTabs(newTabs)
+    
+    if (activeTabId === tabId) {
+      setActiveTabId(newTabs[0].id)
+    }
+  }
   const abortControllerRef = useRef<AbortController | null>(null)
 
   // Check for user session and existing image on mount
@@ -902,26 +1002,70 @@ export default function CapturePage() {
     return (
       <div className="fixed inset-0 z-[100] bg-white flex flex-col">
         {/* Header */}
-        <div className="absolute top-0 left-0 right-0 pt-14 px-4 sm:px-6 pb-4 flex items-center justify-between z-10 bg-white border-b border-[#E8E8E8]">
-          <button
-            onClick={changePhoto}
-            className="h-10 px-3 sm:px-4 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center gap-2"
-          >
-            <Upload className="w-4 h-4" strokeWidth={1} />
-            <span className="hidden sm:inline">Change</span>
-          </button>
-          <div className="flex items-center gap-2 sm:gap-3 ml-auto">
-            <h1 className="font-serif text-base sm:text-xl font-light text-[#1A1A1A] tracking-tight hidden xs:block">
-              Design Your Nails
-            </h1>
-            <div className="flex items-center">
-              <CreditsDisplay showLabel={true} credits={credits} />
+        <div className="absolute top-0 left-0 right-0 pt-14 px-4 sm:px-6 pb-4 z-10 bg-white border-b border-[#E8E8E8]">
+          <div className="flex items-center justify-between mb-3">
+            <button
+              onClick={changePhoto}
+              className="h-10 px-3 sm:px-4 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center gap-2"
+            >
+              <Upload className="w-4 h-4" strokeWidth={1} />
+              <span className="hidden sm:inline">Change</span>
+            </button>
+            <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+              <h1 className="font-serif text-base sm:text-xl font-light text-[#1A1A1A] tracking-tight hidden xs:block">
+                Design Your Nails
+              </h1>
+              <div className="flex items-center">
+                <CreditsDisplay showLabel={true} credits={credits} />
+              </div>
             </div>
+          </div>
+          
+          {/* Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            {designTabs.map((tab) => (
+              <div key={tab.id} className="flex items-center gap-1">
+                <button
+                  onClick={() => setActiveTabId(tab.id)}
+                  className={`h-8 px-3 font-light text-xs tracking-wider uppercase transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${
+                    activeTabId === tab.id
+                      ? 'bg-[#1A1A1A] text-white'
+                      : 'border border-[#E8E8E8] text-[#1A1A1A] hover:bg-[#F8F7F5]'
+                  }`}
+                >
+                  {tab.name}
+                  {tab.finalPreviews.length > 0 && (
+                    <span className={`text-[10px] px-1.5 py-0.5 ${
+                      activeTabId === tab.id ? 'bg-white/20' : 'bg-[#F8F7F5]'
+                    }`}>
+                      {tab.finalPreviews.length}
+                    </span>
+                  )}
+                </button>
+                {designTabs.length > 1 && (
+                  <button
+                    onClick={() => removeTab(tab.id)}
+                    className="w-6 h-6 border border-[#E8E8E8] text-[#6B6B6B] hover:bg-[#F8F7F5] hover:text-[#1A1A1A] transition-all duration-300 flex items-center justify-center"
+                  >
+                    <X className="w-3 h-3" strokeWidth={1} />
+                  </button>
+                )}
+              </div>
+            ))}
+            {designTabs.length < 5 && (
+              <button
+                onClick={addNewTab}
+                className="h-8 px-3 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] transition-all duration-300 flex items-center gap-1 whitespace-nowrap"
+              >
+                <span className="text-lg leading-none">+</span>
+                New
+              </button>
+            )}
           </div>
         </div>
 
         {/* Image Preview - Original on left, generated thumbnails on right */}
-        <div className="pt-20 pb-4 px-4 overflow-y-auto" style={{ height: 'calc(65vh - 80px)', minHeight: '400px' }}>
+        <div className="pt-32 pb-4 px-4 overflow-y-auto" style={{ height: 'calc(65vh - 80px)', minHeight: '400px' }}>
           <div className="max-w-2xl mx-auto h-full">
             <div className="grid grid-cols-2 gap-3 sm:gap-4 h-full">
                 {/* Original Image */}
@@ -944,11 +1088,7 @@ export default function CapturePage() {
                     {/* Draw Button */}
                     <button
                       onClick={() => setShowDrawingCanvas(true)}
-                      className={`absolute bottom-3 right-3 text-white p-3 active:scale-95 transition-all ${
-                        drawingImageUrl 
-                          ? 'bg-[#2D7A4F] hover:bg-[#2D7A4F]/90' 
-                          : 'bg-[#1A1A1A] hover:bg-[#1A1A1A]/90'
-                      }`}
+                      className="absolute bottom-3 right-3 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white p-3 active:scale-95 transition-all"
                       title={drawingImageUrl ? 'Drawing added - click to edit' : 'Draw on image'}
                     >
                       <Pencil className="w-5 h-5" strokeWidth={1} />
