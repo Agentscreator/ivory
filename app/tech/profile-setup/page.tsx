@@ -258,37 +258,41 @@ export default function TechProfileSetupPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#8B7355]" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush pb-safe">
+    <div className="min-h-screen bg-white pb-safe">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10 safe-top">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+      <header className="bg-white border-b border-[#E8E8E8] sticky top-0 z-10 safe-top">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between">
           <div className="flex items-center gap-3 sm:gap-4">
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => router.back()}
-              className="active:scale-95 transition-transform"
+              className="hover:bg-[#F8F7F5] active:scale-95 transition-all rounded-none"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5" strokeWidth={1} />
             </Button>
-            <h1 className="font-serif text-lg sm:text-xl font-bold text-charcoal">Tech Profile</h1>
+            <div>
+              <h1 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] tracking-tight">Profile Setup</h1>
+              <p className="text-xs tracking-wider uppercase text-[#6B6B6B] font-light hidden sm:block">Professional Details</p>
+            </div>
           </div>
           <Button 
             onClick={handleSave} 
             disabled={saving}
-            className="h-9 sm:h-10 active:scale-95 transition-transform"
+            className="h-10 sm:h-11 bg-[#1A1A1A] text-white hover:bg-[#8B7355] transition-all duration-500 px-6 sm:px-8 text-xs tracking-widest uppercase rounded-none font-light"
           >
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 <span className="hidden sm:inline">Saving...</span>
+                <span className="sm:hidden">...</span>
               </>
             ) : (
               "Save"
@@ -298,79 +302,84 @@ export default function TechProfileSetupPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <div className="space-y-4 sm:space-y-6">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="space-y-8 sm:space-y-12">
           {/* Business Info */}
-          <Card className="p-4 sm:p-6 bg-white rounded-2xl sm:rounded-3xl shadow-sm">
-            <h2 className="font-serif text-lg sm:text-xl font-bold text-charcoal mb-3 sm:mb-4">Business Information</h2>
+          <div className="border border-[#E8E8E8] p-6 sm:p-10">
+            <div className="mb-6 sm:mb-8">
+              <p className="text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-2 font-light">Section I</p>
+              <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A] tracking-tight">Business Information</h2>
+            </div>
 
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-5 sm:space-y-6">
               <div>
-                <label className="text-xs sm:text-sm font-semibold text-charcoal mb-1.5 sm:mb-2 block">
+                <label className="block text-xs tracking-wider uppercase text-[#6B6B6B] mb-2 font-light">
                   Business Name
                 </label>
                 <Input
                   placeholder="Your salon or business name"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="h-11 sm:h-12 text-sm sm:text-base"
+                  className="h-12 sm:h-14 text-sm border-[#E8E8E8] rounded-none focus:border-[#8B7355] focus:ring-0 font-light"
                 />
               </div>
 
               <div>
-                <label className="text-xs sm:text-sm font-semibold text-charcoal mb-1.5 sm:mb-2 block">
+                <label className="block text-xs tracking-wider uppercase text-[#6B6B6B] mb-2 font-light">
                   Location
                 </label>
                 <Input 
                   placeholder="City, State" 
                   value={location} 
                   onChange={(e) => setLocation(e.target.value)}
-                  className="h-11 sm:h-12 text-sm sm:text-base"
+                  className="h-12 sm:h-14 text-sm border-[#E8E8E8] rounded-none focus:border-[#8B7355] focus:ring-0 font-light"
                 />
               </div>
 
               <div>
-                <label className="text-xs sm:text-sm font-semibold text-charcoal mb-1.5 sm:mb-2 block">
+                <label className="block text-xs tracking-wider uppercase text-[#6B6B6B] mb-2 font-light">
                   Bio
                 </label>
                 <Textarea
                   placeholder="Tell clients about your experience and style..."
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  rows={4}
-                  className="text-sm sm:text-base resize-none"
+                  rows={5}
+                  className="text-sm border-[#E8E8E8] rounded-none focus:border-[#8B7355] focus:ring-0 resize-none font-light leading-relaxed"
                 />
               </div>
             </div>
-          </Card>
+          </div>
 
           {/* Services & Prices */}
-          <Card className="p-4 sm:p-6 bg-white rounded-2xl sm:rounded-3xl shadow-sm">
-            <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
-              <h2 className="font-serif text-lg sm:text-xl font-bold text-charcoal">Services & Prices</h2>
+          <div className="border border-[#E8E8E8] p-6 sm:p-10">
+            <div className="flex items-start justify-between mb-6 sm:mb-8 gap-4">
+              <div>
+                <p className="text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-2 font-light">Section II</p>
+                <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A] tracking-tight">Services & Pricing</h2>
+              </div>
               <Button 
-                size="sm" 
                 variant="outline" 
                 onClick={addService}
-                className="h-9 sm:h-10 text-xs sm:text-sm active:scale-95 transition-transform"
+                className="h-10 sm:h-11 border-[#E8E8E8] hover:border-[#8B7355] hover:bg-transparent text-[#1A1A1A] rounded-none text-xs tracking-wider uppercase font-light transition-all duration-300 px-4 sm:px-6"
               >
-                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                <Plus className="w-4 h-4 mr-2" strokeWidth={1} />
                 <span className="hidden sm:inline">Add Service</span>
                 <span className="sm:hidden">Add</span>
               </Button>
             </div>
 
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-3 sm:space-y-4">
               {services.map((service) => (
-                <div key={service.id} className="flex gap-2 items-start">
+                <div key={service.id} className="flex gap-3 items-start">
                   <Input
                     placeholder="Service name"
                     value={service.name}
                     onChange={(e) => updateService(service.id, "name", e.target.value)}
-                    className="flex-1 h-11 sm:h-12 text-sm sm:text-base"
+                    className="flex-1 h-12 sm:h-14 text-sm border-[#E8E8E8] rounded-none focus:border-[#8B7355] focus:ring-0 font-light"
                   />
-                  <div className="relative w-24 sm:w-32">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                  <div className="relative w-28 sm:w-36">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] text-sm font-light">
                       $
                     </span>
                     <Input
@@ -378,36 +387,40 @@ export default function TechProfileSetupPage() {
                       type="number"
                       value={service.price}
                       onChange={(e) => updateService(service.id, "price", e.target.value)}
-                      className="pl-6 sm:pl-7 h-11 sm:h-12 text-sm sm:text-base"
+                      className="pl-7 h-12 sm:h-14 text-sm border-[#E8E8E8] rounded-none focus:border-[#8B7355] focus:ring-0 font-light"
                     />
                   </div>
                   <Button 
                     variant="ghost" 
                     size="icon" 
                     onClick={() => removeService(service.id)}
-                    className="h-11 w-11 sm:h-12 sm:w-12 flex-shrink-0 active:scale-95 transition-transform"
+                    className="h-12 w-12 sm:h-14 sm:w-14 flex-shrink-0 hover:bg-[#F8F7F5] active:scale-95 transition-all rounded-none"
                   >
-                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1} />
                   </Button>
                 </div>
               ))}
             </div>
-          </Card>
+          </div>
 
           {/* Portfolio Gallery */}
-          <Card className="p-4 sm:p-6 bg-white rounded-2xl sm:rounded-3xl shadow-sm">
-            <h2 className="font-serif text-lg sm:text-xl font-bold text-charcoal mb-3 sm:mb-4">
-              Portfolio Gallery
-            </h2>
+          <div className="border border-[#E8E8E8] p-6 sm:p-10">
+            <div className="mb-6 sm:mb-8">
+              <p className="text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-2 font-light">Section III</p>
+              <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A] tracking-tight mb-2">
+                Portfolio Gallery
+              </h2>
+              <p className="text-sm text-[#6B6B6B] font-light">Showcase your finest work</p>
+            </div>
             <ImageUpload
               onUpload={handleImageUpload}
               onRemove={handleImageRemove}
               images={portfolioImages}
               maxImages={20}
-              buttonText="Choose Photos"
+              buttonText="Select Images"
               multiple={true}
             />
-          </Card>
+          </div>
         </div>
       </main>
     </div>
