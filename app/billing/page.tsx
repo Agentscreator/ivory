@@ -73,56 +73,84 @@ export default function BillingPage() {
     }
   };
 
+  const isBasicPlan = subscriptionTier === 'free';
+  const isPaidPlan = subscriptionTier !== 'free' && subscriptionStatus === 'active';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush">
+    <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush pb-20 md:pb-8">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
-        <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+      <header className="bg-white/90 backdrop-blur-md border-b border-sand/20 sticky top-0 z-10 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => router.back()}
+            className="hover:bg-sand/20"
+          >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
-            <h1 className="font-serif text-xl font-bold text-charcoal">Billing & Credits</h1>
-            <p className="text-xs text-muted-foreground">Manage your credits and purchases</p>
+          <div className="flex-1">
+            <h1 className="font-serif text-lg sm:text-2xl font-bold text-charcoal">
+              Billing & Credits
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
+              Manage your subscription and credits
+            </p>
           </div>
         </div>
       </header>
 
-      <div className="container max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {/* Current Balance */}
-        <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Coins className="h-6 w-6 text-primary" />
-                Your Balance
-              </span>
-              <CreditsDisplay showLabel={false} className="text-3xl" />
-            </CardTitle>
-            <CardDescription>
-              {subscriptionTier !== 'free' && subscriptionStatus === 'active' ? (
-                <span className="flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-primary" />
-                  {subscriptionTier === 'pro' ? 'Pro' : 'Business'} Plan Active
-                </span>
-              ) : (
-                'Use credits to generate AI nail designs'
-              )}
-            </CardDescription>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
+        {/* Current Balance - Elegant Card */}
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-white via-white to-sand/10 overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/5 to-transparent rounded-full blur-3xl -z-0" />
+          <CardHeader className="relative pb-4 sm:pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="space-y-1">
+                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Coins className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                  </div>
+                  <span>Your Balance</span>
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base">
+                  {isPaidPlan ? (
+                    <span className="flex items-center gap-2 text-primary font-medium">
+                      <Crown className="h-4 w-4" />
+                      {subscriptionTier === 'pro' ? 'Pro' : 'Business'} Plan
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">Basic Plan</span>
+                  )}
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <CreditsDisplay showLabel={false} className="text-4xl sm:text-5xl font-bold" />
+                <span className="text-sm sm:text-base text-muted-foreground">credits</span>
+              </div>
+            </div>
           </CardHeader>
         </Card>
 
         {/* Tabs for Subscriptions and Credits */}
         <Tabs defaultValue="subscriptions" className="w-full">
-          <TabsList className={`grid w-full ${subscriptionTier !== 'free' && subscriptionStatus === 'active' ? 'grid-cols-2' : 'grid-cols-1'}`}>
-            <TabsTrigger value="subscriptions" className="gap-2">
+          <TabsList className={`grid w-full ${isPaidPlan ? 'grid-cols-2' : 'grid-cols-1'} h-auto p-1 bg-white/60 backdrop-blur-sm border border-sand/20`}>
+            <TabsTrigger 
+              value="subscriptions" 
+              className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm py-3"
+            >
               <Crown className="h-4 w-4" />
-              Subscriptions
+              <span className="hidden sm:inline">Subscriptions</span>
+              <span className="sm:hidden">Plans</span>
             </TabsTrigger>
-            {subscriptionTier !== 'free' && subscriptionStatus === 'active' && (
-              <TabsTrigger value="credits" className="gap-2">
+            {isPaidPlan && (
+              <TabsTrigger 
+                value="credits" 
+                className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm py-3"
+              >
                 <Coins className="h-4 w-4" />
-                Buy Credits
+                <span className="hidden sm:inline">Buy Credits</span>
+                <span className="sm:hidden">Credits</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -133,75 +161,83 @@ export default function BillingPage() {
               currentStatus={subscriptionStatus}
             />
             
-            {/* Message for free users */}
-            {subscriptionTier === 'free' && (
-              <Card className="bg-primary/5 border-primary/20">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Want More Credits?
+            {/* Message for Basic users */}
+            {isBasicPlan && (
+              <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 via-white to-primary/10 overflow-hidden">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl" />
+                <CardContent className="p-6 sm:p-8 relative">
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold mb-3 flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                    Unlock Premium Features
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Subscribe to a plan to get monthly credits and unlock the ability to purchase additional credits at any time.
+                  <p className="text-sm sm:text-base text-muted-foreground mb-6">
+                    Upgrade to Pro or Business to get monthly credits and the ability to purchase additional credits anytime.
                   </p>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary mt-0.5">•</span>
-                      <span>Get monthly credits automatically</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary mt-0.5">•</span>
-                      <span>Buy additional credits anytime starting from just 5 credits</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary mt-0.5">•</span>
-                      <span>Unused credits roll over to next month</span>
-                    </li>
-                  </ul>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-lg">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <Coins className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Monthly Credits</p>
+                        <p className="text-xs text-muted-foreground">Automatic renewal</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-lg">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <CreditCard className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Buy More Anytime</p>
+                        <p className="text-xs text-muted-foreground">Starting at 5 credits</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-lg">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Credits Roll Over</p>
+                        <p className="text-xs text-muted-foreground">Never lose credits</p>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
           </TabsContent>
 
-          {subscriptionTier !== 'free' && subscriptionStatus === 'active' && (
+          {isPaidPlan && (
             <TabsContent value="credits" className="space-y-6 mt-6">
-              <Card>
+              <Card className="border-0 shadow-md bg-white">
                 <CardHeader>
-                  <CardTitle>Buy Additional Credits</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-xl sm:text-2xl font-serif">Buy Additional Credits</CardTitle>
+                  <CardDescription className="text-sm sm:text-base">
                     Purchase extra credits on top of your subscription - starting from just 5 credits
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <BuyCreditsDialog>
-                    <Button size="lg" className="w-full sm:w-auto gap-2">
-                      <CreditCard className="h-5 w-5" />
-                      Buy More Credits
-                    </Button>
-                  </BuyCreditsDialog>
-                </CardContent>
               </Card>
 
               {/* Quick Buy Options */}
               <div>
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <h2 className="text-lg sm:text-xl font-serif font-bold mb-4 flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
-                  Quick Purchase
+                  Credit Packages
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                   {CREDIT_PACKAGES.map((pkg) => (
                     <BuyCreditsDialog key={pkg.id}>
-                      <Card className="cursor-pointer hover:border-primary transition-all hover:shadow-md">
-                        <CardContent className="p-4 text-center">
-                          <div className="text-2xl font-bold text-primary mb-1">
+                      <Card className="cursor-pointer hover:border-primary transition-all hover:shadow-lg hover:scale-105 border-0 shadow-md bg-white group">
+                        <CardContent className="p-4 sm:p-6 text-center">
+                          <div className="text-3xl sm:text-4xl font-bold text-primary mb-2 group-hover:scale-110 transition-transform">
                             {pkg.credits}
                           </div>
-                          <div className="text-xs text-muted-foreground mb-2">credits</div>
-                          <div className="text-lg font-semibold">
+                          <div className="text-xs text-muted-foreground mb-3">credits</div>
+                          <div className="text-lg sm:text-xl font-bold mb-2">
                             ${(pkg.price / 100).toFixed(2)}
                           </div>
                           {pkg.savings && (
-                            <div className="text-xs text-green-600 font-medium mt-1">
+                            <div className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">
                               Save {pkg.savings}
                             </div>
                           )}
@@ -216,47 +252,57 @@ export default function BillingPage() {
         </Tabs>
 
         {/* Transaction History */}
-        <Card>
+        <Card className="border-0 shadow-md bg-white">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <History className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl font-serif">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <History className="h-5 w-5 text-primary" />
+              </div>
               Transaction History
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm sm:text-base">
               View all your credit transactions
             </CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="text-center text-muted-foreground py-8">Loading...</p>
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+                <p className="text-muted-foreground">Loading transactions...</p>
+              </div>
             ) : transactions.length === 0 ? (
               <div className="text-center py-12">
-                <Coins className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
-                <p className="text-muted-foreground mb-4">
+                <div className="p-4 bg-sand/20 rounded-full w-fit mx-auto mb-4">
+                  <Coins className="h-12 w-12 text-muted-foreground opacity-50" />
+                </div>
+                <p className="text-muted-foreground mb-6 text-sm sm:text-base">
                   No transactions yet
                 </p>
-                <BuyCreditsDialog>
-                  <Button variant="outline">
-                    Purchase Your First Credits
-                  </Button>
-                </BuyCreditsDialog>
+                {isPaidPlan && (
+                  <BuyCreditsDialog>
+                    <Button variant="outline" className="gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      Purchase Credits
+                    </Button>
+                  </BuyCreditsDialog>
+                )}
               </div>
             ) : (
               <div className="space-y-2">
                 {transactions.map((transaction) => (
                   <div
                     key={transaction.id}
-                    className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-lg bg-sand/5 hover:bg-sand/10 transition-colors border border-transparent hover:border-sand/20"
                   >
-                    <div className="flex-1">
-                      <p className="font-medium">{transaction.description}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm sm:text-base truncate">{transaction.description}</p>
                       <p className="text-xs text-muted-foreground">
                         {format(new Date(transaction.createdAt), 'MMM d, yyyy h:mm a')}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right ml-4">
                       <p
-                        className={`font-semibold text-lg ${
+                        className={`font-bold text-base sm:text-lg ${
                           transaction.amount > 0
                             ? 'text-green-600'
                             : 'text-red-600'
@@ -265,7 +311,7 @@ export default function BillingPage() {
                         {transaction.amount > 0 ? '+' : ''}
                         {transaction.amount}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground whitespace-nowrap">
                         Balance: {transaction.balanceAfter}
                       </p>
                     </div>
@@ -277,27 +323,50 @@ export default function BillingPage() {
         </Card>
 
         {/* Info Card */}
-        <Card className="bg-muted/30">
-          <CardContent className="p-6">
-            <h3 className="font-semibold mb-3">About Credits</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-0.5">•</span>
-                <span>Each AI nail design generation costs 1 credit</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-0.5">•</span>
-                <span>Credits never expire</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-0.5">•</span>
-                <span>Earn free credits by referring friends</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-0.5">•</span>
-                <span>Secure payments powered by Stripe</span>
-              </li>
-            </ul>
+        <Card className="border-0 shadow-md bg-gradient-to-br from-sand/10 via-white to-ivory/20">
+          <CardContent className="p-6 sm:p-8">
+            <h3 className="font-serif text-lg sm:text-xl font-bold mb-4 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              About Credits
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
+                  <Coins className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm sm:text-base">1 Credit per Design</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Each AI generation costs 1 credit</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
+                  <History className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm sm:text-base">Never Expire</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Your credits last forever</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm sm:text-base">Earn Free Credits</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Refer friends to earn more</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
+                  <CreditCard className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm sm:text-base">Secure Payments</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Powered by Stripe</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
