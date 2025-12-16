@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Shield, Bell, Lock, Trash2, HelpCircle } from "lucide-react"
+import { ArrowLeft, Shield, Bell, Lock, Trash2, HelpCircle, UserX } from "lucide-react"
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -58,6 +58,18 @@ export default function SettingsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-sm">Account Security</div>
                   <div className="text-xs text-muted-foreground">Password and authentication</div>
+                </div>
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-14 text-left active:scale-95 transition-transform"
+                onClick={() => router.push("/settings/blocked-users")}
+              >
+                <UserX className="w-5 h-5 mr-3 flex-shrink-0 text-muted-foreground" />
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm">Blocked Users</div>
+                  <div className="text-xs text-muted-foreground">Manage blocked accounts</div>
                 </div>
               </Button>
             </div>

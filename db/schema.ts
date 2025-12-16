@@ -182,6 +182,31 @@ export const creditTransactions = pgTable('credit_transactions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Content moderation - flagged content
+export const contentFlags = pgTable('content_flags', {
+  id: serial('id').primaryKey(),
+  reporterId: integer('reporter_id').references(() => users.id).notNull(),
+  contentType: varchar('content_type', { length: 50 }).notNull(), // 'look', 'review', 'profile'
+  contentId: integer('content_id').notNull(), // ID of the flagged content
+  contentOwnerId: integer('content_owner_id').references(() => users.id).notNull(),
+  reason: varchar('reason', { length: 100 }).notNull(), // 'inappropriate', 'spam', 'harassment', 'other'
+  description: text('description'),
+  status: varchar('status', { length: 50 }).default('pending').notNull(), // 'pending', 'reviewed', 'action_taken', 'dismissed'
+  reviewedBy: integer('reviewed_by').references(() => users.id),
+  reviewedAt: timestamp('reviewed_at'),
+  actionTaken: text('action_taken'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Blocked users
+export const blockedUsers = pgTable('blocked_users', {
+  id: serial('id').primaryKey(),
+  blockerId: integer('blocker_id').references(() => users.id).notNull(), // User who blocked
+  blockedId: integer('blocked_id').references(() => users.id).notNull(), // User who is blocked
+  reason: varchar('reason', { length: 100 }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   techProfile: one(techProfiles, {
@@ -255,6 +280,28 @@ export const referralsRelations = relations(referrals, ({ one }) => ({
 export const creditTransactionsRelations = relations(creditTransactions, ({ one }) => ({
   user: one(users, {
     fields: [creditTransactions.userId],
+    references: [users.id],
+  }),
+}));
+
+export const contentFlagsRelations = relations(contentFlags, ({ one }) => ({
+  reporter: one(users, {
+    fields: [contentFlags.reporterId],
+    references: [users.id],
+  }),
+  contentOwner: one(users, {
+    fields: [contentFlags.contentOwnerId],
+    references: [users.id],
+  }),
+}));
+
+export const blockedUsersRelations = relations(blockedUsers, ({ one }) => ({
+  blocker: one(users, {
+    fields: [blockedUsers.blockerId],
+    references: [users.id],
+  }),
+  blocked: one(users, {
+    fields: [blockedUsers.blockedId],
     references: [users.id],
   }),
 }));

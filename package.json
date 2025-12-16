@@ -11,6 +11,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "setup:moderation": "npx tsx scripts/setup-moderation.ts",
     "setup:services": "bash scripts/install-services.sh",
     "export": "next build",
     "cap:sync": "cap sync",
