@@ -85,305 +85,251 @@ export default function BillingPage() {
   const isPaidPlan = subscriptionTier !== 'free' && subscriptionStatus === 'active';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush pb-20 md:pb-8">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-md border-b border-sand/20 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+      <header className="bg-white border-b border-[#E8E8E8] sticky top-0 z-10 safe-top">
+        <div className="max-w-screen-xl mx-auto px-5 sm:px-6 py-4 sm:py-5 flex items-center gap-4">
+          <button
             onClick={() => router.push('/home')}
-            className="hover:bg-sand/20"
+            className="text-[#1A1A1A] hover:text-[#8B7355] transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
+            <ArrowLeft className="w-5 h-5" strokeWidth={1} />
+          </button>
           <div className="flex-1">
-            <h1 className="font-serif text-lg sm:text-2xl font-bold text-charcoal">
-              Billing & Credits
+            <h1 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] tracking-tight">
+              BILLING & CREDITS
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
-              Manage your subscription and credits
-            </p>
           </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
-        {/* Current Balance - Elegant Card */}
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-white via-white to-sand/10 overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/5 to-transparent rounded-full blur-3xl -z-0" />
-          <CardHeader className="relative pb-4 sm:pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="space-y-1">
-                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Coins className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                  </div>
-                  <span>Your Balance</span>
-                </CardTitle>
-                <CardDescription className="text-sm sm:text-base">
-                  {isPaidPlan ? (
-                    <span className="flex items-center gap-2 text-primary font-medium">
-                      <Crown className="h-4 w-4" />
-                      {subscriptionTier === 'pro' ? 'Pro' : 'Business'} Plan
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground">Basic Plan</span>
-                  )}
-                </CardDescription>
-              </div>
-              <div className="flex items-center gap-2">
-                {credits !== null ? (
-                  <>
-                    <span className="text-4xl sm:text-5xl font-bold">{credits}</span>
-                    <span className="text-sm sm:text-base text-muted-foreground">credits</span>
-                  </>
+      <main className="max-w-screen-xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-28 sm:pb-32 space-y-8">
+        {/* Current Balance */}
+        <div className="border border-[#E8E8E8] p-6 sm:p-8 bg-[#F8F7F5]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div>
+              <p className="text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-2 font-light">Your Balance</p>
+              <h2 className="font-serif text-3xl sm:text-4xl font-light text-[#1A1A1A] tracking-tight mb-2">
+                {credits !== null ? credits : '...'} <span className="text-xl text-[#6B6B6B]">Credits</span>
+              </h2>
+              <p className="text-sm text-[#6B6B6B] font-light">
+                {isPaidPlan ? (
+                  <span className="flex items-center gap-2">
+                    <Crown className="h-4 w-4 text-[#8B7355]" strokeWidth={1} />
+                    {subscriptionTier === 'pro' ? 'Pro' : 'Business'} Plan Active
+                  </span>
                 ) : (
-                  <span className="text-4xl sm:text-5xl font-bold animate-pulse">...</span>
+                  'Basic Plan'
                 )}
-              </div>
+              </p>
             </div>
-          </CardHeader>
-        </Card>
+          </div>
+        </div>
 
-        {/* Tabs for Subscriptions and Credits */}
-        <Tabs defaultValue="subscriptions" className="w-full">
-          <TabsList className={`grid w-full ${isPaidPlan ? 'grid-cols-2' : 'grid-cols-1'} h-auto p-1 bg-white/60 backdrop-blur-sm border border-sand/20`}>
-            <TabsTrigger 
-              value="subscriptions" 
-              className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm py-3"
+        {/* Section Navigation */}
+        <div className="border-b border-[#E8E8E8]">
+          <div className="flex gap-8">
+            <button
+              onClick={() => document.getElementById('subscriptions')?.scrollIntoView({ behavior: 'smooth' })}
+              className="pb-4 border-b-2 border-[#1A1A1A] text-sm tracking-[0.2em] uppercase font-light text-[#1A1A1A]"
             >
-              <Crown className="h-4 w-4" />
-              <span className="hidden sm:inline">Subscriptions</span>
-              <span className="sm:hidden">Plans</span>
-            </TabsTrigger>
+              Subscriptions
+            </button>
             {isPaidPlan && (
-              <TabsTrigger 
-                value="credits" 
-                className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm py-3"
+              <button
+                onClick={() => document.getElementById('credits')?.scrollIntoView({ behavior: 'smooth' })}
+                className="pb-4 border-b-2 border-transparent hover:border-[#8B7355] text-sm tracking-[0.2em] uppercase font-light text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors"
               >
-                <Coins className="h-4 w-4" />
-                <span className="hidden sm:inline">Buy Credits</span>
-                <span className="sm:hidden">Credits</span>
-              </TabsTrigger>
+                Buy Credits
+              </button>
             )}
-          </TabsList>
+            <button
+              onClick={() => document.getElementById('history')?.scrollIntoView({ behavior: 'smooth' })}
+              className="pb-4 border-b-2 border-transparent hover:border-[#8B7355] text-sm tracking-[0.2em] uppercase font-light text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors"
+            >
+              History
+            </button>
+          </div>
+        </div>
 
-          <TabsContent value="subscriptions" className="space-y-6 mt-6">
-            <SubscriptionPlans 
-              currentTier={subscriptionTier}
-              currentStatus={subscriptionStatus}
-            />
-            
-            {/* Message for Basic users */}
-            {isBasicPlan && (
-              <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 via-white to-primary/10 overflow-hidden">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl" />
-                <CardContent className="p-6 sm:p-8 relative">
-                  <h3 className="font-serif text-xl sm:text-2xl font-bold mb-3 flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+        {/* Subscriptions Section */}
+        <div id="subscriptions">
+          <div className="mb-6">
+            <p className="text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-2 font-light">Plans</p>
+            <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A] tracking-tight">Subscription Options</h2>
+          </div>
+
+          <SubscriptionPlans 
+            currentTier={subscriptionTier}
+            currentStatus={subscriptionStatus}
+          />
+          
+          {/* Message for Basic users */}
+          {isBasicPlan && (
+            <div className="border border-[#E8E8E8] p-6 sm:p-8 bg-[#F8F7F5] mt-6">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 border border-[#E8E8E8] flex items-center justify-center flex-shrink-0 bg-white">
+                  <Sparkles className="w-6 h-6 text-[#8B7355]" strokeWidth={1} />
+                </div>
+                <div>
+                  <h3 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] mb-2 tracking-tight">
                     Unlock Premium Features
                   </h3>
-                  <p className="text-sm sm:text-base text-muted-foreground mb-6">
+                  <p className="text-sm sm:text-base text-[#6B6B6B] leading-relaxed font-light">
                     Upgrade to Pro or Business to get monthly credits and the ability to purchase additional credits anytime.
                   </p>
-                  <div className="grid sm:grid-cols-3 gap-4">
-                    <div className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-lg">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Coins className="h-4 w-4 text-primary" />
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-3 gap-4">
+                <div className="border border-[#E8E8E8] p-4 bg-white">
+                  <p className="font-serif text-base font-light text-[#1A1A1A] mb-1">Monthly Credits</p>
+                  <p className="text-xs text-[#6B6B6B] font-light">Automatic renewal</p>
+                </div>
+                <div className="border border-[#E8E8E8] p-4 bg-white">
+                  <p className="font-serif text-base font-light text-[#1A1A1A] mb-1">Buy More Anytime</p>
+                  <p className="text-xs text-[#6B6B6B] font-light">Starting at 5 credits</p>
+                </div>
+                <div className="border border-[#E8E8E8] p-4 bg-white">
+                  <p className="font-serif text-base font-light text-[#1A1A1A] mb-1">Credits Roll Over</p>
+                  <p className="text-xs text-[#6B6B6B] font-light">Never lose credits</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Buy Credits Section - Only for paid users */}
+        {isPaidPlan && (
+          <div id="credits">
+            <div className="mb-6">
+              <p className="text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-2 font-light">Additional</p>
+              <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A] tracking-tight mb-2">Credit Packages</h2>
+              <p className="text-sm text-[#6B6B6B] font-light">Purchase extra credits on top of your subscription</p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {CREDIT_PACKAGES.map((pkg) => (
+                <BuyCreditsDialog key={pkg.id}>
+                  <div className="border border-[#E8E8E8] p-6 bg-white cursor-pointer hover:border-[#8B7355] active:scale-[0.98] transition-all duration-300 group">
+                    <div className="text-center">
+                      <div className="text-4xl font-light text-[#1A1A1A] mb-2 group-hover:text-[#8B7355] transition-colors">
+                        {pkg.credits}
                       </div>
-                      <div>
-                        <p className="font-medium text-sm">Monthly Credits</p>
-                        <p className="text-xs text-muted-foreground">Automatic renewal</p>
+                      <div className="text-xs tracking-wider uppercase text-[#6B6B6B] mb-4 font-light">credits</div>
+                      <div className="text-2xl font-light text-[#1A1A1A] mb-2">
+                        ${(pkg.price / 100).toFixed(2)}
                       </div>
-                    </div>
-                    <div className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-lg">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <CreditCard className="h-4 w-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Buy More Anytime</p>
-                        <p className="text-xs text-muted-foreground">Starting at 5 credits</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3 p-4 bg-white/60 backdrop-blur-sm rounded-lg">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Sparkles className="h-4 w-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Credits Roll Over</p>
-                        <p className="text-xs text-muted-foreground">Never lose credits</p>
-                      </div>
+                      {pkg.savings && (
+                        <div className="text-xs text-green-600 font-light">
+                          Save {pkg.savings}
+                        </div>
+                      )}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          {isPaidPlan && (
-            <TabsContent value="credits" className="space-y-6 mt-6">
-              <Card className="border-0 shadow-md bg-white">
-                <CardHeader>
-                  <CardTitle className="text-xl sm:text-2xl font-serif">Buy Additional Credits</CardTitle>
-                  <CardDescription className="text-sm sm:text-base">
-                    Purchase extra credits on top of your subscription - starting from just 5 credits
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-
-              {/* Quick Buy Options */}
-              <div>
-                <h2 className="text-lg sm:text-xl font-serif font-bold mb-4 flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Credit Packages
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-                  {CREDIT_PACKAGES.map((pkg) => (
-                    <BuyCreditsDialog key={pkg.id}>
-                      <Card className="cursor-pointer hover:border-primary transition-all hover:shadow-lg hover:scale-105 border-0 shadow-md bg-white group">
-                        <CardContent className="p-4 sm:p-6 text-center">
-                          <div className="text-3xl sm:text-4xl font-bold text-primary mb-2 group-hover:scale-110 transition-transform">
-                            {pkg.credits}
-                          </div>
-                          <div className="text-xs text-muted-foreground mb-3">credits</div>
-                          <div className="text-lg sm:text-xl font-bold mb-2">
-                            ${(pkg.price / 100).toFixed(2)}
-                          </div>
-                          {pkg.savings && (
-                            <div className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">
-                              Save {pkg.savings}
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </BuyCreditsDialog>
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
-          )}
-        </Tabs>
+                </BuyCreditsDialog>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Transaction History */}
-        <Card className="border-0 shadow-md bg-white">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl font-serif">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <History className="h-5 w-5 text-primary" />
+        <div id="history">
+          <div className="mb-6">
+            <p className="text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-2 font-light">Activity</p>
+            <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A] tracking-tight">Transaction History</h2>
+          </div>
+
+          {loading ? (
+            <div className="border border-[#E8E8E8] p-12 text-center bg-white">
+              <div className="w-12 h-12 border-2 border-[#E8E8E8] border-t-[#8B7355] rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-sm text-[#6B6B6B] font-light">Loading transactions...</p>
+            </div>
+          ) : transactions.length === 0 ? (
+            <div className="border border-[#E8E8E8] p-12 text-center bg-white">
+              <div className="w-16 h-16 mx-auto mb-6 border border-[#E8E8E8] flex items-center justify-center">
+                <History className="w-8 h-8 text-[#6B6B6B]" strokeWidth={1} />
               </div>
-              Transaction History
-            </CardTitle>
-            <CardDescription className="text-sm sm:text-base">
-              View all your credit transactions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-                <p className="text-muted-foreground">Loading transactions...</p>
-              </div>
-            ) : transactions.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="p-4 bg-sand/20 rounded-full w-fit mx-auto mb-4">
-                  <Coins className="h-12 w-12 text-muted-foreground opacity-50" />
-                </div>
-                <p className="text-muted-foreground mb-6 text-sm sm:text-base">
-                  No transactions yet
-                </p>
-                {isPaidPlan && (
-                  <BuyCreditsDialog>
-                    <Button variant="outline" className="gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Purchase Credits
-                    </Button>
-                  </BuyCreditsDialog>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {transactions.map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-sand/5 hover:bg-sand/10 transition-colors border border-transparent hover:border-sand/20"
-                  >
+              <p className="text-sm text-[#6B6B6B] font-light">No transactions yet</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {transactions.map((transaction) => (
+                <div
+                  key={transaction.id}
+                  className="border border-[#E8E8E8] p-4 sm:p-5 bg-white hover:border-[#8B7355] transition-colors"
+                >
+                  <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm sm:text-base truncate">{transaction.description}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="font-serif text-base font-light text-[#1A1A1A] mb-1 truncate">{transaction.description}</p>
+                      <p className="text-xs text-[#6B6B6B] font-light tracking-wider uppercase">
                         {format(new Date(transaction.createdAt), 'MMM d, yyyy h:mm a')}
                       </p>
                     </div>
                     <div className="text-right ml-4">
                       <p
-                        className={`font-bold text-base sm:text-lg ${
+                        className={`text-xl font-light ${
                           transaction.amount > 0
                             ? 'text-green-600'
-                            : 'text-red-600'
+                            : 'text-[#1A1A1A]'
                         }`}
                       >
                         {transaction.amount > 0 ? '+' : ''}
                         {transaction.amount}
                       </p>
-                      <p className="text-xs text-muted-foreground whitespace-nowrap">
+                      <p className="text-xs text-[#6B6B6B] font-light whitespace-nowrap">
                         Balance: {transaction.balanceAfter}
                       </p>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-        {/* Info Card */}
-        <Card className="border-0 shadow-md bg-gradient-to-br from-sand/10 via-white to-ivory/20">
-          <CardContent className="p-6 sm:p-8">
-            <h3 className="font-serif text-lg sm:text-xl font-bold mb-4 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              About Credits
-            </h3>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
-                  <Coins className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-sm sm:text-base">1 Credit per Design</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Each AI generation costs 1 credit</p>
-                </div>
+        {/* Info Section */}
+        <div className="border border-[#E8E8E8] p-6 sm:p-8 bg-[#F8F7F5]">
+          <h3 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] mb-6 tracking-tight">About Credits</h3>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 border border-[#E8E8E8] flex items-center justify-center flex-shrink-0 bg-white">
+                <Coins className="w-6 h-6 text-[#8B7355]" strokeWidth={1} />
               </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
-                  <History className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-sm sm:text-base">Never Expire</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Your credits last forever</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-sm sm:text-base">Earn Free Credits</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Refer friends to earn more</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
-                  <CreditCard className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-sm sm:text-base">Secure Payments</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Powered by Stripe</p>
-                </div>
+              <div>
+                <p className="font-serif text-base font-light text-[#1A1A1A] mb-1">1 Credit per Design</p>
+                <p className="text-sm text-[#6B6B6B] font-light">Each AI generation costs 1 credit</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 border border-[#E8E8E8] flex items-center justify-center flex-shrink-0 bg-white">
+                <History className="w-6 h-6 text-[#8B7355]" strokeWidth={1} />
+              </div>
+              <div>
+                <p className="font-serif text-base font-light text-[#1A1A1A] mb-1">Never Expire</p>
+                <p className="text-sm text-[#6B6B6B] font-light">Your credits last forever</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 border border-[#E8E8E8] flex items-center justify-center flex-shrink-0 bg-white">
+                <Sparkles className="w-6 h-6 text-[#8B7355]" strokeWidth={1} />
+              </div>
+              <div>
+                <p className="font-serif text-base font-light text-[#1A1A1A] mb-1">Earn Free Credits</p>
+                <p className="text-sm text-[#6B6B6B] font-light">Refer friends to earn more</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 border border-[#E8E8E8] flex items-center justify-center flex-shrink-0 bg-white">
+                <CreditCard className="w-6 h-6 text-[#8B7355]" strokeWidth={1} />
+              </div>
+              <div>
+                <p className="font-serif text-base font-light text-[#1A1A1A] mb-1">Secure Payments</p>
+                <p className="text-sm text-[#6B6B6B] font-light">Powered by Stripe</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
