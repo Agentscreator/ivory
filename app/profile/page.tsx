@@ -3,10 +3,11 @@
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, LogOut, Settings, Plus, Camera, Upload, Loader2 } from "lucide-react"
+import { ArrowLeft, LogOut, Settings, Plus, Camera, Upload, Loader2, Coins } from "lucide-react"
 import Image from "next/image"
 import { useToast } from "@/components/ui/use-toast"
 import { BottomNav } from "@/components/bottom-nav"
+import { CreditsDisplay } from "@/components/credits-display"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -362,6 +363,24 @@ export default function ProfilePage() {
                   {userType === "tech" ? "Verified Professional" : "Member"}
                 </span>
               </div>
+              
+              {/* Credits Display */}
+              <div className="mt-6 pt-6 border-t border-[#E8E8E8]">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Coins className="w-5 h-5 text-[#8B7355]" />
+                    <span className="text-sm font-light tracking-wider uppercase text-[#6B6B6B]">Your Credits</span>
+                  </div>
+                  <CreditsDisplay showLabel={false} className="text-2xl font-semibold" />
+                </div>
+                <button
+                  onClick={() => router.push("/billing")}
+                  className="w-full h-11 bg-[#8B7355] text-white font-light text-sm tracking-wider uppercase hover:bg-[#8B7355]/90 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  <Coins className="w-4 h-4" />
+                  Buy More Credits
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -468,6 +487,30 @@ export default function ProfilePage() {
               </div>
             </div>
           )}
+
+          <div
+            className="border border-[#E8E8E8] p-5 sm:p-6 bg-white cursor-pointer hover:border-[#8B7355] active:scale-[0.98] transition-all duration-300"
+            onClick={() => router.push("/billing")}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 border border-[#E8E8E8] bg-[#F8F7F5] flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-[#1A1A1A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-serif font-light text-base sm:text-lg text-[#1A1A1A] tracking-tight mb-1">
+                  Billing & Credits
+                </div>
+                <div className="text-xs text-[#6B6B6B] font-light tracking-wider uppercase">
+                  Purchase Credits & History
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-[#6B6B6B] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
 
           <div
             className="border border-[#E8E8E8] p-5 sm:p-6 bg-white cursor-pointer hover:border-[#8B7355] active:scale-[0.98] transition-all duration-300"
