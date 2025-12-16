@@ -15,3 +15,16 @@ struct ivory_Watch_AppApp: App {
         }
     }
 }
+
+// MARK: - App Configuration
+extension ivory_Watch_AppApp {
+    init() {
+        // Configure app appearance
+        configureAppearance()
+    }
+    
+    private func configureAppearance() {
+        // Set accent color to match main app
+        // Ivory's Choice brand color: #8B7355
+    }
+}
