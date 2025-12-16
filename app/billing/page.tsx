@@ -8,7 +8,7 @@ import { CreditsDisplay } from '@/components/credits-display';
 import { BuyCreditsDialog } from '@/components/buy-credits-dialog';
 import { ArrowLeft, Coins, CreditCard, History, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
-import { CREDIT_PACKAGES } from '@/lib/stripe';
+import { CREDIT_PACKAGES } from '@/lib/stripe-config';
 
 interface CreditTransaction {
   id: number;

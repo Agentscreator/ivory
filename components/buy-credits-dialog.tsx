@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Coins, Check, Loader2, CreditCard, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
-import { CREDIT_PACKAGES } from '@/lib/stripe';
+import { CREDIT_PACKAGES } from '@/lib/stripe-config';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
