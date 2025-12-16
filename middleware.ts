@@ -5,7 +5,10 @@ import { jwtVerify } from 'jose';
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'dev-secret-change-in-production');
 
 // Routes that require authentication
-const protectedRoutes = ['/home', '/capture', '/editor', '/look', '/profile', '/send-to-tech', '/share', '/tech'];
+const protectedRoutes = ['/home', '/capture', '/editor', '/look', '/profile', '/send-to-tech', '/tech'];
+
+// Public routes that don't require authentication
+const publicRoutes = ['/shared'];
 
 // Routes that should redirect to home if already authenticated
 const authRoutes = ['/', '/auth'];
@@ -17,6 +20,7 @@ export async function middleware(request: NextRequest) {
   // Check if route requires authentication
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
   const isAuthRoute = authRoutes.includes(pathname);
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
   // Verify session token
   let isAuthenticated = false;
@@ -28,6 +32,11 @@ export async function middleware(request: NextRequest) {
       // Token is invalid or expired
       isAuthenticated = false;
     }
+  }
+
+  // Allow public routes without authentication
+  if (isPublicRoute) {
+    return NextResponse.next();
   }
 
   // Redirect to login if accessing protected route without authentication
