@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CreditsDisplay } from '@/components/credits-display';
 import { BuyCreditsDialog } from '@/components/buy-credits-dialog';
 import { SubscriptionPlans } from '@/components/subscription-plans';
 import { ArrowLeft, Coins, CreditCard, History, Sparkles, Crown } from 'lucide-react';
@@ -93,7 +92,7 @@ export default function BillingPage() {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => router.back()}
+            onClick={() => router.push('/home')}
             className="hover:bg-sand/20"
           >
             <ArrowLeft className="w-5 h-5" />
