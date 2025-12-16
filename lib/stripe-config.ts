@@ -37,15 +37,23 @@ export const SUBSCRIPTION_PLANS = [
   },
 ] as const;
 
-// One-time credit packages (for additional credits)
+// One-time credit packages (for additional credits - only for paid subscribers)
 export const CREDIT_PACKAGES = [
+  {
+    id: 'credits_5',
+    name: '5 Credits',
+    credits: 5,
+    price: 499, // $4.99 in cents
+    popular: false,
+    savings: undefined,
+  },
   {
     id: 'credits_10',
     name: '10 Credits',
     credits: 10,
-    price: 999, // $9.99 in cents
+    price: 899, // $8.99 in cents
     popular: false,
-    savings: undefined,
+    savings: '10%',
   },
   {
     id: 'credits_25',

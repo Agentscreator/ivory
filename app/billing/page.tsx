@@ -96,15 +96,17 @@ export default function BillingPage() {
 
         {/* Tabs for Subscriptions and Credits */}
         <Tabs defaultValue="subscriptions" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className={`grid w-full ${subscriptionTier !== 'free' && subscriptionStatus === 'active' ? 'grid-cols-2' : 'grid-cols-1'}`}>
             <TabsTrigger value="subscriptions" className="gap-2">
               <Crown className="h-4 w-4" />
               Subscriptions
             </TabsTrigger>
-            <TabsTrigger value="credits" className="gap-2">
-              <Coins className="h-4 w-4" />
-              Buy Credits
-            </TabsTrigger>
+            {subscriptionTier !== 'free' && subscriptionStatus === 'active' && (
+              <TabsTrigger value="credits" className="gap-2">
+                <Coins className="h-4 w-4" />
+                Buy Credits
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="subscriptions" className="space-y-6 mt-6">
@@ -112,56 +114,87 @@ export default function BillingPage() {
               currentTier={subscriptionTier}
               currentStatus={subscriptionStatus}
             />
+            
+            {/* Message for free users */}
+            {subscriptionTier === 'free' && (
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Want More Credits?
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Subscribe to a plan to get monthly credits and unlock the ability to purchase additional credits at any time.
+                  </p>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Get monthly credits automatically</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Buy additional credits anytime starting from just 5 credits</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>Unused credits roll over to next month</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
-          <TabsContent value="credits" className="space-y-6 mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Buy Additional Credits</CardTitle>
-                <CardDescription>
-                  Purchase extra credits on top of your subscription
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <BuyCreditsDialog>
-                  <Button size="lg" className="w-full sm:w-auto gap-2">
-                    <CreditCard className="h-5 w-5" />
-                    Buy More Credits
-                  </Button>
-                </BuyCreditsDialog>
-              </CardContent>
-            </Card>
-
-            {/* Quick Buy Options */}
-            <div>
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Quick Purchase
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {CREDIT_PACKAGES.map((pkg) => (
-                  <BuyCreditsDialog key={pkg.id}>
-                    <Card className="cursor-pointer hover:border-primary transition-all hover:shadow-md">
-                      <CardContent className="p-4 text-center">
-                        <div className="text-2xl font-bold text-primary mb-1">
-                          {pkg.credits}
-                        </div>
-                        <div className="text-xs text-muted-foreground mb-2">credits</div>
-                        <div className="text-lg font-semibold">
-                          ${(pkg.price / 100).toFixed(2)}
-                        </div>
-                        {pkg.savings && (
-                          <div className="text-xs text-green-600 font-medium mt-1">
-                            Save {pkg.savings}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
+          {subscriptionTier !== 'free' && subscriptionStatus === 'active' && (
+            <TabsContent value="credits" className="space-y-6 mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Buy Additional Credits</CardTitle>
+                  <CardDescription>
+                    Purchase extra credits on top of your subscription - starting from just 5 credits
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <BuyCreditsDialog>
+                    <Button size="lg" className="w-full sm:w-auto gap-2">
+                      <CreditCard className="h-5 w-5" />
+                      Buy More Credits
+                    </Button>
                   </BuyCreditsDialog>
-                ))}
+                </CardContent>
+              </Card>
+
+              {/* Quick Buy Options */}
+              <div>
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Quick Purchase
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  {CREDIT_PACKAGES.map((pkg) => (
+                    <BuyCreditsDialog key={pkg.id}>
+                      <Card className="cursor-pointer hover:border-primary transition-all hover:shadow-md">
+                        <CardContent className="p-4 text-center">
+                          <div className="text-2xl font-bold text-primary mb-1">
+                            {pkg.credits}
+                          </div>
+                          <div className="text-xs text-muted-foreground mb-2">credits</div>
+                          <div className="text-lg font-semibold">
+                            ${(pkg.price / 100).toFixed(2)}
+                          </div>
+                          {pkg.savings && (
+                            <div className="text-xs text-green-600 font-medium mt-1">
+                              Save {pkg.savings}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </BuyCreditsDialog>
+                  ))}
+                </div>
               </div>
-            </div>
-          </TabsContent>
+            </TabsContent>
+          )}
         </Tabs>
 
         {/* Transaction History */}
