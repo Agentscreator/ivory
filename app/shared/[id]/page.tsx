@@ -107,13 +107,13 @@ export default function SharedDesignPage() {
       <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush">
         {/* Header */}
         <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
-        <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center gap-4">
-          <h1 className="font-serif text-xl font-bold text-charcoal">Ivory</h1>
-        </div>
-      </header>
+          <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center gap-4">
+            <h1 className="font-serif text-xl font-bold text-charcoal">Ivory</h1>
+          </div>
+        </header>
 
-      {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 py-8">
+        {/* Main Content */}
+        <main className="max-w-2xl mx-auto px-4 py-8">
         <Card className="overflow-hidden border-0 bg-white shadow-xl mb-6">
           <div className="aspect-square relative">
             <Image 
@@ -172,6 +172,7 @@ export default function SharedDesignPage() {
                     Sign in to report
                   </Button>
                 )}
+              </div>
             </div>
           </div>
         </Card>
