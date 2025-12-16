@@ -99,3 +99,14 @@ export async function deleteSession() {
   // Clear cookie
   cookieStore.delete('session');
 }
+
+// Verify a JWT token (for API routes that need direct token verification)
+export async function verifyToken(token: string) {
+  try {
+    const { payload } = await jwtVerify(token, secret);
+    return payload as { userId: number };
+  } catch (error) {
+    console.error('Token verification error:', error);
+    return null;
+  }
+}

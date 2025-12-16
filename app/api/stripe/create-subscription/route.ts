@@ -3,25 +3,20 @@ import { stripe, getSubscriptionPlan } from '@/lib/stripe';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { getSession } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.cookies.get('auth_token')?.value;
-    if (!token) {
+    // Get session using the auth library
+    const session = await getSession();
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Verify token and get user
-    const { verifyToken } = await import('@/lib/auth');
-    const payload = await verifyToken(token);
-    if (!payload) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, payload.userId))
+      .where(eq(users.id, session.id))
       .limit(1);
 
     if (!user) {
@@ -55,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Stripe Checkout Session for subscription
-    const session = await stripe.checkout.sessions.create({
+    const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
       line_items: [
@@ -83,7 +78,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ sessionId: session.id, url: session.url });
+    return NextResponse.json({ sessionId: checkoutSession.id, url: checkoutSession.url });
   } catch (error) {
     console.error('Error creating subscription:', error);
     return NextResponse.json(
