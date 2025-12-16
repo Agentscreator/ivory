@@ -39,6 +39,15 @@ function AuthPageContent() {
         if (data.user) {
           // User is already logged in, redirect them
           localStorage.setItem("ivoryUser", JSON.stringify(data.user))
+          
+          // Check if there's a return URL stored
+          const returnUrl = localStorage.getItem('returnUrl')
+          if (returnUrl) {
+            localStorage.removeItem('returnUrl')
+            router.push(returnUrl)
+            return
+          }
+          
           if (data.user.userType === 'tech') {
             router.push('/tech/dashboard')
           } else if (data.user.userType === 'client') {
@@ -88,6 +97,15 @@ function AuthPageContent() {
         
         const user = await response.json()
         localStorage.setItem("ivoryUser", JSON.stringify(user))
+        
+        // Check if there's a return URL stored
+        const returnUrl = localStorage.getItem('returnUrl')
+        if (returnUrl) {
+          localStorage.removeItem('returnUrl')
+          router.push(returnUrl)
+          return
+        }
+        
         router.push("/user-type")
       } else {
         // Log in - find existing user
@@ -105,6 +123,14 @@ function AuthPageContent() {
         
         const user = await response.json()
         localStorage.setItem("ivoryUser", JSON.stringify(user))
+        
+        // Check if there's a return URL stored
+        const returnUrl = localStorage.getItem('returnUrl')
+        if (returnUrl) {
+          localStorage.removeItem('returnUrl')
+          router.push(returnUrl)
+          return
+        }
         
         // If user already has a type, go to home, otherwise select type
         if (user.userType) {

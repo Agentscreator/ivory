@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Edit2, Heart, Loader2 } from "lucide-react"
 import Image from "next/image"
+import Head from "next/head"
 import ContentModerationMenu from "@/components/content-moderation-menu"
 
 type Look = {
@@ -92,9 +93,20 @@ export default function SharedDesignPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
+    <>
+      <Head>
+        {/* Deep linking meta tags for mobile app */}
+        <meta name="apple-itunes-app" content={`app-id=YOUR_APP_ID, app-argument=ivoryschoice://shared/${params.id}`} />
+        <meta name="al:ios:url" content={`ivoryschoice://shared/${params.id}`} />
+        <meta name="al:ios:app_store_id" content="YOUR_APP_ID" />
+        <meta name="al:ios:app_name" content="Ivory's Choice" />
+        <meta name="al:android:url" content={`ivoryschoice://shared/${params.id}`} />
+        <meta name="al:android:package" content="com.ivoryschoice.app" />
+        <meta name="al:android:app_name" content="Ivory's Choice" />
+      </Head>
+      <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush">
+        {/* Header */}
+        <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
         <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center gap-4">
           <h1 className="font-serif text-xl font-bold text-charcoal">Ivory</h1>
         </div>
@@ -136,17 +148,30 @@ export default function SharedDesignPage() {
                 >
                   <Heart className={`w-6 h-6 ${liked ? "fill-current" : ""}`} />
                 </Button>
-                {currentUserId && look.userId !== currentUserId && (
-                  <ContentModerationMenu
-                    currentUserId={currentUserId}
-                    contentType="look"
-                    contentId={look.id}
-                    contentOwnerId={look.userId}
-                    contentOwnerUsername={look.user?.username || `User ${look.userId}`}
-                    showBlockOption={true}
-                  />
+                {currentUserId ? (
+                  look.userId !== currentUserId && (
+                    <ContentModerationMenu
+                      currentUserId={currentUserId}
+                      contentType="look"
+                      contentId={look.id}
+                      contentOwnerId={look.userId}
+                      contentOwnerUsername={look.user?.username || `User ${look.userId}`}
+                      showBlockOption={true}
+                    />
+                  )
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => {
+                      localStorage.setItem('returnUrl', window.location.pathname)
+                      router.push("/auth")
+                    }}
+                  >
+                    Sign in to report
+                  </Button>
                 )}
-              </div>
             </div>
           </div>
         </Card>
@@ -157,16 +182,27 @@ export default function SharedDesignPage() {
             Edit This Design
           </Button>
 
-          <Card className="p-4 bg-muted/30">
-            <p className="text-sm text-center text-muted-foreground">
-              Create your own Ivory account to save and customize this design
-            </p>
-            <Button variant="outline" className="w-full mt-3 bg-white" onClick={() => router.push("/")}>
-              Sign Up Free
-            </Button>
-          </Card>
+          {!currentUserId && (
+            <Card className="p-4 bg-muted/30">
+              <p className="text-sm text-center text-muted-foreground">
+                Create your own Ivory account to save and customize this design
+              </p>
+              <Button 
+                variant="outline" 
+                className="w-full mt-3 bg-white" 
+                onClick={() => {
+                  // Store the current URL to return after login
+                  localStorage.setItem('returnUrl', window.location.pathname)
+                  router.push("/auth")
+                }}
+              >
+                Sign Up Free
+              </Button>
+            </Card>
+          )}
         </div>
       </main>
-    </div>
+      </div>
+    </>
   )
 }
