@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ReferralCard } from '@/components/referral-card';
 import { CreditsDisplay } from '@/components/credits-display';
+import { BuyCreditsDialog } from '@/components/buy-credits-dialog';
 import { Coins, History } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 interface CreditTransaction {
   id: number;
@@ -19,10 +22,24 @@ interface CreditTransaction {
 export default function CreditsPage() {
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
+    // Handle payment success/cancel
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+
+    if (success === 'true') {
+      toast.success('Payment successful! Your credits have been added.');
+      // Remove query params from URL
+      window.history.replaceState({}, '', '/settings/credits');
+    } else if (canceled === 'true') {
+      toast.error('Payment was canceled.');
+      window.history.replaceState({}, '', '/settings/credits');
+    }
+
     fetchTransactions();
-  }, []);
+  }, [searchParams]);
 
   const fetchTransactions = async () => {
     try {
@@ -61,6 +78,9 @@ export default function CreditsPage() {
             Use credits to generate AI nail designs
           </CardDescription>
         </CardHeader>
+        <CardContent>
+          <BuyCreditsDialog />
+        </CardContent>
       </Card>
 
       <ReferralCard />
