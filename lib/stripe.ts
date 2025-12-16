@@ -14,4 +14,11 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 // Re-export client-safe utilities
-export { CREDIT_PACKAGES, getCreditPackage, type CreditPackage } from './stripe-config';
+export {
+  SUBSCRIPTION_PLANS,
+  CREDIT_PACKAGES,
+  getSubscriptionPlan,
+  getCreditPackage,
+  type SubscriptionPlan,
+  type CreditPackage,
+} from './stripe-config';

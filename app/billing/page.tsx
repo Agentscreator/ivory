@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreditsDisplay } from '@/components/credits-display';
 import { BuyCreditsDialog } from '@/components/buy-credits-dialog';
-import { ArrowLeft, Coins, CreditCard, History, Sparkles } from 'lucide-react';
+import { SubscriptionPlans } from '@/components/subscription-plans';
+import { ArrowLeft, Coins, CreditCard, History, Sparkles, Crown } from 'lucide-react';
 import { format } from 'date-fns';
 import { CREDIT_PACKAGES } from '@/lib/stripe-config';
 
@@ -23,20 +25,31 @@ export default function BillingPage() {
   const router = useRouter();
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [subscriptionTier, setSubscriptionTier] = useState('free');
+  const [subscriptionStatus, setSubscriptionStatus] = useState('inactive');
 
   useEffect(() => {
-    fetchTransactions();
+    fetchData();
   }, []);
 
-  const fetchTransactions = async () => {
+  const fetchData = async () => {
     try {
+      // Fetch user data for subscription info
+      const userStr = localStorage.getItem('ivoryUser');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        setSubscriptionTier(user.subscriptionTier || 'free');
+        setSubscriptionStatus(user.subscriptionStatus || 'inactive');
+      }
+
+      // Fetch transactions
       const response = await fetch('/api/credits/history');
       if (response.ok) {
         const data = await response.json();
         setTransactions(data.transactions);
       }
     } catch (error) {
-      console.error('Error fetching transactions:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -69,48 +82,87 @@ export default function BillingPage() {
               <CreditsDisplay showLabel={false} className="text-3xl" />
             </CardTitle>
             <CardDescription>
-              Use credits to generate AI nail designs
+              {subscriptionTier !== 'free' && subscriptionStatus === 'active' ? (
+                <span className="flex items-center gap-2">
+                  <Crown className="h-4 w-4 text-primary" />
+                  {subscriptionTier === 'pro' ? 'Pro' : 'Business'} Plan Active
+                </span>
+              ) : (
+                'Use credits to generate AI nail designs'
+              )}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <BuyCreditsDialog>
-              <Button size="lg" className="w-full sm:w-auto gap-2">
-                <CreditCard className="h-5 w-5" />
-                Buy More Credits
-              </Button>
-            </BuyCreditsDialog>
-          </CardContent>
         </Card>
 
-        {/* Quick Buy Options */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Quick Purchase
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {CREDIT_PACKAGES.map((pkg) => (
-              <BuyCreditsDialog key={pkg.id}>
-                <Card className="cursor-pointer hover:border-primary transition-all hover:shadow-md">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-primary mb-1">
-                      {pkg.credits}
-                    </div>
-                    <div className="text-xs text-muted-foreground mb-2">credits</div>
-                    <div className="text-lg font-semibold">
-                      ${(pkg.price / 100).toFixed(2)}
-                    </div>
-                    {pkg.savings && (
-                      <div className="text-xs text-green-600 font-medium mt-1">
-                        Save {pkg.savings}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </BuyCreditsDialog>
-            ))}
-          </div>
-        </div>
+        {/* Tabs for Subscriptions and Credits */}
+        <Tabs defaultValue="subscriptions" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="subscriptions" className="gap-2">
+              <Crown className="h-4 w-4" />
+              Subscriptions
+            </TabsTrigger>
+            <TabsTrigger value="credits" className="gap-2">
+              <Coins className="h-4 w-4" />
+              Buy Credits
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="subscriptions" className="space-y-6 mt-6">
+            <SubscriptionPlans 
+              currentTier={subscriptionTier}
+              currentStatus={subscriptionStatus}
+            />
+          </TabsContent>
+
+          <TabsContent value="credits" className="space-y-6 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Buy Additional Credits</CardTitle>
+                <CardDescription>
+                  Purchase extra credits on top of your subscription
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BuyCreditsDialog>
+                  <Button size="lg" className="w-full sm:w-auto gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Buy More Credits
+                  </Button>
+                </BuyCreditsDialog>
+              </CardContent>
+            </Card>
+
+            {/* Quick Buy Options */}
+            <div>
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                Quick Purchase
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {CREDIT_PACKAGES.map((pkg) => (
+                  <BuyCreditsDialog key={pkg.id}>
+                    <Card className="cursor-pointer hover:border-primary transition-all hover:shadow-md">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-primary mb-1">
+                          {pkg.credits}
+                        </div>
+                        <div className="text-xs text-muted-foreground mb-2">credits</div>
+                        <div className="text-lg font-semibold">
+                          ${(pkg.price / 100).toFixed(2)}
+                        </div>
+                        {pkg.savings && (
+                          <div className="text-xs text-green-600 font-medium mt-1">
+                            Save {pkg.savings}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </BuyCreditsDialog>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Transaction History */}
         <Card>

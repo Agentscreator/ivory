@@ -18,6 +18,12 @@ export const users: any = pgTable('users', {
   credits: integer('credits').default(5).notNull(), // Free credits on signup
   referralCode: varchar('referral_code', { length: 50 }).unique(), // User's unique referral code
   referredBy: integer('referred_by').references((): any => users.id), // Who referred this user
+  // Subscription fields
+  subscriptionTier: varchar('subscription_tier', { length: 50 }).default('free'), // free, pro, business
+  subscriptionStatus: varchar('subscription_status', { length: 50 }).default('inactive'), // active, canceled, past_due, inactive
+  stripeCustomerId: varchar('stripe_customer_id', { length: 255 }),
+  stripeSubscriptionId: varchar('stripe_subscription_id', { length: 255 }),
+  subscriptionCurrentPeriodEnd: timestamp('subscription_current_period_end'),
   resetPasswordToken: varchar('reset_password_token', { length: 255 }),
   resetPasswordExpires: timestamp('reset_password_expires'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
