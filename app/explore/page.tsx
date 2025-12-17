@@ -1,9 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { GoogleMapsSearch } from "@/components/google-maps-search"
+import { Search } from "lucide-react"
 
 // Sample designs for browsing without authentication
 const sampleDesigns = [
@@ -54,12 +56,42 @@ const sampleDesigns = [
 export default function ExplorePage() {
   const router = useRouter()
   const [selectedStyle, setSelectedStyle] = useState<string>("all")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [location, setLocation] = useState("")
+  const [techs, setTechs] = useState<any[]>([])
+  const [isSearching, setIsSearching] = useState(false)
 
   const styles = ["all", "French Manicure", "Floral Art", "Geometric", "Minimalist", "Glitter", "Ombre"]
 
   const filteredDesigns = selectedStyle === "all" 
     ? sampleDesigns 
     : sampleDesigns.filter(design => design.style === selectedStyle)
+
+  const handleSearch = async () => {
+    if (!searchQuery && !location) return
+    
+    setIsSearching(true)
+    try {
+      const params = new URLSearchParams()
+      if (searchQuery) params.append('q', searchQuery)
+      if (location) params.append('location', location)
+      
+      const response = await fetch(`/api/tech/search?${params}`)
+      const data = await response.json()
+      
+      if (data.techs) {
+        setTechs(data.techs)
+      }
+    } catch (error) {
+      console.error('Search error:', error)
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  const handleLocationSelect = (selectedLocation: string) => {
+    setLocation(selectedLocation)
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -105,6 +137,63 @@ export default function ExplorePage() {
             Browse curated nail designs created by our AI and master artisans. 
             Sign up to create your own custom designs.
           </p>
+
+          {/* Search Bar */}
+          <div className="max-w-4xl mx-auto mb-8">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B6B6B]" />
+                <Input
+                  type="text"
+                  placeholder="Search nail techs..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  className="pl-10 h-12 border-[#E8E8E8] focus:border-[#8B7355]"
+                />
+              </div>
+              <GoogleMapsSearch
+                onLocationSelect={handleLocationSelect}
+                placeholder="Location..."
+                className="flex-1 h-12 pl-10 border-[#E8E8E8] focus:border-[#8B7355]"
+              />
+              <Button
+                onClick={handleSearch}
+                disabled={isSearching}
+                className="bg-[#1A1A1A] text-white hover:bg-[#8B7355] h-12 px-8 text-xs tracking-widest uppercase"
+              >
+                {isSearching ? "Searching..." : "Search"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Search Results */}
+          {techs.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-xl font-light text-[#1A1A1A] mb-4">
+                Found {techs.length} nail tech{techs.length !== 1 ? 's' : ''}
+              </h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {techs.map((tech) => (
+                  <div
+                    key={tech.id}
+                    onClick={() => router.push(`/tech/${tech.userId}`)}
+                    className="bg-white border border-[#E8E8E8] p-6 cursor-pointer hover:border-[#8B7355] transition-all"
+                  >
+                    <h3 className="text-lg font-light text-[#1A1A1A] mb-2">
+                      {tech.businessName || tech.user?.username}
+                    </h3>
+                    <p className="text-sm text-[#6B6B6B] mb-2">{tech.location}</p>
+                    {tech.rating && (
+                      <p className="text-sm text-[#8B7355]">
+                        ⭐ {tech.rating} ({tech.totalReviews} reviews)
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Style Filter */}
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3">

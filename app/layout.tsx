@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
@@ -13,13 +13,6 @@ export const metadata: Metadata = {
   title: "Ivory - AI Nail Design",
   description: "Design stunning nail art with AI and connect with professional nail techs",
   generator: "v0.app",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-    viewportFit: "cover",
-  },
   icons: {
     icon: [
       {
@@ -42,6 +35,14 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Ivory",
   },
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
 }
 
 export default function RootLayout({

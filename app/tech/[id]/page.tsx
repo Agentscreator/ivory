@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, MapPin, Star, Phone, Globe, Instagram, DollarSign, Clock } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, Phone, Globe, Instagram, DollarSign, Clock, Map, Navigation } from 'lucide-react';
+import { TechLocationMap } from '@/components/tech-location-map';
 
 export default function TechProfilePage() {
   const router = useRouter();
@@ -120,6 +121,10 @@ export default function TechProfilePage() {
             <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            <TabsTrigger value="location">
+              <Map className="h-4 w-4 mr-2" />
+              Location
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="services" className="space-y-4 mt-6">
@@ -243,6 +248,68 @@ export default function TechProfilePage() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          <TabsContent value="location" className="mt-6">
+            <Card className="border-[#E8E8E8]">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-[#8B7355]" />
+                  {tech.businessName || tech.user?.username}
+                </CardTitle>
+                <CardDescription className="flex items-center gap-2">
+                  {tech.location || 'Location not set'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {tech.location ? (
+                  <>
+                    <TechLocationMap
+                      location={tech.location}
+                      businessName={tech.businessName}
+                      className="w-full h-[400px] rounded-lg overflow-hidden border border-[#E8E8E8]"
+                    />
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-[#E8E8E8] hover:border-[#8B7355]"
+                        onClick={() => {
+                          const query = encodeURIComponent(tech.location);
+                          window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+                        }}
+                      >
+                        <MapPin className="h-4 w-4 mr-2" />
+                        Open in Google Maps
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-[#E8E8E8] hover:border-[#8B7355]"
+                        onClick={() => {
+                          if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition((position) => {
+                              const { latitude, longitude } = position.coords;
+                              const query = encodeURIComponent(tech.location);
+                              window.open(
+                                `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${query}`,
+                                '_blank'
+                              );
+                            });
+                          }
+                        }}
+                      >
+                        <Navigation className="h-4 w-4 mr-2" />
+                        Get Directions
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-12 text-center text-[#6B6B6B]">
+                    <MapPin className="h-12 w-12 mx-auto mb-4 text-[#E8E8E8]" />
+                    <p>Location not available</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

@@ -302,6 +302,13 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   }),
 }));
 
+export const portfolioImagesRelations = relations(portfolioImages, ({ one }) => ({
+  techProfile: one(techProfiles, {
+    fields: [portfolioImages.techProfileId],
+    references: [techProfiles.id],
+  }),
+}));
+
 export const techProfilesRelations = relations(techProfiles, ({ one, many }) => ({
   user: one(users, {
     fields: [techProfiles.userId],
