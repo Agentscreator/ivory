@@ -1,9 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Share2, Copy, Check, Gift } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -67,23 +64,24 @@ export function ReferralCard() {
           url: link,
         });
       } catch (error) {
-        // User cancelled or error occurred
         console.log('Share cancelled or failed');
       }
     } else {
-      // Fallback to copy
       copyToClipboard();
     }
   };
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Referral Program</CardTitle>
-          <CardDescription>Loading...</CardDescription>
-        </CardHeader>
-      </Card>
+      <div className="border border-[#E8E8E8] p-6 sm:p-8 bg-white">
+        <div className="flex items-center gap-3 mb-4">
+          <Gift className="w-5 h-5 text-[#8B7355]" strokeWidth={1} />
+          <h2 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] tracking-tight">
+            Earn Free Credits
+          </h2>
+        </div>
+        <p className="text-sm text-[#6B6B6B] font-light">Loading...</p>
+      </div>
     );
   }
 
@@ -92,69 +90,79 @@ export function ReferralCard() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Gift className="h-5 w-5" />
+    <div className="border border-[#E8E8E8] p-6 sm:p-8 bg-white">
+      <div className="flex items-center gap-3 mb-2">
+        <Gift className="w-5 h-5 text-[#8B7355]" strokeWidth={1} />
+        <h2 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] tracking-tight">
           Earn Free Credits
-        </CardTitle>
-        <CardDescription>
-          Share with 3 friends and get 1 free credit!
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="space-y-1">
-            <p className="text-2xl font-bold">{stats.totalReferrals}</p>
-            <p className="text-xs text-muted-foreground">Total Referrals</p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-2xl font-bold">{stats.creditsEarned}</p>
-            <p className="text-xs text-muted-foreground">Credits Earned</p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-2xl font-bold">{stats.referralsUntilNextCredit}</p>
-            <p className="text-xs text-muted-foreground">Until Next Credit</p>
-          </div>
-        </div>
+        </h2>
+      </div>
+      <p className="text-sm text-[#6B6B6B] font-light mb-8">
+        Share with 3 friends and get 1 free credit!
+      </p>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Your Referral Link</label>
-          <div className="flex gap-2">
-            <Input
-              value={getReferralLink()}
-              readOnly
-              className="flex-1"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={copyToClipboard}
-            >
-              {copied ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="text-center border border-[#E8E8E8] p-4 bg-[#F8F7F5]">
+          <p className="font-serif text-3xl font-light text-[#1A1A1A] mb-1">{stats.totalReferrals}</p>
+          <p className="text-xs tracking-wider uppercase text-[#6B6B6B] font-light">Total Referrals</p>
         </div>
-
-        <Button
-          onClick={shareReferralLink}
-          className="w-full"
-          variant="default"
-        >
-          <Share2 className="h-4 w-4 mr-2" />
-          Share Referral Link
-        </Button>
-
-        <div className="text-xs text-muted-foreground space-y-1">
-          <p>• New users get 5 free credits when they sign up</p>
-          <p>• You get 1 credit for every 3 people who sign up with your link</p>
-          <p>• Credits can be used to generate AI nail designs</p>
+        <div className="text-center border border-[#E8E8E8] p-4 bg-[#F8F7F5]">
+          <p className="font-serif text-3xl font-light text-[#1A1A1A] mb-1">{stats.creditsEarned}</p>
+          <p className="text-xs tracking-wider uppercase text-[#6B6B6B] font-light">Credits Earned</p>
         </div>
-      </CardContent>
-    </Card>
+        <div className="text-center border border-[#E8E8E8] p-4 bg-[#F8F7F5]">
+          <p className="font-serif text-3xl font-light text-[#1A1A1A] mb-1">{stats.referralsUntilNextCredit}</p>
+          <p className="text-xs tracking-wider uppercase text-[#6B6B6B] font-light">Until Next Credit</p>
+        </div>
+      </div>
+
+      {/* Referral Link */}
+      <div className="space-y-3 mb-6">
+        <label className="text-xs tracking-wider uppercase text-[#6B6B6B] font-light">Your Referral Link</label>
+        <div className="flex gap-2">
+          <input
+            value={getReferralLink()}
+            readOnly
+            className="flex-1 px-4 py-3 border border-[#E8E8E8] font-light text-sm focus:outline-none focus:border-[#8B7355] transition-all duration-300"
+          />
+          <button
+            onClick={copyToClipboard}
+            className="w-12 h-12 border border-[#E8E8E8] hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center"
+          >
+            {copied ? (
+              <Check className="w-5 h-5 text-green-600" strokeWidth={1} />
+            ) : (
+              <Copy className="w-5 h-5 text-[#1A1A1A]" strokeWidth={1} />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Share Button */}
+      <button
+        onClick={shareReferralLink}
+        className="w-full h-12 bg-[#1A1A1A] text-white font-light text-sm tracking-wider uppercase hover:bg-[#1A1A1A]/90 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 mb-6"
+      >
+        <Share2 className="w-4 h-4" strokeWidth={1} />
+        Share Referral Link
+      </button>
+
+      {/* Info */}
+      <div className="border-t border-[#E8E8E8] pt-6 space-y-2">
+        <p className="text-xs text-[#6B6B6B] font-light flex items-start gap-2">
+          <span className="text-[#8B7355]">•</span>
+          <span>New users get 5 free credits when they sign up</span>
+        </p>
+        <p className="text-xs text-[#6B6B6B] font-light flex items-start gap-2">
+          <span className="text-[#8B7355]">•</span>
+          <span>You get 1 credit for every 3 people who sign up with your link</span>
+        </p>
+        <p className="text-xs text-[#6B6B6B] font-light flex items-start gap-2">
+          <span className="text-[#8B7355]">•</span>
+          <span>Credits can be used to generate AI nail designs</span>
+        </p>
+      </div>
+    </div>
   );
 }
