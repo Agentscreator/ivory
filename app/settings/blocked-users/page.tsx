@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { BottomNav } from '@/components/bottom-nav';
 import { ArrowLeft, UserX } from 'lucide-react';
 
 interface BlockedUser {
@@ -64,60 +66,81 @@ export default function BlockedUsersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto p-4">
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => router.back()}
-            className="p-2 hover:bg-gray-100 rounded-full"
+    <div className="min-h-screen bg-white pb-24">
+      {/* Header */}
+      <header className="bg-white border-b border-[#E8E8E8] sticky top-0 z-10 safe-top">
+        <div className="max-w-screen-xl mx-auto px-5 sm:px-6 py-4 sm:py-5 flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => router.back()} 
+            className="hover:bg-[#F8F7F5] active:scale-95 transition-all rounded-none"
           >
-            <ArrowLeft size={24} />
-          </button>
-          <h1 className="text-2xl font-bold">Blocked Users</h1>
+            <ArrowLeft className="w-5 h-5" strokeWidth={1} />
+          </Button>
+          <h1 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] tracking-tight">
+            Blocked Users
+          </h1>
         </div>
+      </header>
 
+      {/* Main Content */}
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-safe">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+          <div className="border border-[#E8E8E8] p-12 text-center bg-white">
+            <div className="w-12 h-12 border-2 border-[#E8E8E8] border-t-[#8B7355] rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-sm text-[#6B6B6B] font-light">Loading...</p>
           </div>
         ) : blockedUsers.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center">
-            <UserX size={48} className="mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-600">You haven't blocked any users</p>
+          <div className="border border-[#E8E8E8] p-12 text-center bg-white">
+            <UserX className="w-12 h-12 text-[#6B6B6B] mx-auto mb-4" strokeWidth={1} />
+            <h2 className="font-serif text-xl font-light text-[#1A1A1A] tracking-tight mb-2">
+              No Blocked Users
+            </h2>
+            <p className="text-sm text-[#6B6B6B] font-light">
+              You haven't blocked any users
+            </p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl divide-y">
+          <div className="space-y-3">
             {blockedUsers.map((user) => (
-              <div key={user.id} className="p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-medium">User #{user.blockedId}</p>
-                  {user.reason && (
-                    <p className="text-sm text-gray-600 capitalize">
-                      Reason: {user.reason}
+              <div key={user.id} className="border border-[#E8E8E8] p-5 sm:p-6 bg-white hover:border-[#8B7355] transition-all">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-serif text-base font-light text-[#1A1A1A] mb-1">
+                      User #{user.blockedId}
                     </p>
-                  )}
-                  <p className="text-xs text-gray-400">
-                    Blocked {new Date(user.createdAt).toLocaleDateString()}
-                  </p>
+                    {user.reason && (
+                      <p className="text-sm text-[#6B6B6B] font-light capitalize mb-1">
+                        Reason: {user.reason}
+                      </p>
+                    )}
+                    <p className="text-xs text-[#6B6B6B] font-light tracking-wider uppercase">
+                      Blocked {new Date(user.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleUnblock(user.blockedId)}
+                    className="h-10 px-4 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 whitespace-nowrap"
+                  >
+                    Unblock
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleUnblock(user.blockedId)}
-                  className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Unblock
-                </button>
               </div>
             ))}
           </div>
         )}
 
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800">
-            <strong>Note:</strong> Blocked users cannot see your content or send you design requests. 
+        <div className="mt-6 border border-[#8B7355] bg-[#F8F7F5] p-6">
+          <p className="text-sm text-[#1A1A1A] font-light">
+            <span className="font-serif font-normal">Note:</span> Blocked users cannot see your content or send you design requests. 
             Their content is automatically hidden from your feed.
           </p>
         </div>
-      </div>
+      </main>
+
+      {/* Bottom Navigation */}
+      <BottomNav onCenterAction={() => router.push('/capture')} />
     </div>
   );
 }

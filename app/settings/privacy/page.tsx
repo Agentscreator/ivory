@@ -2,36 +2,43 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { BottomNav } from "@/components/bottom-nav"
 import { ArrowLeft, ExternalLink } from "lucide-react"
 
 export default function PrivacyPage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush pb-24">
+    <div className="min-h-screen bg-white pb-24">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10 safe-top">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="active:scale-95 transition-transform">
-            <ArrowLeft className="w-5 h-5" />
+      <header className="bg-white border-b border-[#E8E8E8] sticky top-0 z-10 safe-top">
+        <div className="max-w-screen-xl mx-auto px-5 sm:px-6 py-4 sm:py-5 flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => router.back()} 
+            className="hover:bg-[#F8F7F5] active:scale-95 transition-all rounded-none"
+          >
+            <ArrowLeft className="w-5 h-5" strokeWidth={1} />
           </Button>
-          <h1 className="font-serif text-lg sm:text-xl font-bold text-charcoal">Privacy & Data</h1>
+          <h1 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] tracking-tight">
+            Privacy & Data
+          </h1>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-safe">
-        <Card className="p-6 bg-white rounded-2xl shadow-sm mb-4">
-          <h2 className="font-serif text-xl font-bold text-charcoal mb-4">Your Privacy Matters</h2>
-          <p className="text-sm text-muted-foreground mb-6">
+        <div className="border border-[#E8E8E8] p-6 sm:p-8 bg-white mb-6">
+          <h2 className="font-serif text-2xl font-light text-[#1A1A1A] tracking-tight mb-2">Your Privacy Matters</h2>
+          <p className="text-sm text-[#6B6B6B] font-light mb-8">
             We're committed to protecting your personal information and being transparent about how we use your data.
           </p>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <h3 className="font-semibold text-sm mb-2">What We Collect</h3>
-              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+              <h3 className="font-serif text-lg font-light text-[#1A1A1A] tracking-tight mb-3">What We Collect</h3>
+              <ul className="text-sm text-[#6B6B6B] space-y-2 list-disc list-inside font-light">
                 <li>Account information (username, email)</li>
                 <li>Design images you upload</li>
                 <li>AI-generated nail designs</li>
@@ -40,8 +47,8 @@ export default function PrivacyPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-sm mb-2">How We Use Your Data</h3>
-              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+              <h3 className="font-serif text-lg font-light text-[#1A1A1A] tracking-tight mb-3">How We Use Your Data</h3>
+              <ul className="text-sm text-[#6B6B6B] space-y-2 list-disc list-inside font-light">
                 <li>To provide and improve our services</li>
                 <li>To connect you with nail technicians</li>
                 <li>To generate AI-enhanced designs</li>
@@ -50,8 +57,8 @@ export default function PrivacyPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-sm mb-2">Your Rights</h3>
-              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+              <h3 className="font-serif text-lg font-light text-[#1A1A1A] tracking-tight mb-3">Your Rights</h3>
+              <ul className="text-sm text-[#6B6B6B] space-y-2 list-disc list-inside font-light">
                 <li>Access your personal data</li>
                 <li>Request data correction or deletion</li>
                 <li>Export your data</li>
@@ -59,43 +66,43 @@ export default function PrivacyPage() {
               </ul>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-6 bg-white rounded-2xl shadow-sm mb-4">
-          <h3 className="font-semibold text-sm mb-3">Data Management</h3>
-          <div className="space-y-2">
-            <Button
-              variant="outline"
-              className="w-full justify-between h-12 active:scale-95 transition-transform"
+        <div className="border border-[#E8E8E8] p-6 sm:p-8 bg-white mb-6">
+          <h3 className="font-serif text-xl font-light text-[#1A1A1A] tracking-tight mb-6">Data Management</h3>
+          <div className="space-y-3">
+            <button
               onClick={() => {
                 // TODO: Implement data export
                 alert("Data export feature coming soon")
               }}
+              className="w-full h-12 border border-[#E8E8E8] text-[#1A1A1A] font-light text-sm tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-between px-4"
             >
-              <span className="text-sm">Download My Data</span>
-              <ExternalLink className="w-4 h-4" />
-            </Button>
+              <span>Download My Data</span>
+              <ExternalLink className="w-4 h-4" strokeWidth={1} />
+            </button>
             
-            <Button
-              variant="outline"
-              className="w-full justify-between h-12 active:scale-95 transition-transform"
+            <button
               onClick={() => router.push("/settings/delete-account")}
+              className="w-full h-12 border border-red-200 text-red-600 font-light text-sm tracking-wider uppercase hover:bg-red-50 active:scale-95 transition-all duration-300 flex items-center justify-between px-4"
             >
-              <span className="text-sm text-destructive">Delete My Account</span>
-              <ArrowLeft className="w-4 h-4 rotate-180 text-destructive" />
-            </Button>
+              <span>Delete My Account</span>
+              <ArrowLeft className="w-4 h-4 rotate-180" strokeWidth={1} />
+            </button>
           </div>
-        </Card>
+        </div>
 
-        <Button
-          variant="link"
-          className="w-full text-sm text-muted-foreground"
+        <button
           onClick={() => router.push("/privacy-policy")}
+          className="w-full text-sm text-[#6B6B6B] font-light hover:text-[#8B7355] transition-colors flex items-center justify-center gap-2"
         >
           View Full Privacy Policy
-          <ExternalLink className="w-3 h-3 ml-1" />
-        </Button>
+          <ExternalLink className="w-3 h-3" strokeWidth={1} />
+        </button>
       </main>
+
+      {/* Bottom Navigation */}
+      <BottomNav onCenterAction={() => router.push('/capture')} />
     </div>
   )
 }
