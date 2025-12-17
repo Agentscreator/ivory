@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 // PATCH - Update booking status (confirm, cancel, complete)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '');
@@ -22,7 +22,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
-    const bookingId = parseInt(params.id);
+    const { id } = await params;
+    const bookingId = parseInt(id);
     const body = await request.json();
     const { status, techNotes, cancellationReason } = body;
 

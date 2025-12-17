@@ -6,10 +6,11 @@ import { eq } from 'drizzle-orm';
 // GET - Fetch tech profile details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const techId = parseInt(params.id);
+    const { id } = await params;
+    const techId = parseInt(id);
 
     const tech = await db.query.techProfiles.findFirst({
       where: eq(techProfiles.id, techId),
