@@ -147,14 +147,13 @@ export default function CapturePage() {
       setAiPrompt(activeTab.aiPrompt)
       setCapturedImage(activeTab.originalImage)
       
-      // Only manage camera if we don't have an image
-      // Don't start camera if tab already has content (image or designs)
+      // Only start camera if tab has no content (no image and no designs)
       if (!activeTab.originalImage && activeTab.finalPreviews.length === 0) {
         setTimeout(() => {
           startCamera()
         }, 100)
-      } else if (activeTab.originalImage) {
-        // If switching to a tab with an image, stop camera
+      } else {
+        // If tab has an image or designs, stop camera
         stopCamera()
       }
     }
@@ -266,10 +265,11 @@ export default function CapturePage() {
             
             // Find the active tab and check if it needs camera
             const activeTabToRestore = tabs.find((t: DesignTab) => t.id === savedActiveTabId) || tabs[0]
-            // Only start camera if the active tab has no content
+            // Only start camera if the active tab has no content (no image AND no designs)
             if (!activeTabToRestore.originalImage && activeTabToRestore.finalPreviews.length === 0) {
               setTimeout(() => startCamera(), 100)
             }
+            // If tab has content, don't start camera at all
             return
           }
         } catch (e) {

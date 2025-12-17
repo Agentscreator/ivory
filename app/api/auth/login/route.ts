@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     // Create session
-    await createSession(user[0].id);
+    const token = await createSession(user[0].id);
 
     return NextResponse.json({
       id: user[0].id,
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
       email: user[0].email,
       userType: user[0].userType,
       avatar: user[0].avatar,
+      token, // Return token for localStorage compatibility
     });
   } catch (error) {
     console.error('Login error:', error);

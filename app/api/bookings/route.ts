@@ -6,7 +6,12 @@ import { eq, and, gte, lte, or } from 'drizzle-orm';
 // GET - Fetch bookings (client or tech view)
 export async function GET(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    // Try to get token from Authorization header or cookie
+    let token = request.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) {
+      token = request.cookies.get('session')?.value;
+    }
+    
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -76,7 +81,12 @@ export async function GET(request: NextRequest) {
 // POST - Create new booking
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    // Try to get token from Authorization header or cookie
+    let token = request.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) {
+      token = request.cookies.get('session')?.value;
+    }
+    
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

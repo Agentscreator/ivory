@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { techProfiles, users } from '@/db/schema';
-import { ilike, or, sql } from 'drizzle-orm';
+import { ilike, or, and } from 'drizzle-orm';
 
 // GET - Search nail techs
 export async function GET(request: NextRequest) {
@@ -10,23 +10,31 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get('q') || '';
     const location = searchParams.get('location') || '';
 
-    let whereConditions = [];
+    let whereCondition;
 
-    if (query) {
-      whereConditions.push(
+    // Build search conditions
+    if (query && location) {
+      // Both query and location
+      whereCondition = and(
         or(
           ilike(techProfiles.businessName, `%${query}%`),
           ilike(techProfiles.bio, `%${query}%`)
-        )
+        ),
+        ilike(techProfiles.location, `%${location}%`)
       );
-    }
-
-    if (location) {
-      whereConditions.push(ilike(techProfiles.location, `%${location}%`));
+    } else if (query) {
+      // Only query
+      whereCondition = or(
+        ilike(techProfiles.businessName, `%${query}%`),
+        ilike(techProfiles.bio, `%${query}%`)
+      );
+    } else if (location) {
+      // Only location
+      whereCondition = ilike(techProfiles.location, `%${location}%`);
     }
 
     const techs = await db.query.techProfiles.findMany({
-      where: whereConditions.length > 0 ? sql`${whereConditions.join(' AND ')}` : undefined,
+      where: whereCondition,
       with: {
         user: {
           columns: {
