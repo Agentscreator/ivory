@@ -40,6 +40,7 @@ type DesignTab = {
   selectedDesignImages: string[]
   drawingImageUrl: string | null
   aiPrompt: string
+  originalImage: string | null
 }
 
 export default function CapturePage() {
@@ -83,7 +84,8 @@ export default function CapturePage() {
       },
       selectedDesignImages: [],
       drawingImageUrl: null,
-      aiPrompt: ''
+      aiPrompt: '',
+      originalImage: null
     }
   ])
   const [activeTabId, setActiveTabId] = useState('1')
@@ -143,6 +145,17 @@ export default function CapturePage() {
       setSelectedDesignImages(activeTab.selectedDesignImages)
       setDrawingImageUrl(activeTab.drawingImageUrl)
       setAiPrompt(activeTab.aiPrompt)
+      setCapturedImage(activeTab.originalImage)
+      
+      // If switching to a tab without an image, start camera
+      if (!activeTab.originalImage) {
+        setTimeout(() => {
+          startCamera()
+        }, 100)
+      } else {
+        // If switching to a tab with an image, stop camera
+        stopCamera()
+      }
     }
   }, [activeTabId])
   
@@ -156,11 +169,12 @@ export default function CapturePage() {
             designSettings,
             selectedDesignImages,
             drawingImageUrl,
-            aiPrompt
+            aiPrompt,
+            originalImage: capturedImage
           }
         : tab
     ))
-  }, [finalPreviews, designSettings, selectedDesignImages, drawingImageUrl, aiPrompt, activeTabId])
+  }, [finalPreviews, designSettings, selectedDesignImages, drawingImageUrl, aiPrompt, capturedImage, activeTabId])
   
   // Add new tab
   const addNewTab = () => {
@@ -181,10 +195,16 @@ export default function CapturePage() {
       },
       selectedDesignImages: [],
       drawingImageUrl: null,
-      aiPrompt: ''
+      aiPrompt: '',
+      originalImage: null
     }
     setDesignTabs([...designTabs, newTab])
     setActiveTabId(newId)
+    
+    // Start camera for new tab since it has no image
+    setTimeout(() => {
+      startCamera()
+    }, 100)
   }
   
   // Remove tab
@@ -200,7 +220,7 @@ export default function CapturePage() {
   }
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  // Check for user session and existing image on mount
+  // Check for user session and existing tabs on mount
   useEffect(() => {
     const initializePage = async () => {
       // Ensure user data is in localStorage
@@ -226,68 +246,31 @@ export default function CapturePage() {
         }
       }
 
-      // Check for existing image
-      const existingImage = localStorage.getItem("currentEditingImage")
-      if (existingImage) {
-        // User already has an image, go straight to design page
-        setCapturedImage(existingImage)
-        
-        // Restore session state
-        const savedPreviews = localStorage.getItem("captureSession_finalPreviews")
-        const savedPreview = localStorage.getItem("captureSession_finalPreview")
-        const savedSettings = localStorage.getItem("captureSession_designSettings")
-        const savedPrompt = localStorage.getItem("captureSession_aiPrompt")
-        const savedDesignImages = localStorage.getItem("captureSession_selectedDesignImages")
-        const savedDrawingImage = localStorage.getItem("captureSession_drawingImageUrl")
-        
-        if (savedPreviews) {
-          try {
-            const previews = JSON.parse(savedPreviews)
-            setFinalPreviews(previews)
-            console.log('Restored finalPreviews from session:', previews)
-          } catch (e) {
-            console.error('Error parsing saved previews:', e)
+      // Check for existing tabs
+      const savedTabs = localStorage.getItem("captureSession_designTabs")
+      const savedActiveTabId = localStorage.getItem("captureSession_activeTabId")
+      
+      if (savedTabs) {
+        try {
+          const tabs = JSON.parse(savedTabs)
+          // Check if any tab has content (original image or generated designs)
+          const hasContent = tabs.some((tab: DesignTab) => tab.originalImage || tab.finalPreviews.length > 0)
+          
+          if (hasContent) {
+            setDesignTabs(tabs)
+            if (savedActiveTabId) {
+              setActiveTabId(savedActiveTabId)
+            }
+            console.log('Restored design tabs from session:', tabs)
+            return // Don't start camera if we have existing content
           }
+        } catch (e) {
+          console.error('Error parsing saved tabs:', e)
         }
-        
-        if (savedPreview) {
-          setFinalPreview(savedPreview)
-          console.log('Restored finalPreview from session')
-        }
-        
-        if (savedSettings) {
-          try {
-            const settings = JSON.parse(savedSettings)
-            setDesignSettings(settings)
-            console.log('Restored design settings from session')
-          } catch (e) {
-            console.error('Error parsing saved settings:', e)
-          }
-        }
-        
-        if (savedPrompt) {
-          setAiPrompt(savedPrompt)
-          console.log('Restored AI prompt from session')
-        }
-        
-        if (savedDesignImages) {
-          try {
-            const images = JSON.parse(savedDesignImages)
-            setSelectedDesignImages(images)
-            console.log('Restored selected design images from session')
-          } catch (e) {
-            console.error('Error parsing saved design images:', e)
-          }
-        }
-        
-        if (savedDrawingImage) {
-          setDrawingImageUrl(savedDrawingImage)
-          console.log('Restored drawing image from session')
-        }
-      } else {
-        // No existing image, start camera
-        startCamera()
       }
+      
+      // No existing tabs with content, start camera
+      startCamera()
     }
 
     initializePage()
@@ -297,60 +280,19 @@ export default function CapturePage() {
       if (zoomIndicatorTimeoutRef.current) {
         clearTimeout(zoomIndicatorTimeoutRef.current)
       }
-      // Clear session state when component unmounts (user navigates away)
-      localStorage.removeItem("captureSession_finalPreviews")
-      localStorage.removeItem("captureSession_finalPreview")
-      localStorage.removeItem("captureSession_designSettings")
-      localStorage.removeItem("captureSession_aiPrompt")
-      localStorage.removeItem("captureSession_selectedDesignImages")
-      localStorage.removeItem("captureSession_drawingImageUrl")
-      console.log('Cleared capture session state on unmount')
     }
   }, [])
 
-  // Save session state whenever finalPreviews changes
+  // Save design tabs whenever they change
   useEffect(() => {
-    if (finalPreviews.length > 0) {
-      localStorage.setItem("captureSession_finalPreviews", JSON.stringify(finalPreviews))
-      console.log('Saved finalPreviews to session')
-    }
-  }, [finalPreviews])
+    localStorage.setItem("captureSession_designTabs", JSON.stringify(designTabs))
+    console.log('Saved design tabs to session')
+  }, [designTabs])
 
-  // Save session state whenever finalPreview changes
+  // Save active tab ID whenever it changes
   useEffect(() => {
-    if (finalPreview) {
-      localStorage.setItem("captureSession_finalPreview", finalPreview)
-      console.log('Saved finalPreview to session')
-    }
-  }, [finalPreview])
-
-  // Save design settings whenever they change
-  useEffect(() => {
-    if (capturedImage) {
-      localStorage.setItem("captureSession_designSettings", JSON.stringify(designSettings))
-    }
-  }, [designSettings, capturedImage])
-
-  // Save AI prompt whenever it changes
-  useEffect(() => {
-    if (aiPrompt && capturedImage) {
-      localStorage.setItem("captureSession_aiPrompt", aiPrompt)
-    }
-  }, [aiPrompt, capturedImage])
-
-  // Save selected design images whenever they change
-  useEffect(() => {
-    if (selectedDesignImages.length > 0 && capturedImage) {
-      localStorage.setItem("captureSession_selectedDesignImages", JSON.stringify(selectedDesignImages))
-    }
-  }, [selectedDesignImages, capturedImage])
-
-  // Save drawing image whenever it changes
-  useEffect(() => {
-    if (drawingImageUrl && capturedImage) {
-      localStorage.setItem("captureSession_drawingImageUrl", drawingImageUrl)
-    }
-  }, [drawingImageUrl, capturedImage])
+    localStorage.setItem("captureSession_activeTabId", activeTabId)
+  }, [activeTabId])
 
   const startCamera = async () => {
     try {
@@ -874,6 +816,11 @@ export default function CapturePage() {
           description: 'Redirecting to your collection...',
           duration: 2000,
         })
+        
+        // Clear session data after successful save
+        localStorage.removeItem("captureSession_designTabs")
+        localStorage.removeItem("captureSession_activeTabId")
+        
         // Small delay to show the success message, then redirect
         setTimeout(() => {
           // Redirect based on user type
@@ -889,6 +836,11 @@ export default function CapturePage() {
         toast.success(`${successCount} of ${images.length} designs saved`, {
           description: 'Redirecting to your collection...',
         })
+        
+        // Clear session data after partial save
+        localStorage.removeItem("captureSession_designTabs")
+        localStorage.removeItem("captureSession_activeTabId")
+        
         setTimeout(() => {
           // Redirect based on user type
           if (user.userType === 'tech') {
@@ -935,6 +887,20 @@ export default function CapturePage() {
   }
 
   const changePhoto = () => {
+    // Clear the current tab's data
+    setDesignTabs(tabs => tabs.map(tab => 
+      tab.id === activeTabId 
+        ? {
+            ...tab,
+            originalImage: null,
+            finalPreviews: [],
+            selectedDesignImages: [],
+            drawingImageUrl: null
+          }
+        : tab
+    ))
+    
+    // Clear current state
     setCapturedImage(null)
     setFinalPreview(null)
     setFinalPreviews([])
@@ -942,6 +908,8 @@ export default function CapturePage() {
     setGeneratedDesigns([])
     setDesignMode(null)
     setDrawingImageUrl(null)
+    
+    // Start camera for new photo
     startCamera()
   }
 
