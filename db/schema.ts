@@ -295,6 +295,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   aiGenerations: many(aiGenerations),
   referralsMade: many(referrals, { relationName: 'referrer' }),
   creditTransactions: many(creditTransactions),
+  sessions: many(sessions),
   referrer: one(users, {
     fields: [users.referredBy],
     references: [users.id],
@@ -421,6 +422,13 @@ export const blockedUsersRelations = relations(blockedUsers, ({ one }) => ({
   }),
   blocked: one(users, {
     fields: [blockedUsers.blockedId],
+    references: [users.id],
+  }),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
     references: [users.id],
   }),
 }));
