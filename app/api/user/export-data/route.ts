@@ -48,10 +48,19 @@ export async function GET() {
       : [];
     const userTransactions = await db.select().from(creditTransactions).where(eq(creditTransactions.userId, userId));
     const userReferrals = await db.select().from(referrals).where(eq(referrals.referrerId, userId));
-    const userBookingsAsClient = await db.select().from(bookings).where(eq(bookings.clientId, userId));
-    const userBookingsAsTech = techProfile
-      ? await db.select().from(bookings).where(eq(bookings.techProfileId, techProfile.id))
-      : [];
+    
+    // Fetch bookings (may not exist if migration hasn't been run)
+    let userBookingsAsClient: any[] = [];
+    let userBookingsAsTech: any[] = [];
+    try {
+      userBookingsAsClient = await db.select().from(bookings).where(eq(bookings.clientId, userId));
+      userBookingsAsTech = techProfile
+        ? await db.select().from(bookings).where(eq(bookings.techProfileId, techProfile.id))
+        : [];
+    } catch (error) {
+      // Bookings table doesn't exist yet - skip it
+      console.log('Bookings table not found, skipping bookings data');
+    }
 
     // Compile all data
     const exportData = {
