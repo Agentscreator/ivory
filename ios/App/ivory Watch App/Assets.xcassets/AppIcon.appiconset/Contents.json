@@ -17,22 +17,6 @@
       "subtype" : "42mm"
     },
     {
-      "filename" : "watch-icon-40mm@2x.png",
-      "idiom" : "watch",
-      "role" : "notificationCenter",
-      "scale" : "2x",
-      "size" : "29x29",
-      "subtype" : "40mm"
-    },
-    {
-      "filename" : "watch-icon-44mm@2x.png",
-      "idiom" : "watch",
-      "role" : "notificationCenter",
-      "scale" : "2x",
-      "size" : "33x33",
-      "subtype" : "44mm"
-    },
-    {
       "filename" : "watch-icon-38mm-companion@2x.png",
       "idiom" : "watch",
       "role" : "companionSettings",
@@ -45,6 +29,14 @@
       "role" : "companionSettings",
       "scale" : "3x",
       "size" : "29x29"
+    },
+    {
+      "filename" : "20251211_1016_Creative App Icon_remix_01kc6zp918e7ytfzdgxr7kwfqq 1.jpg",
+      "idiom" : "watch",
+      "role" : "notificationCenter",
+      "scale" : "2x",
+      "size" : "33x33",
+      "subtype" : "45mm"
     },
     {
       "filename" : "watch-icon-38mm-home@2x.png",
