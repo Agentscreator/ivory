@@ -1,12 +1,48 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { BottomNav } from "@/components/bottom-nav"
-import { ArrowLeft, ExternalLink } from "lucide-react"
+import { ArrowLeft, ExternalLink, Download, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 export default function PrivacyPage() {
   const router = useRouter()
+  const [downloading, setDownloading] = useState(false)
+
+  const handleDownloadData = async () => {
+    try {
+      setDownloading(true)
+      const response = await fetch('/api/user/export-data')
+      
+      if (!response.ok) {
+        throw new Error('Failed to download data')
+      }
+
+      // Get the blob from response
+      const blob = await response.blob()
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `ivory-data-export-${Date.now()}.json`
+      document.body.appendChild(a)
+      a.click()
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      toast.success('Your data has been downloaded successfully')
+    } catch (error) {
+      console.error('Error downloading data:', error)
+      toast.error('Failed to download data. Please try again.')
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -72,14 +108,16 @@ export default function PrivacyPage() {
           <h3 className="font-serif text-xl font-light text-[#1A1A1A] tracking-tight mb-6">Data Management</h3>
           <div className="space-y-3">
             <button
-              onClick={() => {
-                // TODO: Implement data export
-                alert("Data export feature coming soon")
-              }}
-              className="w-full h-12 border border-[#E8E8E8] text-[#1A1A1A] font-light text-sm tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-between px-4"
+              onClick={handleDownloadData}
+              disabled={downloading}
+              className="w-full h-12 border border-[#E8E8E8] text-[#1A1A1A] font-light text-sm tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-between px-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>Download My Data</span>
-              <ExternalLink className="w-4 h-4" strokeWidth={1} />
+              <span>{downloading ? 'Preparing Download...' : 'Download My Data'}</span>
+              {downloading ? (
+                <Loader2 className="w-4 h-4 animate-spin" strokeWidth={1} />
+              ) : (
+                <Download className="w-4 h-4" strokeWidth={1} />
+              )}
             </button>
             
             <button
