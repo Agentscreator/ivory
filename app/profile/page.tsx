@@ -369,6 +369,31 @@ export default function ProfilePage() {
           )}
         </div>
 
+        {/* Tech Profile Setup for Tech Users */}
+        {userType === "tech" && (
+          <div
+            className="border border-[#E8E8E8] p-5 sm:p-6 bg-white cursor-pointer hover:border-[#8B7355] active:scale-[0.98] transition-all duration-300 mb-5 sm:mb-6"
+            onClick={() => router.push("/tech/profile-setup")}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 border border-[#E8E8E8] bg-[#F8F7F5] flex items-center justify-center flex-shrink-0">
+                <Settings className="w-6 h-6 text-[#1A1A1A]" strokeWidth={1} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-serif font-light text-base sm:text-lg text-[#1A1A1A] tracking-tight mb-1">
+                  Tech Profile Setup
+                </div>
+                <div className="text-xs text-[#6B6B6B] font-light tracking-wider uppercase">
+                  Services, Prices & Gallery
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-[#6B6B6B] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        )}
+
         {/* Portfolio Gallery for Tech Users */}
         {userType === "tech" && (
           <div className="border border-[#E8E8E8] p-6 sm:p-8 mb-5 sm:mb-6 bg-white">
@@ -446,34 +471,7 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* Menu Options */}
-        <div className="space-y-3 mb-5 sm:mb-6">
-          {userType === "tech" && (
-            <div
-              className="border border-[#E8E8E8] p-5 sm:p-6 bg-white cursor-pointer hover:border-[#8B7355] active:scale-[0.98] transition-all duration-300"
-              onClick={() => router.push("/tech/profile-setup")}
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 border border-[#E8E8E8] bg-[#F8F7F5] flex items-center justify-center flex-shrink-0">
-                  <Settings className="w-6 h-6 text-[#1A1A1A]" strokeWidth={1} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-serif font-light text-base sm:text-lg text-[#1A1A1A] tracking-tight mb-1">
-                    Tech Profile Setup
-                  </div>
-                  <div className="text-xs text-[#6B6B6B] font-light tracking-wider uppercase">
-                    Services, Prices & Gallery
-                  </div>
-                </div>
-                <svg className="w-5 h-5 text-[#6B6B6B] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          )}
 
-
-        </div>
 
         {/* Logout */}
         <button
