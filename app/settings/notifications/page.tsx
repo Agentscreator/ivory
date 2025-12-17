@@ -46,13 +46,15 @@ export default function NotificationsPage() {
               </div>
               <button
                 onClick={() => setEmailNotifications(!emailNotifications)}
-                className={`relative inline-flex h-6 w-11 items-center transition-colors ${
-                  emailNotifications ? "bg-[#8B7355]" : "bg-[#E8E8E8]"
+                className={`relative inline-flex h-7 w-12 items-center border transition-all duration-300 ${
+                  emailNotifications 
+                    ? "bg-[#8B7355] border-[#8B7355]" 
+                    : "bg-white border-[#E8E8E8]"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform bg-white transition-transform ${
-                    emailNotifications ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-5 w-5 border border-[#E8E8E8] bg-white transition-all duration-300 ${
+                    emailNotifications ? "translate-x-6" : "translate-x-0.5"
                   }`}
                 />
               </button>
@@ -65,13 +67,15 @@ export default function NotificationsPage() {
               </div>
               <button
                 onClick={() => setPushNotifications(!pushNotifications)}
-                className={`relative inline-flex h-6 w-11 items-center transition-colors ${
-                  pushNotifications ? "bg-[#8B7355]" : "bg-[#E8E8E8]"
+                className={`relative inline-flex h-7 w-12 items-center border transition-all duration-300 ${
+                  pushNotifications 
+                    ? "bg-[#8B7355] border-[#8B7355]" 
+                    : "bg-white border-[#E8E8E8]"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform bg-white transition-transform ${
-                    pushNotifications ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-5 w-5 border border-[#E8E8E8] bg-white transition-all duration-300 ${
+                    pushNotifications ? "translate-x-6" : "translate-x-0.5"
                   }`}
                 />
               </button>
@@ -90,13 +94,15 @@ export default function NotificationsPage() {
               </div>
               <button
                 onClick={() => setDesignRequests(!designRequests)}
-                className={`relative inline-flex h-6 w-11 items-center transition-colors ${
-                  designRequests ? "bg-[#8B7355]" : "bg-[#E8E8E8]"
+                className={`relative inline-flex h-7 w-12 items-center border transition-all duration-300 ${
+                  designRequests 
+                    ? "bg-[#8B7355] border-[#8B7355]" 
+                    : "bg-white border-[#E8E8E8]"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform bg-white transition-transform ${
-                    designRequests ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-5 w-5 border border-[#E8E8E8] bg-white transition-all duration-300 ${
+                    designRequests ? "translate-x-6" : "translate-x-0.5"
                   }`}
                 />
               </button>
@@ -109,13 +115,15 @@ export default function NotificationsPage() {
               </div>
               <button
                 onClick={() => setMessages(!messages)}
-                className={`relative inline-flex h-6 w-11 items-center transition-colors ${
-                  messages ? "bg-[#8B7355]" : "bg-[#E8E8E8]"
+                className={`relative inline-flex h-7 w-12 items-center border transition-all duration-300 ${
+                  messages 
+                    ? "bg-[#8B7355] border-[#8B7355]" 
+                    : "bg-white border-[#E8E8E8]"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform bg-white transition-transform ${
-                    messages ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-5 w-5 border border-[#E8E8E8] bg-white transition-all duration-300 ${
+                    messages ? "translate-x-6" : "translate-x-0.5"
                   }`}
                 />
               </button>
@@ -128,13 +136,15 @@ export default function NotificationsPage() {
               </div>
               <button
                 onClick={() => setMarketing(!marketing)}
-                className={`relative inline-flex h-6 w-11 items-center transition-colors ${
-                  marketing ? "bg-[#8B7355]" : "bg-[#E8E8E8]"
+                className={`relative inline-flex h-7 w-12 items-center border transition-all duration-300 ${
+                  marketing 
+                    ? "bg-[#8B7355] border-[#8B7355]" 
+                    : "bg-white border-[#E8E8E8]"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform bg-white transition-transform ${
-                    marketing ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-5 w-5 border border-[#E8E8E8] bg-white transition-all duration-300 ${
+                    marketing ? "translate-x-6" : "translate-x-0.5"
                   }`}
                 />
               </button>
