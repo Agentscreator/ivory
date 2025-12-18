@@ -258,7 +258,13 @@ export default function CapturePage() {
               setActiveTabId(savedActiveTabId)
             }
             console.log('Restored design tabs from session:', tabs)
-            // Don't auto-start camera - let user tap to take photo
+            
+            // Find the active tab and check if it needs camera
+            const activeTabToRestore = tabs.find((t: DesignTab) => t.id === savedActiveTabId) || tabs[0]
+            // Only start camera if the active tab has no content (no image AND no designs)
+            if (!activeTabToRestore.originalImage && activeTabToRestore.finalPreviews.length === 0) {
+              setTimeout(() => startCamera(), 100)
+            }
             return
           }
         } catch (e) {
@@ -266,7 +272,8 @@ export default function CapturePage() {
         }
       }
       
-      // No existing tabs with content - don't auto-start camera, show placeholder
+      // No existing tabs with content - auto-start camera
+      startCamera()
     }
 
     initializePage()
@@ -1694,9 +1701,6 @@ export default function CapturePage() {
     )
   }
 
-  // Check if camera is active
-  const isCameraActive = streamRef.current !== null
-
   return (
     <div className="fixed inset-0 z-[100] bg-black">
       <div
@@ -1705,29 +1709,6 @@ export default function CapturePage() {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {!isCameraActive && (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A1A] to-[#2D2D2D] flex items-center justify-center">
-            <button
-              onClick={startCamera}
-              className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all active:scale-95"
-            >
-              <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                  />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <div className="text-center">
-                <p className="text-white text-lg font-medium mb-1">Tap to Take Photo</p>
-                <p className="text-white/60 text-sm">or upload from gallery</p>
-              </div>
-            </button>
-          </div>
-        )}
         <video
           ref={videoRef}
           autoPlay
@@ -1739,34 +1720,31 @@ export default function CapturePage() {
             filter: 'brightness(1.08) contrast(1.08) saturate(1.15)',
             opacity: isFlipping ? 0 : 1,
             transition: 'transform 0.15s ease-out, opacity 0.2s ease-out',
-            display: isCameraActive ? 'block' : 'none',
           }}
         />
 
-        {/* Hand Reference Overlay - only show when camera is active */}
-        {isCameraActive && (
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-[5] overflow-visible">
-            <style jsx>{`
-              @keyframes blink-outline {
-                0%, 100% { opacity: 0.5; }
-                50% { opacity: 0.9; }
-              }
-              .hand-outline {
-                animation: blink-outline 2s ease-in-out infinite;
-              }
-            `}</style>
-            <img
-              src={`/ref${handReference}.png`}
-              alt="Hand reference"
-              className="hand-outline w-full h-full object-contain"
-              style={{
-                transform: `scale(${handReference === 1 ? 1.8 : handReference === 3 ? 2.03 : 2.9})`,
-                mixBlendMode: 'screen',
-                filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) brightness(1.2)',
-              }}
-            />
-          </div>
-        )}
+        {/* Hand Reference Overlay */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-[5] overflow-visible">
+          <style jsx>{`
+            @keyframes blink-outline {
+              0%, 100% { opacity: 0.5; }
+              50% { opacity: 0.9; }
+            }
+            .hand-outline {
+              animation: blink-outline 2s ease-in-out infinite;
+            }
+          `}</style>
+          <img
+            src={`/ref${handReference}.png`}
+            alt="Hand reference"
+            className="hand-outline w-full h-full object-contain"
+            style={{
+              transform: `scale(${handReference === 1 ? 1.8 : handReference === 3 ? 2.03 : 2.9})`,
+              mixBlendMode: 'screen',
+              filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) brightness(1.2)',
+            }}
+          />
+        </div>
 
         {isFlipping && (
           <div className="absolute inset-0 bg-black flex items-center justify-center">
@@ -1804,36 +1782,34 @@ export default function CapturePage() {
           </div>
         )}
 
-        {/* Right Side Controls - only show when camera is active */}
-        {isCameraActive && (
-          <div className="absolute right-5 top-1/2 transform -translate-y-1/2 z-10 flex flex-col gap-3">
-            {/* Flip Camera Button */}
-            <button
-              onClick={flipCamera}
-              disabled={isFlipping}
-              className={`w-14 h-14 rounded-2xl backdrop-blur-md flex flex-col items-center justify-center transition-all duration-200 active:scale-95 ${
-                facingMode === "environment"
-                  ? "bg-white/95 text-gray-900 shadow-xl"
-                  : "bg-black/40 hover:bg-black/50 text-white shadow-lg"
-              } ${isFlipping ? "opacity-50" : ""}`}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </button>
+        {/* Right Side Controls */}
+        <div className="absolute right-5 top-1/2 transform -translate-y-1/2 z-10 flex flex-col gap-3">
+          {/* Flip Camera Button */}
+          <button
+            onClick={flipCamera}
+            disabled={isFlipping}
+            className={`w-14 h-14 rounded-2xl backdrop-blur-md flex flex-col items-center justify-center transition-all duration-200 active:scale-95 ${
+              facingMode === "environment"
+                ? "bg-white/95 text-gray-900 shadow-xl"
+                : "bg-black/40 hover:bg-black/50 text-white shadow-lg"
+            } ${isFlipping ? "opacity-50" : ""}`}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
 
-            {/* Hand Reference Toggle */}
-            <button
-              onClick={() => setHandReference(handReference === 3 ? 2 : handReference === 2 ? 1 : 3)}
-              className="w-14 h-14 rounded-2xl bg-black/40 backdrop-blur-md hover:bg-black/50 text-white shadow-lg flex flex-col items-center justify-center transition-all duration-200 active:scale-95"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-              <span className="text-[10px] font-semibold mt-0.5">{handReference}</span>
-            </button>
-          </div>
-        )}
+          {/* Hand Reference Toggle */}
+          <button
+            onClick={() => setHandReference(handReference === 3 ? 2 : handReference === 2 ? 1 : 3)}
+            className="w-14 h-14 rounded-2xl bg-black/40 backdrop-blur-md hover:bg-black/50 text-white shadow-lg flex flex-col items-center justify-center transition-all duration-200 active:scale-95"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <span className="text-[10px] font-semibold mt-0.5">{handReference}</span>
+          </button>
+        </div>
 
         {/* Bottom Controls */}
         <div className="absolute bottom-0 left-0 right-0 pb-10 pt-6 px-6 z-10">
@@ -1851,32 +1827,16 @@ export default function CapturePage() {
               </svg>
             </button>
 
-            {isCameraActive ? (
-              <button
-                onClick={capturePhoto}
-                className="relative w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-2xl"
-                style={{
-                  background: 'linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%)',
-                  border: '4px solid rgba(0, 0, 0, 0.3)'
-                }}
-              >
-                <div className="w-16 h-16 rounded-full bg-white shadow-inner"></div>
-              </button>
-            ) : (
-              <button
-                onClick={startCamera}
-                className="relative w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-2xl bg-white/20 backdrop-blur-md hover:bg-white/30"
-              >
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                  />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </button>
-            )}
+            <button
+              onClick={capturePhoto}
+              className="relative w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-2xl"
+              style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%)',
+                border: '4px solid rgba(0, 0, 0, 0.3)'
+              }}
+            >
+              <div className="w-16 h-16 rounded-full bg-white shadow-inner"></div>
+            </button>
 
             <div className="w-14"></div>
           </div>
