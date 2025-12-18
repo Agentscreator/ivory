@@ -126,14 +126,9 @@
 
 /* Vertical Sidebar Layout for Desktop */
 @media (min-width: 1024px) {
-  /* Add left padding to body when sidebar is visible */
-  body {
-    padding-left: 5rem; /* 80px - width of sidebar */
-  }
-  
-  /* Remove padding from the sidebar itself */
-  .vertical-sidebar {
-    margin-left: -5rem; /* Offset the body padding */
+  /* Add left margin to main content areas to avoid sidebar overlap */
+  body > *:not(.vertical-sidebar):not(nav) {
+    margin-left: 8rem; /* 128px - extra spacing from sidebar */
   }
 }
 
