@@ -248,23 +248,28 @@ function AuthPageContent() {
             }
 
             const data = await response.json();
+            console.log('Apple sign-in successful, user data:', data.user);
             localStorage.setItem("ivoryUser", JSON.stringify(data.user));
 
             // Check if there's a return URL stored
             const returnUrl = localStorage.getItem('returnUrl');
             if (returnUrl) {
               localStorage.removeItem('returnUrl');
-              router.push(returnUrl);
+              console.log('Redirecting to return URL:', returnUrl);
+              window.location.href = returnUrl;
               return;
             }
 
-            // Navigate based on user type
+            // Navigate based on user type - use window.location for more reliable navigation
             if (data.user.userType === 'tech') {
-              router.push('/tech/dashboard');
+              console.log('Redirecting to tech dashboard');
+              window.location.href = '/tech/dashboard';
             } else if (data.user.userType === 'client') {
-              router.push('/home');
+              console.log('Redirecting to home');
+              window.location.href = '/home';
             } else {
-              router.push('/user-type');
+              console.log('Redirecting to user type selection');
+              window.location.href = '/user-type';
             }
           } else {
             alert(result.error || 'Failed to sign in with Apple');
