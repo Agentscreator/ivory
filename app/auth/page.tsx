@@ -319,18 +319,23 @@ function AuthPageContent() {
             <h1 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A] mb-2 tracking-tight">
               IVORY'S CHOICE
             </h1>
-            <p className="text-xs sm:text-sm tracking-wider uppercase text-[#6B6B6B] font-light mb-3">
+            <p className="text-xs sm:text-sm tracking-wider uppercase text-[#6B6B6B] font-light mb-4">
               {referralCode ? "Exclusive Invitation" : isSignUp ? "Begin Your Journey" : "Welcome Back"}
             </p>
             
-            {/* Account Toggle - More Prominent */}
-            <button 
-              type="button" 
-              onClick={() => setIsSignUp(!isSignUp)} 
-              className="text-sm sm:text-base text-[#1A1A1A] hover:text-[#8B7355] transition-colors duration-300 font-normal underline decoration-[#8B7355] decoration-2 underline-offset-4 touch-manipulation"
-            >
-              {isSignUp ? "Already have an account? Sign in" : "New to Ivory's Choice? Create account"}
-            </button>
+            {/* Account Toggle - Elegant & Aesthetic */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 border border-[#E8E8E8] bg-[#FAFAF8] rounded-sm">
+              <span className="text-xs tracking-wide text-[#6B6B6B] font-light">
+                {isSignUp ? "Already have an account?" : "New to Ivory's Choice?"}
+              </span>
+              <button 
+                type="button" 
+                onClick={() => setIsSignUp(!isSignUp)} 
+                className="text-sm font-normal text-[#8B7355] hover:text-[#1A1A1A] transition-colors duration-300 underline decoration-[#8B7355] decoration-1 underline-offset-2 touch-manipulation"
+              >
+                {isSignUp ? "Sign in" : "Create account"}
+              </button>
+            </div>
             
             {referralCode && (
               <p className="text-xs text-[#8B7355] mt-3 font-light">5 complimentary credits included</p>
