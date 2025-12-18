@@ -124,6 +124,19 @@
   }
 }
 
+/* Vertical Sidebar Layout for Desktop */
+@media (min-width: 1024px) {
+  /* Add left padding to main content when sidebar is visible */
+  body:has(.vertical-sidebar) {
+    padding-left: 5rem; /* 80px - width of sidebar */
+  }
+  
+  /* Ensure main content doesn't overlap with sidebar */
+  main {
+    margin-left: 0;
+  }
+}
+
 /* Apple Watch Optimizations */
 @media (max-width: 272px) {
   /* Apple Watch Series 9/8/7 (45mm): 396x484px */
