@@ -18,9 +18,17 @@ export default function BookingsPage() {
   const [techs, setTechs] = useState<any[]>([]);
   const [myBookings, setMyBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const isWatch = useIsAppleWatch();
 
   useEffect(() => {
+    // Check authentication first
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/auth');
+      return;
+    }
+    setIsAuthenticated(true);
     fetchMyBookings();
 
     // Check for payment success/cancel in URL
@@ -41,9 +49,22 @@ export default function BookingsPage() {
   const fetchMyBookings = async () => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/auth');
+        return;
+      }
+      
       const response = await fetch('/api/bookings', {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      if (response.status === 401) {
+        // Session expired or invalid
+        localStorage.removeItem('token');
+        router.push('/auth');
+        return;
+      }
+      
       const data = await response.json();
       if (response.ok) {
         setMyBookings(data.bookings);
@@ -81,6 +102,18 @@ export default function BookingsPage() {
       default: return 'bg-gray-500';
     }
   };
+
+  // Show loading while checking authentication
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1A1A] mx-auto mb-4"></div>
+          <p className="text-[#6B6B6B]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
