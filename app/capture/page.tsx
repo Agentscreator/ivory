@@ -197,7 +197,10 @@ export default function CapturePage() {
     setDesignTabs([...designTabs, newTab])
     setActiveTabId(newId)
     
-    // Don't auto-start camera - let user tap to take photo
+    // Auto-start camera for new tab
+    setTimeout(() => {
+      startCamera()
+    }, 100)
   }
   
   // Remove tab
