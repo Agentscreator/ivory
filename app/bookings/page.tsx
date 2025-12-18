@@ -19,17 +19,27 @@ export default function BookingsPage() {
   const [myBookings, setMyBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
   const isWatch = useIsAppleWatch();
 
   useEffect(() => {
-    // Check authentication first
-    const token = localStorage.getItem('token');
-    if (!token) {
+    // Check authentication using ivoryUser (consistent with rest of app)
+    const userStr = localStorage.getItem('ivoryUser');
+    if (!userStr) {
       router.push('/auth');
       return;
     }
-    setIsAuthenticated(true);
-    fetchMyBookings();
+    
+    try {
+      const user = JSON.parse(userStr);
+      setUserId(user.id);
+      setIsAuthenticated(true);
+      fetchMyBookings(user.id);
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      router.push('/auth');
+      return;
+    }
 
     // Check for payment success/cancel in URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -46,28 +56,29 @@ export default function BookingsPage() {
     }
   }, []);
 
-  const fetchMyBookings = async () => {
+  const fetchMyBookings = async (userIdParam?: number) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
+      const userStr = localStorage.getItem('ivoryUser');
+      if (!userStr) {
         router.push('/auth');
         return;
       }
       
-      const response = await fetch('/api/bookings', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const user = JSON.parse(userStr);
+      const id = userIdParam || user.id;
+      
+      const response = await fetch(`/api/bookings?userId=${id}`);
       
       if (response.status === 401) {
         // Session expired or invalid
-        localStorage.removeItem('token');
+        localStorage.removeItem('ivoryUser');
         router.push('/auth');
         return;
       }
       
       const data = await response.json();
       if (response.ok) {
-        setMyBookings(data.bookings);
+        setMyBookings(data.bookings || []);
       }
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -335,12 +346,10 @@ export default function BookingsPage() {
                       <Button
                         className="w-full bg-[#1A1A1A] hover:bg-[#8B7355] text-white transition-all"
                         onClick={async () => {
-                          const token = localStorage.getItem('token');
                           const response = await fetch('/api/stripe/create-booking-checkout', {
                             method: 'POST',
                             headers: {
                               'Content-Type': 'application/json',
-                              Authorization: `Bearer ${token}`,
                             },
                             body: JSON.stringify({ bookingId: booking.id }),
                           });
@@ -362,7 +371,7 @@ export default function BookingsPage() {
       </main>
 
       {/* Bottom Navigation */}
-      <BottomNav onCenterAction={() => router.push('/capture')} />
+      <BottomNav onCenterAction={() => router.push('/capture')} centerActionLabel="Create" />
     </div>
   );
 }
