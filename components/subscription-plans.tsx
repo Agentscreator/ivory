@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,18 +8,100 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Loader2, Sparkles, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { SUBSCRIPTION_PLANS } from '@/lib/stripe-config';
+import { iapManager, IAP_PRODUCT_IDS } from '@/lib/iap';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface SubscriptionPlansProps {
   currentTier?: string;
   currentStatus?: string;
+  isNative?: boolean;
 }
 
-export function SubscriptionPlans({ currentTier = 'free', currentStatus = 'inactive' }: SubscriptionPlansProps) {
+export function SubscriptionPlans({ currentTier = 'free', currentStatus = 'inactive', isNative = false }: SubscriptionPlansProps) {
   const [loading, setLoading] = useState<string | null>(null);
+  const [iapProducts, setIapProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isNative) {
+      loadIAPProducts();
+      setupIAPListeners();
+    }
+  }, [isNative]);
+
+  const loadIAPProducts = async () => {
+    try {
+      const products = await iapManager.loadProducts();
+      setIapProducts(products);
+    } catch (error) {
+      console.error('Failed to load IAP products:', error);
+      toast.error('Failed to load subscription options');
+    }
+  };
+
+  const setupIAPListeners = () => {
+    iapManager.onPurchaseComplete(async (result) => {
+      try {
+        // Validate with server
+        const response = await fetch('/api/iap/validate-receipt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            receipt: result.receipt,
+            productId: result.productId,
+            transactionId: result.transactionId,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          toast.success(`Subscription activated! ${data.added} credits added.`);
+          
+          // Finish the transaction
+          await iapManager.finishTransaction(result.transactionId);
+          
+          // Reload page to show new subscription
+          window.location.reload();
+        } else {
+          throw new Error('Validation failed');
+        }
+      } catch (error) {
+        console.error('Purchase validation error:', error);
+        toast.error('Failed to activate subscription. Please contact support.');
+      } finally {
+        setLoading(null);
+      }
+    });
+
+    iapManager.onPurchaseError((error) => {
+      console.error('Purchase error:', error);
+      toast.error(error.errorMessage || 'Purchase failed');
+      setLoading(null);
+    });
+  };
+
+  const handleSubscribeIAP = async (planId: string) => {
+    try {
+      setLoading(planId);
+      
+      // Map plan ID to IAP product ID
+      const productId = planId === 'pro' 
+        ? IAP_PRODUCT_IDS.PRO_MONTHLY 
+        : IAP_PRODUCT_IDS.BUSINESS_MONTHLY;
+
+      await iapManager.purchase(productId);
+      // Loading state will be cleared by purchase listener
+    } catch (error) {
+      console.error('IAP purchase error:', error);
+      toast.error('Failed to start purchase');
+      setLoading(null);
+    }
+  };
 
   const handleSubscribe = async (planId: string) => {
+    if (isNative) {
+      return handleSubscribeIAP(planId);
+    }
     try {
       setLoading(planId);
 

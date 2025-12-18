@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Capacitor } from '@capacitor/core';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BuyCreditsDialog } from '@/components/buy-credits-dialog';
 import { SubscriptionPlans } from '@/components/subscription-plans';
-import { ArrowLeft, Coins, CreditCard, History, Sparkles, Crown } from 'lucide-react';
+import { ArrowLeft, Coins, CreditCard, History, Sparkles, Crown, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { CREDIT_PACKAGES } from '@/lib/stripe-config';
 import { toast } from 'sonner';
@@ -28,6 +29,7 @@ export default function BillingPage() {
   const [subscriptionTier, setSubscriptionTier] = useState('free');
   const [subscriptionStatus, setSubscriptionStatus] = useState('inactive');
   const [credits, setCredits] = useState<number | null>(null);
+  const isNative = Capacitor.isNativePlatform();
 
   useEffect(() => {
     // Check for Stripe redirect parameters
@@ -152,6 +154,35 @@ export default function BillingPage() {
           </div>
         </div>
 
+        {/* Platform Notice for iOS */}
+        {isNative && (
+          <div className="border border-[#8B7355] p-6 sm:p-8 bg-[#F8F7F5]">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 border border-[#8B7355] flex items-center justify-center flex-shrink-0 bg-white">
+                <Crown className="w-6 h-6 text-[#8B7355]" strokeWidth={1} />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] mb-2 tracking-tight">
+                  iOS In-App Purchase
+                </h3>
+                <p className="text-sm sm:text-base text-[#6B6B6B] leading-relaxed font-light mb-4">
+                  Subscriptions and credits are purchased through Apple's secure payment system. Manage your subscriptions in iOS Settings.
+                </p>
+                <button
+                  onClick={() => {
+                    // Open iOS subscription management
+                    window.open('https://apps.apple.com/account/subscriptions', '_blank');
+                  }}
+                  className="flex items-center gap-2 text-sm text-[#8B7355] hover:text-[#1A1A1A] transition-colors font-light"
+                >
+                  <span>Manage Subscriptions</span>
+                  <ExternalLink className="w-4 h-4" strokeWidth={1} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Subscriptions Section */}
         <div id="subscriptions">
           <div className="mb-6">
@@ -162,6 +193,7 @@ export default function BillingPage() {
           <SubscriptionPlans 
             currentTier={subscriptionTier}
             currentStatus={subscriptionStatus}
+            isNative={isNative}
           />
           
           {/* Message for Basic users */}
