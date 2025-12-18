@@ -243,7 +243,11 @@ export default function TechDashboardPage() {
             {requests
               .filter((req) => req.status === "pending")
               .map((request) => (
-                <Card key={request.id} className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm">
+                <Card 
+                  key={request.id} 
+                  className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm cursor-pointer"
+                  onClick={() => router.push(`/tech/request/${request.id}`)}
+                >
                   <CardContent className="p-0">
                     <div className="flex gap-0 flex-col sm:flex-row">
                       {/* Design Image */}
@@ -292,7 +296,10 @@ export default function TechDashboardPage() {
                         <div className="flex gap-2.5 flex-wrap">
                           <Button 
                             size="sm" 
-                            onClick={() => handleApprove(request.id)} 
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleApprove(request.id)
+                            }} 
                             className="h-10 sm:h-11 px-5 text-sm font-medium bg-gradient-to-r from-terracotta to-rose hover:from-terracotta/90 hover:to-rose/90 shadow-md hover:shadow-lg active:scale-95 transition-all duration-200"
                           >
                             <Check className="w-4 h-4 mr-2" />
@@ -301,7 +308,10 @@ export default function TechDashboardPage() {
                           <Button 
                             size="sm" 
                             variant="outline" 
-                            onClick={() => handleRequestModification(request.id)} 
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleRequestModification(request.id)
+                            }} 
                             className="h-10 sm:h-11 px-4 sm:px-5 text-sm font-medium border-2 hover:bg-muted/50 active:scale-95 transition-all duration-200"
                           >
                             <MessageCircle className="w-4 h-4 mr-2" />
@@ -311,6 +321,7 @@ export default function TechDashboardPage() {
                           <Button 
                             size="sm" 
                             variant="outline" 
+                            onClick={(e) => e.stopPropagation()}
                             className="h-10 sm:h-11 px-4 sm:px-5 text-sm font-medium border-2 hover:bg-muted/50 active:scale-95 transition-all duration-200"
                           >
                             <DollarSign className="w-4 h-4 mr-2" />
