@@ -19,6 +19,7 @@ export async function GET(
         originalImageUrl: looks.originalImageUrl,
         aiPrompt: looks.aiPrompt,
         nailPositions: looks.nailPositions,
+        designMetadata: looks.designMetadata,
         isPublic: looks.isPublic,
         viewCount: looks.viewCount,
         createdAt: looks.createdAt,

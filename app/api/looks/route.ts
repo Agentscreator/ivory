@@ -92,7 +92,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, title, imageUrl, originalImageUrl, aiPrompt, nailPositions, isPublic } = body;
+    const { userId, title, imageUrl, originalImageUrl, aiPrompt, nailPositions, designMetadata, isPublic } = body;
 
     if (!userId || !title || !imageUrl) {
       return NextResponse.json(
@@ -110,6 +110,7 @@ export async function POST(request: Request) {
         originalImageUrl,
         aiPrompt,
         nailPositions,
+        designMetadata, // Store all capture page settings for remix/edit
         isPublic: isPublic || false,
       })
       .returning();

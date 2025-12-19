@@ -242,6 +242,64 @@ export default function CapturePage() {
         }
       }
 
+      // Check for loaded design metadata (from edit/remix)
+      const loadedMetadata = localStorage.getItem("loadedDesignMetadata")
+      const loadedEditingImage = localStorage.getItem("currentEditingImage")
+      const loadedPreview = localStorage.getItem("generatedPreview")
+      const isRemix = localStorage.getItem("isRemix") === "true"
+      
+      if (loadedMetadata && loadedEditingImage) {
+        try {
+          const metadata = JSON.parse(loadedMetadata)
+          console.log('Loading design metadata for edit/remix:', metadata)
+          
+          // Create a new tab with the loaded design
+          const newTab: DesignTab = {
+            id: '1',
+            name: isRemix ? 'Remix' : 'Edit',
+            finalPreviews: loadedPreview ? [loadedPreview] : [],
+            designSettings: metadata.designSettings || designSettings,
+            selectedDesignImages: metadata.selectedDesignImages || [],
+            drawingImageUrl: metadata.drawingImageUrl || null,
+            aiPrompt: metadata.aiPrompt || '',
+            originalImage: loadedEditingImage
+          }
+          
+          setDesignTabs([newTab])
+          setActiveTabId('1')
+          setCapturedImage(loadedEditingImage)
+          setDesignSettings(metadata.designSettings || designSettings)
+          setSelectedDesignImages(metadata.selectedDesignImages || [])
+          setDrawingImageUrl(metadata.drawingImageUrl || null)
+          setAiPrompt(metadata.aiPrompt || '')
+          setFinalPreviews(loadedPreview ? [loadedPreview] : [])
+          
+          if (metadata.influenceWeights) {
+            setInfluenceWeights(metadata.influenceWeights)
+          }
+          if (metadata.handReference) {
+            setHandReference(metadata.handReference)
+          }
+          if (metadata.designMode) {
+            setDesignMode(metadata.designMode)
+          }
+          if (metadata.colorLightness !== undefined) {
+            setColorLightness(metadata.colorLightness)
+          }
+          
+          // Clear the loaded metadata
+          localStorage.removeItem("loadedDesignMetadata")
+          localStorage.removeItem("currentEditingImage")
+          localStorage.removeItem("generatedPreview")
+          localStorage.removeItem("isRemix")
+          
+          toast.success(isRemix ? 'Design loaded for remix!' : 'Design loaded for editing!')
+          return
+        } catch (e) {
+          console.error('Error loading design metadata:', e)
+        }
+      }
+      
       // Check for existing tabs
       const savedTabs = localStorage.getItem("captureSession_designTabs")
       const savedActiveTabId = localStorage.getItem("captureSession_activeTabId")
@@ -784,6 +842,18 @@ export default function CapturePage() {
       
       // Save all designs
       const savePromises = images.map((imageUrl, index) => {
+        // Create comprehensive metadata for remix/edit functionality
+        const designMetadata = {
+          designSettings,
+          selectedDesignImages,
+          drawingImageUrl,
+          aiPrompt: aiPrompt || null,
+          influenceWeights,
+          handReference,
+          designMode,
+          colorLightness,
+        }
+        
         const payload = {
           userId: user.id,
           title: `Design ${new Date().toLocaleDateString()}${images.length > 1 ? ` (${index + 1})` : ''}`,
@@ -791,6 +861,7 @@ export default function CapturePage() {
           originalImageUrl: capturedImage,
           designSettings,
           aiPrompt: aiPrompt || null,
+          designMetadata, // Store all settings for remix/edit
           isPublic: false,
         }
         

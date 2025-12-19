@@ -141,6 +141,7 @@ export const looks = pgTable('looks', {
   originalImageUrl: text('original_image_url'), // original hand photo
   aiPrompt: text('ai_prompt'), // AI generation prompt if used
   nailPositions: jsonb('nail_positions'), // coordinates and colors for each nail
+  designMetadata: jsonb('design_metadata'), // All capture page settings for remix/edit
   isPublic: boolean('is_public').default(false),
   shareToken: varchar('share_token', { length: 100 }).unique(),
   allowCollaborativeEdit: boolean('allow_collaborative_edit').default(false),

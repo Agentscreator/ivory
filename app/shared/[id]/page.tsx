@@ -16,6 +16,7 @@ type Look = {
   originalImageUrl: string | null
   userId: number
   createdAt: string
+  designMetadata?: any
   user?: {
     username: string
   }
@@ -90,10 +91,17 @@ export default function SharedDesignPage() {
       return
     }
 
-    // Store the design in localStorage for editing
+    // Store the design in localStorage for editing with all metadata
     if (look) {
       localStorage.setItem("currentEditingImage", look.originalImageUrl || look.imageUrl)
       localStorage.setItem("generatedPreview", look.imageUrl)
+      
+      // Store all design metadata if available
+      if (look.designMetadata) {
+        localStorage.setItem("loadedDesignMetadata", JSON.stringify(look.designMetadata))
+      }
+      
+      toast.success('Loading design for editing!')
     }
     router.push("/capture")
   }
@@ -108,12 +116,18 @@ export default function SharedDesignPage() {
       return
     }
 
-    // Store the design for remixing - load it into the editor
+    // Store the design for remixing - load it into the capture page with all settings
     if (look) {
       // Store both the original and generated images so they can remix it
       localStorage.setItem("currentEditingImage", look.originalImageUrl || look.imageUrl)
       localStorage.setItem("generatedPreview", look.imageUrl)
       localStorage.setItem("isRemix", "true") // Flag to indicate this is a remix
+      
+      // Store all design metadata if available
+      if (look.designMetadata) {
+        localStorage.setItem("loadedDesignMetadata", JSON.stringify(look.designMetadata))
+      }
+      
       toast.success('Loading design for remix!')
     }
     router.push("/capture")
