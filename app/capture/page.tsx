@@ -46,7 +46,19 @@ type DesignTab = {
 export default function CapturePage() {
   const router = useRouter()
   const { credits, hasCredits, refresh: refreshCredits } = useCredits()
-  const [capturedImage, setCapturedImage] = useState<string | null>(null)
+  
+  // Check localStorage immediately for loaded design to prevent camera flash
+  const getInitialCapturedImage = () => {
+    if (typeof window === 'undefined') return null
+    const loadedImage = localStorage.getItem("currentEditingImage")
+    if (loadedImage) {
+      console.log('🎯 Found initial captured image in localStorage')
+      return loadedImage
+    }
+    return null
+  }
+  
+  const [capturedImage, setCapturedImage] = useState<string | null>(getInitialCapturedImage())
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment')
   const [isFlipping, setIsFlipping] = useState(false)
   const [zoom, setZoom] = useState(1)
