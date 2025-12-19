@@ -29,7 +29,7 @@ const sampleDesigns = [
   { id: "floral-4", imageUrl: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=600&h=800&fit=crop&q=80&hue=60", title: "Tropical Hibiscus", description: "Exotic island vibes", style: "Floral Art" },
   { id: "floral-5", imageUrl: "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=600&h=800&fit=crop&q=80&hue=90", title: "Lavender Fields", description: "Purple floral elegance", style: "Floral Art" },
   { id: "floral-6", imageUrl: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=800&fit=crop&q=80&hue=120", title: "Daisy Chain", description: "White petals and yellow centers", style: "Floral Art" },
-  { id: "floral-7", imageUrl: "https://images.unsplash.com/photo-1596704017254-9b121068ec31?w=600&h=800&fit=crop&q=80", title: "Botanical Leaves", description: "Green foliage accents", style: "Floral Art" },
+  { id: "floral-7", imageUrl: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&h=800&fit=crop&q=80", title: "Botanical Leaves", description: "Green foliage accents", style: "Floral Art" },
   { id: "floral-8", imageUrl: "https://images.unsplash.com/photo-1598452963314-b09f397a5c48?w=600&h=800&fit=crop&q=80", title: "Watercolor Blooms", description: "Soft painted flowers", style: "Floral Art" },
   { id: "floral-9", imageUrl: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&h=800&fit=crop&q=80&hue=210", title: "Pressed Flowers", description: "Dried flower art", style: "Floral Art" },
   { id: "floral-10", imageUrl: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&h=800&fit=crop&q=80&hue=240", title: "3D Floral", description: "Raised petal details", style: "Floral Art" },
@@ -59,7 +59,7 @@ const sampleDesigns = [
   { id: "min-10", imageUrl: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=800&fit=crop&q=80&sat=-80", title: "Subtle Shimmer", description: "Hint of pearl", style: "Minimalist" },
   
   // Glitter (10 designs)
-  { id: "glitter-1", imageUrl: "https://images.unsplash.com/photo-1596704017254-9b121068ec31?w=600&h=800&fit=crop&q=80", title: "Full Sparkle", description: "All-over glitter", style: "Glitter" },
+  { id: "glitter-1", imageUrl: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=600&h=800&fit=crop&q=80", title: "Full Sparkle", description: "All-over glitter", style: "Glitter" },
   { id: "glitter-2", imageUrl: "https://images.unsplash.com/photo-1598452963314-b09f397a5c48?w=600&h=800&fit=crop&q=80", title: "Glitter Gradient", description: "Fading sparkle", style: "Glitter" },
   { id: "glitter-3", imageUrl: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&h=800&fit=crop&q=80&brightness=10", title: "Accent Glitter", description: "One sparkly nail", style: "Glitter" },
   { id: "glitter-4", imageUrl: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&h=800&fit=crop&q=80&brightness=10", title: "Chunky Glitter", description: "Large glitter pieces", style: "Glitter" },
