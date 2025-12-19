@@ -1135,7 +1135,7 @@ export default function CapturePage() {
           </div>
           
           {/* Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:justify-end">
             {designTabs.map((tab) => (
               <div key={tab.id} className="flex items-center gap-1">
                 <button
