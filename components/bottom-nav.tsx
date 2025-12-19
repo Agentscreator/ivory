@@ -38,8 +38,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
             return (
               <button
                 key={item.path}
-                onClick={async () => {
-                  await haptics.light()
+                onClick={() => {
+                  haptics.light()
                   router.push(item.path)
                 }}
                 className={cn(
@@ -57,8 +57,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
 
           {/* Center Action Button */}
           <button
-            onClick={async () => {
-              await haptics.medium()
+            onClick={() => {
+              haptics.medium()
               onCenterAction?.()
             }}
             className="relative flex items-center justify-center bg-[#1A1A1A] hover:bg-[#8B7355] active:scale-95 transition-all duration-300 w-12 h-12 rounded-lg"
@@ -74,8 +74,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
             return (
               <button
                 key={item.path}
-                onClick={async () => {
-                  await haptics.light()
+                onClick={() => {
+                  haptics.light()
                   router.push(item.path)
                 }}
                 className={cn(
@@ -112,8 +112,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
           )}>
             {/* Home Button */}
             <button
-              onClick={async () => {
-                await haptics.light();
+              onClick={() => {
+                haptics.light();
                 router.push('/home');
               }}
               className={cn(
@@ -131,8 +131,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
 
             {/* Bookings Button */}
             <button
-              onClick={async () => {
-                await haptics.light();
+              onClick={() => {
+                haptics.light();
                 router.push('/bookings');
               }}
               className={cn(
@@ -150,8 +150,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
 
             {/* Center Action Button */}
             <button
-              onClick={async () => {
-                await haptics.medium();
+              onClick={() => {
+                haptics.medium();
                 onCenterAction?.();
               }}
               className={cn(
@@ -164,8 +164,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
 
             {/* Profile Button */}
             <button
-              onClick={async () => {
-                await haptics.light();
+              onClick={() => {
+                haptics.light();
                 router.push('/profile');
               }}
               className={cn(
@@ -183,8 +183,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
 
             {/* Settings Button */}
             <button
-              onClick={async () => {
-                await haptics.light();
+              onClick={() => {
+                haptics.light();
                 router.push('/settings');
               }}
               className={cn(
