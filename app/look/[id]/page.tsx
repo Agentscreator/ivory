@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Share2, Trash2, Send } from "lucide-react"
 import Image from "next/image"
+import { BottomNav } from "@/components/bottom-nav"
 
 type NailLook = {
   id: string
@@ -91,7 +92,7 @@ export default function LookDetailPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-12 lg:py-16 pb-8 sm:pb-12">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-12 lg:py-16 pb-28 sm:pb-32">
         {/* Image Container */}
         <div className={`mb-8 sm:mb-14 lg:mb-16 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="aspect-square relative overflow-hidden border border-[#E8E8E8] bg-[#F8F7F5] shadow-sm">
@@ -147,6 +148,9 @@ export default function LookDetailPage() {
           </Button>
         </div>
       </main>
+
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   )
 }
