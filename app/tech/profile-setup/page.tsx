@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { ImageUpload } from "@/components/image-upload"
+import { GoogleMapsSearch } from "@/components/google-maps-search"
 import { ArrowLeft, Plus, X, Loader2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -328,12 +329,16 @@ export default function TechProfileSetupPage() {
                 <label className="block text-xs tracking-wider uppercase text-[#6B6B6B] mb-2 font-light">
                   Location
                 </label>
-                <Input 
-                  placeholder="City, State" 
-                  value={location} 
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="h-12 sm:h-14 text-sm border-[#E8E8E8] rounded-none focus:border-[#8B7355] focus:ring-0 font-light"
+                <GoogleMapsSearch
+                  onLocationSelect={(location) => setLocation(location)}
+                  placeholder="Search for your city..."
+                  className="h-12 sm:h-14 text-sm border-[#E8E8E8] rounded-none focus:border-[#8B7355] focus:ring-0 font-light pl-10"
                 />
+                {location && (
+                  <p className="text-xs text-[#6B6B6B] mt-2 font-light">
+                    Selected: {location}
+                  </p>
+                )}
               </div>
 
               <div>
