@@ -1893,7 +1893,7 @@ S
             alt="Hand reference"
             className="hand-outline w-full h-full object-contain transition-all duration-700"
             style={{
-              transform: `scale(${handReference === 1 ? 1.8 : handReference === 3 ? 2.03 : 2.9})`,
+              transform: `scale(${handReference === 1 ? 1.8 : handReference === 3 ? 3.05 : 2.9})`,
               mixBlendMode: 'screen',
               filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.6)) brightness(1.1)',
             }}
@@ -1956,15 +1956,14 @@ S
             </svg>
           </button>
 
-          {/* Hand Reference Toggle */}
+          {/* Hand Reference Toggle - Right Arrow */}
           <button
             onClick={() => setHandReference(handReference === 3 ? 2 : handReference === 2 ? 1 : 3)}
             className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white shadow-xl flex flex-col items-center justify-center transition-all duration-500 active:scale-95"
           >
             <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
             </svg>
-            <span className="text-[9px] sm:text-[10px] font-light mt-1 tracking-wider">{handReference}</span>
           </button>
         </div>
 
