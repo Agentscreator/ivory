@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, Send, Search, Loader2 } from "lucide-react"
+import { ArrowLeft, Send, Search, Loader2, UserPlus, Mail } from "lucide-react"
 import Image from "next/image"
 import { toast } from "sonner"
 
@@ -123,150 +123,197 @@ export default function SendToTechPage() {
     }
   }
 
+  const handleInviteTech = () => {
+    const subject = encodeURIComponent("Join me on Ivory's Choice!")
+    const body = encodeURIComponent(
+      `Hi!\n\nI'd love for you to join Ivory's Choice - it's a platform where I can design my nails and send them directly to you.\n\nSign up here: ${window.location.origin}/auth?signup=true&type=tech\n\nLooking forward to working with you!\n\nBest,\n${JSON.parse(localStorage.getItem("ivoryUser") || "{}").username || "Your Client"}`
+    )
+    window.location.href = `mailto:?subject=${subject}&body=${body}`
+  }
+
   if (sent) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush flex items-center justify-center p-4">
-        <Card className="p-8 text-center max-w-md">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-terracotta to-rose flex items-center justify-center">
-            <Send className="w-10 h-10 text-white" />
+      <div className="min-h-screen bg-white flex items-center justify-center p-4 pb-safe">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 sm:mb-8 border border-[#E8E8E8] flex items-center justify-center bg-[#F8F7F5]">
+            <Send className="w-10 h-10 sm:w-12 sm:h-12 text-[#8B7355]" strokeWidth={1} />
           </div>
-          <h2 className="font-serif text-2xl font-bold text-charcoal mb-2">Design Sent!</h2>
-          <p className="text-muted-foreground">{selectedTech?.name} will review your design and get back to you soon</p>
-        </Card>
+          <h2 className="font-serif text-3xl sm:text-4xl font-light text-[#1A1A1A] mb-3 sm:mb-4 tracking-tight">Design Sent</h2>
+          <p className="text-base sm:text-lg text-[#6B6B6B] font-light leading-relaxed tracking-wide">
+            {selectedTech?.name} will review your design and get back to you soon
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush">
+    <div className="min-h-screen bg-white pb-safe">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
-        <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="font-serif text-xl font-bold text-charcoal">Send to Nail Tech</h1>
+      <header className="bg-white border-b border-[#E8E8E8] sticky top-0 z-10 pt-safe">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-5">
+          <button 
+            onClick={() => router.back()} 
+            className="flex items-center gap-2 sm:gap-3 text-[#1A1A1A] hover:text-[#8B7355] transition-colors duration-500 group active:scale-95 min-h-[44px] -ml-2 pl-2 pr-4"
+          >
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform duration-500" strokeWidth={1} />
+            <span className="text-[10px] sm:text-xs tracking-[0.25em] sm:tracking-[0.3em] uppercase font-light">Back</span>
+          </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-12 pb-8 sm:pb-16">
+        {/* Page Title */}
+        <div className="mb-8 sm:mb-12 text-center">
+          <p className="text-[10px] sm:text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-3 sm:mb-4 font-light">Share Your Design</p>
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[#1A1A1A] tracking-tight">Send to Nail Tech</h1>
+        </div>
+
         {/* Design Preview */}
-        <Card className="overflow-hidden border-0 bg-white shadow-xl mb-6">
-          <div className="aspect-video relative">
-            <Image src={lookImage || "/placeholder.svg"} alt="Your design" fill className="object-cover" />
+        <div className="mb-8 sm:mb-12">
+          <div className="aspect-square relative overflow-hidden border border-[#E8E8E8] bg-[#F8F7F5] shadow-sm max-w-md mx-auto">
+            <Image 
+              src={lookImage || "/placeholder.svg"} 
+              alt="Your design" 
+              fill 
+              className="object-cover" 
+              priority
+              sizes="(max-width: 640px) 100vw, 448px"
+            />
           </div>
-        </Card>
+        </div>
 
         {/* Search Nail Tech */}
-        <div className="mb-6">
-          <label className="text-sm font-semibold text-charcoal mb-2 block">Find Your Nail Tech</label>
+        <div className="mb-6 sm:mb-8">
+          <label className="text-[11px] tracking-[0.25em] uppercase text-[#1A1A1A] mb-3 sm:mb-4 block font-light">Find Your Nail Tech</label>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B6B6B]" strokeWidth={1.5} />
             <Input
-              placeholder="Search by name or email..."
+              placeholder="Search by name..."
               value={searchTech}
               onChange={(e) => setSearchTech(e.target.value)}
-              className="pl-10"
+              className="pl-12 h-12 sm:h-14 border-[#E8E8E8] rounded-none focus:border-[#8B7355] text-base font-light"
             />
           </div>
         </div>
 
         {/* Nail Tech List */}
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <div className="flex items-center justify-center py-16 sm:py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-[#8B7355]" strokeWidth={1.5} />
           </div>
         ) : techs.length === 0 ? (
-          <Card className="p-8 text-center mb-6">
-            <p className="text-muted-foreground mb-4">
-              No nail techs available yet. Be the first to invite one!
+          <div className="text-center py-12 sm:py-16 border border-[#E8E8E8] mb-6 sm:mb-8">
+            <UserPlus className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 text-[#8B7355]" strokeWidth={1} />
+            <p className="text-base sm:text-lg text-[#6B6B6B] font-light mb-6 sm:mb-8 tracking-wide">
+              No nail techs available yet
             </p>
-          </Card>
+            <Button 
+              onClick={handleInviteTech}
+              className="bg-[#1A1A1A] text-white hover:bg-[#8B7355] transition-all duration-500 h-12 sm:h-14 px-8 sm:px-10 text-[10px] sm:text-[11px] tracking-[0.25em] uppercase rounded-none font-light active:scale-[0.98]"
+            >
+              <Mail className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" strokeWidth={1.5} />
+              Invite Nail Tech
+            </Button>
+          </div>
         ) : (
-          <div className="space-y-3 mb-6">
+          <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
             {techs
               .filter((tech) => tech.name.toLowerCase().includes(searchTech.toLowerCase()))
               .map((tech) => (
-              <Card
+              <div
                 key={tech.id}
-                className={`p-4 cursor-pointer transition-all ${
+                className={`border cursor-pointer transition-all duration-300 p-4 sm:p-5 active:scale-[0.99] ${
                   selectedTech?.id === tech.id
-                    ? "border-primary border-2 bg-primary/5"
-                    : "border hover:border-primary/50"
+                    ? "border-[#8B7355] bg-[#F8F7F5]"
+                    : "border-[#E8E8E8] hover:border-[#8B7355]"
                 }`}
                 onClick={() => setSelectedTech(tech)}
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full overflow-hidden bg-muted flex-shrink-0">
-                    <Image src={tech.avatar || "/placeholder.svg"} alt={tech.name} width={64} height={64} />
+                <div className="flex items-center gap-4 sm:gap-5">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-[#F8F7F5] flex-shrink-0 border border-[#E8E8E8]">
+                    <Image src={tech.avatar || "/placeholder.svg"} alt={tech.name} width={64} height={64} className="object-cover" />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-charcoal">{tech.name}</h3>
-                    <p className="text-sm text-muted-foreground">{tech.location}</p>
-                    <div className="flex items-center gap-1 mt-1">
-                      <span className="text-yellow-500">★</span>
-                      <span className="text-sm font-medium">{tech.rating}</span>
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-serif text-base sm:text-lg text-[#1A1A1A] font-light mb-1 truncate">{tech.name}</h3>
+                    <p className="text-xs sm:text-sm text-[#6B6B6B] font-light tracking-wide truncate">{tech.location}</p>
+                    {tech.rating > 0 && (
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <span className="text-[#8B7355]">★</span>
+                        <span className="text-xs sm:text-sm font-light text-[#1A1A1A]">{tech.rating.toFixed(1)}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
             {techs.filter((tech) => tech.name.toLowerCase().includes(searchTech.toLowerCase())).length === 0 && (
-              <Card className="p-8 text-center">
-                <p className="text-muted-foreground">
+              <div className="text-center py-12 sm:py-16 border border-[#E8E8E8]">
+                <p className="text-base sm:text-lg text-[#6B6B6B] font-light tracking-wide">
                   No nail techs found matching "{searchTech}"
                 </p>
-              </Card>
+              </div>
             )}
           </div>
         )}
 
         {/* Message */}
         {selectedTech && (
-          <div className="mb-6">
-            <label className="text-sm font-semibold text-charcoal mb-2 block">Add a Message (Optional)</label>
+          <div className="mb-6 sm:mb-8">
+            <label className="text-[11px] tracking-[0.25em] uppercase text-[#1A1A1A] mb-3 sm:mb-4 block font-light">Add a Message (Optional)</label>
             <Textarea
               placeholder="Let your nail tech know any special requests or details..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={4}
+              className="border-[#E8E8E8] rounded-none focus:border-[#8B7355] text-base font-light resize-none"
             />
           </div>
         )}
 
         {/* Send Button */}
         <Button 
-          size="lg" 
-          className="w-full" 
+          className="w-full bg-[#1A1A1A] text-white hover:bg-[#8B7355] transition-all duration-500 h-12 sm:h-14 lg:h-16 text-[10px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] uppercase rounded-none font-light active:scale-[0.98] touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed mb-6 sm:mb-8"
           disabled={!selectedTech || sending || loading} 
           onClick={handleSend}
         >
           {sending ? (
             <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 animate-spin" strokeWidth={1.5} />
               Sending...
             </>
           ) : (
             <>
-              <Send className="w-5 h-5 mr-2" />
-              Send Design to {selectedTech?.name || "Nail Tech"}
+              <Send className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" strokeWidth={1.5} />
+              {selectedTech ? `Send to ${selectedTech.name}` : "Select a Nail Tech"}
             </>
           )}
         </Button>
 
-        {/* No Tech on Ivory */}
-        <Card className="mt-6 p-4 bg-muted/30">
-          <p className="text-sm text-muted-foreground mb-2">
-            <strong>Tech not on Ivory?</strong>
-          </p>
-          <p className="text-sm text-muted-foreground mb-3">
-            Send them an invite! When they join, they can claim their profile and see your design.
-          </p>
-          <Button variant="outline" size="sm" className="bg-white">
+        {/* Invite Section */}
+        <div className="border border-[#E8E8E8] p-6 sm:p-8 bg-[#F8F7F5]">
+          <div className="flex items-start gap-4 sm:gap-6 mb-5 sm:mb-6">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 border border-[#E8E8E8] flex items-center justify-center flex-shrink-0 bg-white">
+              <UserPlus className="w-6 h-6 sm:w-7 sm:h-7 text-[#8B7355]" strokeWidth={1} />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-serif text-lg sm:text-xl font-light text-[#1A1A1A] mb-2 tracking-tight">
+                Tech Not on Ivory?
+              </h3>
+              <p className="text-sm sm:text-base text-[#6B6B6B] leading-relaxed font-light tracking-wide">
+                Send them an invite! When they join, they can see your design and connect with you.
+              </p>
+            </div>
+          </div>
+          <Button 
+            onClick={handleInviteTech}
+            className="w-full sm:w-auto bg-transparent border-2 border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all duration-500 h-12 sm:h-14 px-8 sm:px-10 text-[10px] sm:text-[11px] tracking-[0.25em] uppercase rounded-none font-light active:scale-[0.98]"
+          >
+            <Mail className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" strokeWidth={1.5} />
             Invite Nail Tech
           </Button>
-        </Card>
+        </div>
       </main>
     </div>
   )
