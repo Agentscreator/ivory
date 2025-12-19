@@ -81,7 +81,13 @@ export default function SharePage() {
 
   const downloadImage = async () => {
     try {
-      const response = await fetch(look?.imageUrl || '')
+      // Use API route to proxy the download and avoid CORS issues
+      const response = await fetch(`/api/download-image?url=${encodeURIComponent(look?.imageUrl || '')}`)
+      
+      if (!response.ok) {
+        throw new Error('Download failed')
+      }
+      
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
