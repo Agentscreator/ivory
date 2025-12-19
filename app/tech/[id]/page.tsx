@@ -84,12 +84,9 @@ export default function TechProfilePage() {
             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-500" strokeWidth={1.5} />
             Back
           </button>
-          <div className="flex items-center justify-between">
-            <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-[#1A1A1A] tracking-[-0.01em]">
-              Nail Technician Profile
-            </h1>
-            <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-[#8B7355]" strokeWidth={1.5} />
-          </div>
+          <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-[#1A1A1A] tracking-[-0.01em]">
+            Nail Technician Profile
+          </h1>
         </div>
       </header>
 

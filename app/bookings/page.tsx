@@ -127,12 +127,9 @@ export default function BookingsPage() {
       {/* Elegant Header */}
       <header className={`bg-white border-b border-[#E8E8E8] sticky top-0 z-50 backdrop-blur-md bg-white/98 safe-top ${isWatch ? 'watch-compact' : ''}`}>
         <div className={`max-w-[1400px] mx-auto ${isWatch ? 'px-3 py-3' : 'px-6 sm:px-8 lg:px-16 py-6 sm:py-8'}`}>
-          <div className="flex items-center justify-between">
-            <h1 className={`font-serif font-light text-[#1A1A1A] tracking-[-0.01em] ${isWatch ? 'text-base' : 'text-2xl sm:text-3xl lg:text-4xl'}`}>
-              Book Your Appointment
-            </h1>
-            <Sparkles className={`text-[#8B7355] ${isWatch ? 'w-5 h-5' : 'w-6 h-6 sm:w-7 sm:h-7'}`} strokeWidth={1.5} />
-          </div>
+          <h1 className={`font-serif font-light text-[#1A1A1A] tracking-[-0.01em] ${isWatch ? 'text-base' : 'text-2xl sm:text-3xl lg:text-4xl'}`}>
+            Book Your Appointment
+          </h1>
         </div>
       </header>
 
