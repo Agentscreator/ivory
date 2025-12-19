@@ -1,4 +1,4 @@
-import { Capacitor, registerPlugin } from '@capacitor/core';
+import { Capacitor, registerPlugin, PluginListenerHandle } from '@capacitor/core';
 
 export interface IAPPlugin {
   getProducts(options: { productIds: string[] }): Promise<{
@@ -8,6 +8,10 @@ export interface IAPPlugin {
   purchase(options: { productId: string }): Promise<void>;
   restorePurchases(): Promise<void>;
   finishTransaction(options: { transactionId: string }): Promise<void>;
+  addListener(
+    eventName: 'purchaseCompleted' | 'purchaseFailed' | 'purchaseRestored',
+    listenerFunc: (data: any) => void
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
 }
 
 export interface IAPProduct {

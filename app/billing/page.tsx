@@ -244,7 +244,7 @@ export default function BillingPage() {
                     Grow Your Business
                   </h3>
                   <p className="text-sm sm:text-base text-[#6B6B6B] leading-relaxed font-light">
-                    Get 5 free bookings to start. After that, upgrade to Business for unlimited bookings and premium features.
+                    You have 5 free credits for AI designs and 5 free bookings to start. After 5 bookings, upgrade to Business for unlimited bookings and premium features.
                   </p>
                 </div>
               </div>

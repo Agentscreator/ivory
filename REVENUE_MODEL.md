@@ -37,6 +37,7 @@ Separate pricing tiers for regular users (clients) and nail technicians, optimiz
 ### Free Tier
 - **Cost:** $0
 - **Includes:**
+  - 5 signup credits (for AI designs)
   - 5 free bookings
   - Basic profile
   - Portfolio showcase
@@ -82,6 +83,7 @@ Separate pricing tiers for regular users (clients) and nail technicians, optimiz
 ✅ Save and share designs
 
 ### For Nail Techs
+✅ 5 signup credits (for AI designs)
 ✅ 5 free bookings to start
 ✅ Unlimited bookings with subscription
 ✅ Direct payments via Stripe Connect

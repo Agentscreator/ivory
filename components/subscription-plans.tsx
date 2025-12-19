@@ -172,6 +172,12 @@ export function SubscriptionPlans({ currentTier = 'free', currentStatus = 'inact
             <Check className="h-5 w-5 text-[#8B7355] flex-shrink-0 mt-0.5" strokeWidth={1} />
             <span>5 credits on signup</span>
           </li>
+          {userType === 'tech' && (
+            <li className="flex items-start gap-3 text-sm sm:text-base font-light text-[#1A1A1A]">
+              <Check className="h-5 w-5 text-[#8B7355] flex-shrink-0 mt-0.5" strokeWidth={1} />
+              <span>5 free bookings</span>
+            </li>
+          )}
           <li className="flex items-start gap-3 text-sm sm:text-base font-light text-[#1A1A1A]">
             <Check className="h-5 w-5 text-[#8B7355] flex-shrink-0 mt-0.5" strokeWidth={1} />
             <span>Basic design tools</span>
@@ -180,10 +186,12 @@ export function SubscriptionPlans({ currentTier = 'free', currentStatus = 'inact
             <Check className="h-5 w-5 text-[#8B7355] flex-shrink-0 mt-0.5" strokeWidth={1} />
             <span>Community support</span>
           </li>
-          <li className="flex items-start gap-3 text-sm sm:text-base font-light text-[#6B6B6B]">
-            <Check className="h-5 w-5 text-[#6B6B6B] flex-shrink-0 mt-0.5" strokeWidth={1} />
-            <span>Upgrade to buy more credits</span>
-          </li>
+          {userType === 'client' && (
+            <li className="flex items-start gap-3 text-sm sm:text-base font-light text-[#6B6B6B]">
+              <Check className="h-5 w-5 text-[#6B6B6B] flex-shrink-0 mt-0.5" strokeWidth={1} />
+              <span>Upgrade to buy more credits</span>
+            </li>
+          )}
         </ul>
       </div>
 
