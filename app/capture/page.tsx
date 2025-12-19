@@ -1856,7 +1856,7 @@ S
   }
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black">
+    <div className="fixed inset-0 z-[100] bg-gradient-to-b from-[#1A1A1A] via-black to-[#1A1A1A]">
       <div
         className="relative w-full h-full"
         onTouchStart={handleTouchStart}
@@ -1868,111 +1868,114 @@ S
           autoPlay
           playsInline
           muted
-          className="w-full h-full object-cover transition-opacity duration-200"
+          className="w-full h-full object-cover transition-all duration-500"
           style={{
             transform: `${facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)'} scale(${zoom})`,
             filter: 'brightness(1.08) contrast(1.08) saturate(1.15)',
             opacity: isFlipping ? 0 : 1,
-            transition: 'transform 0.15s ease-out, opacity 0.2s ease-out',
+            transition: 'transform 0.3s ease-out, opacity 0.5s ease-out',
           }}
         />
 
         {/* Hand Reference Overlay */}
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-[5] overflow-visible">
           <style jsx>{`
-            @keyframes blink-outline {
-              0%, 100% { opacity: 0.5; }
-              50% { opacity: 0.9; }
+            @keyframes elegant-pulse {
+              0%, 100% { opacity: 0.4; transform: scale(1); }
+              50% { opacity: 0.7; transform: scale(1.02); }
             }
             .hand-outline {
-              animation: blink-outline 2s ease-in-out infinite;
+              animation: elegant-pulse 3s ease-in-out infinite;
             }
           `}</style>
           <img
             src={`/ref${handReference}.png`}
             alt="Hand reference"
-            className="hand-outline w-full h-full object-contain"
+            className="hand-outline w-full h-full object-contain transition-all duration-700"
             style={{
               transform: `scale(${handReference === 1 ? 1.8 : handReference === 3 ? 2.03 : 2.9})`,
               mixBlendMode: 'screen',
-              filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) brightness(1.2)',
+              filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.6)) brightness(1.1)',
             }}
           />
         </div>
 
         {isFlipping && (
-          <div className="absolute inset-0 bg-black flex items-center justify-center">
-            <svg className="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </div>
-        )}
-
-        {/* Top Bar */}
-        <div className="absolute top-0 left-0 right-0 pt-14 px-5 pb-4 flex items-center justify-between z-10">
-          <button
-            onClick={() => router.back()}
-            className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-all shadow-lg active:scale-95"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <div className="text-white font-semibold text-lg">PHOTO</div>
-          <div className="w-11"></div>
-        </div>
-
-        {/* Zoom Indicator */}
-        {showZoomIndicator && zoom > 1 && (
-          <div className="absolute top-28 left-1/2 transform -translate-x-1/2 z-10 transition-opacity duration-300">
-            <div className="bg-black/60 backdrop-blur-md text-white px-4 py-2 rounded-full flex items-center space-x-2 shadow-xl">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span className="font-semibold text-sm">{zoom.toFixed(1)}x</span>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A1A] to-black flex items-center justify-center backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-4 animate-fade-in">
+              <Loader2 className="w-10 h-10 text-white animate-spin" strokeWidth={1.5} />
+              <p className="text-white/80 text-sm font-light tracking-[0.2em] uppercase">Switching Camera</p>
             </div>
           </div>
         )}
 
-        {/* Right Side Controls */}
-        <div className="absolute right-5 top-1/2 transform -translate-y-1/2 z-10 flex flex-col gap-3">
+        {/* Elegant Top Bar */}
+        <div className="absolute top-0 left-0 right-0 pt-12 sm:pt-14 px-4 sm:px-6 pb-5 flex items-center justify-between z-10 bg-gradient-to-b from-black/60 via-black/30 to-transparent backdrop-blur-sm">
+          <button
+            onClick={() => router.back()}
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all duration-500 shadow-lg active:scale-95"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <div className="text-white font-serif text-base sm:text-lg font-light tracking-[0.25em] uppercase">Capture</div>
+          
+          <div className="flex items-center">
+            <CreditsDisplay showLabel={false} credits={credits} />
+          </div>
+        </div>
+
+        {/* Elegant Zoom Indicator */}
+        {showZoomIndicator && zoom > 1 && (
+          <div className="absolute top-28 sm:top-32 left-1/2 transform -translate-x-1/2 z-10 transition-all duration-500 animate-fade-in">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-5 py-2.5 rounded-full flex items-center space-x-3 shadow-2xl">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span className="font-light text-sm tracking-wider">{zoom.toFixed(1)}×</span>
+            </div>
+          </div>
+        )}
+
+        {/* Elegant Right Side Controls */}
+        <div className="absolute right-4 sm:right-6 top-1/2 transform -translate-y-1/2 z-10 flex flex-col gap-4 animate-fade-in-delayed">
           {/* Flip Camera Button */}
           <button
             onClick={flipCamera}
             disabled={isFlipping}
-            className={`w-14 h-14 rounded-2xl backdrop-blur-md flex flex-col items-center justify-center transition-all duration-200 active:scale-95 ${
+            className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full backdrop-blur-md border flex flex-col items-center justify-center transition-all duration-500 active:scale-95 ${
               facingMode === "environment"
-                ? "bg-white/95 text-gray-900 shadow-xl"
-                : "bg-black/40 hover:bg-black/50 text-white shadow-lg"
+                ? "bg-white/95 border-white/50 text-[#1A1A1A] shadow-2xl"
+                : "bg-white/10 border-white/20 hover:bg-white/20 text-white shadow-xl"
             } ${isFlipping ? "opacity-50" : ""}`}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>
 
           {/* Hand Reference Toggle */}
           <button
             onClick={() => setHandReference(handReference === 3 ? 2 : handReference === 2 ? 1 : 3)}
-            className="w-14 h-14 rounded-2xl bg-black/40 backdrop-blur-md hover:bg-black/50 text-white shadow-lg flex flex-col items-center justify-center transition-all duration-200 active:scale-95"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white shadow-xl flex flex-col items-center justify-center transition-all duration-500 active:scale-95"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
-            <span className="text-[10px] font-semibold mt-0.5">{handReference}</span>
+            <span className="text-[9px] sm:text-[10px] font-light mt-1 tracking-wider">{handReference}</span>
           </button>
         </div>
 
-        {/* Bottom Controls */}
-        <div className="absolute bottom-0 left-0 right-0 pb-10 pt-6 px-6 z-10">
+        {/* Elegant Bottom Controls */}
+        <div className="absolute bottom-0 left-0 right-0 pb-8 sm:pb-10 pt-8 px-6 z-10 bg-gradient-to-t from-black/60 via-black/30 to-transparent backdrop-blur-sm">
           <div className="flex items-center justify-between max-w-md mx-auto">
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-14 h-14 rounded-2xl bg-black/40 backdrop-blur-md hover:bg-black/50 transition-all shadow-lg flex items-center justify-center active:scale-95"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-500 shadow-xl flex items-center justify-center active:scale-95"
             >
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <svg className="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -1983,16 +1986,23 @@ S
 
             <button
               onClick={capturePhoto}
-              className="relative w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-2xl"
+              className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center transition-all duration-500 active:scale-95 shadow-2xl hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]"
               style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%)',
-                border: '4px solid rgba(0, 0, 0, 0.3)'
+                background: 'linear-gradient(135deg, #ffffff 0%, #f8f7f5 100%)',
+                border: '5px solid rgba(255, 255, 255, 0.3)'
               }}
             >
-              <div className="w-16 h-16 rounded-full bg-white shadow-inner"></div>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white shadow-inner"></div>
             </button>
 
-            <div className="w-14"></div>
+            <div className="w-14 sm:w-16"></div>
+          </div>
+          
+          {/* Elegant Instruction Text */}
+          <div className="text-center mt-6 animate-fade-in">
+            <p className="text-white/70 text-xs sm:text-sm font-light tracking-[0.15em] uppercase">
+              Position your hand in the frame
+            </p>
           </div>
         </div>
       </div>
