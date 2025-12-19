@@ -104,7 +104,8 @@ export default function SharedDesignPage() {
       localStorage.setItem("generatedPreview", look.imageUrl)
       
       // Store all design metadata if available, otherwise create basic metadata
-      const metadata = look.designMetadata || {
+      // Also handle case where designMetadata exists but is null
+      const metadata = (look.designMetadata && Object.keys(look.designMetadata).length > 0) ? look.designMetadata : {
         designSettings: {
           nailLength: 'medium',
           nailShape: 'oval',
