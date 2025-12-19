@@ -215,6 +215,7 @@ export default function CapturePage() {
   }
   const abortControllerRef = useRef<AbortController | null>(null)
   const hasLoadedDesignRef = useRef(false) // Track if we've loaded a design to prevent double-loading
+  const isInitialLoadRef = useRef(true) // Track if we're in initial load to prevent premature saves
 
   // Check for user session and existing tabs on mount
   useEffect(() => {
@@ -310,6 +311,12 @@ export default function CapturePage() {
           
           toast.success('Design loaded for editing!')
           console.log('✅ Design has content, camera will NOT start')
+          
+          // Mark initial load as complete after a short delay
+          setTimeout(() => {
+            isInitialLoadRef.current = false
+          }, 200)
+          
           return
         } catch (e) {
           console.error('Error loading design metadata:', e)
@@ -343,6 +350,12 @@ export default function CapturePage() {
             } else {
               console.log('✅ Active tab has content, NOT starting camera')
             }
+            
+            // Mark initial load as complete
+            setTimeout(() => {
+              isInitialLoadRef.current = false
+            }, 200)
+            
             return
           }
         } catch (e) {
@@ -353,6 +366,11 @@ export default function CapturePage() {
       // No existing tabs with content - auto-start camera
       console.log('⚠️ No saved tabs with content, starting camera')
       startCamera()
+      
+      // Mark initial load as complete
+      setTimeout(() => {
+        isInitialLoadRef.current = false
+      }, 200)
     }
 
     initializePage()
@@ -365,10 +383,12 @@ export default function CapturePage() {
     }
   }, [])
 
-  // Save design tabs whenever they change
+  // Save design tabs whenever they change (but skip during initial load)
   useEffect(() => {
-    localStorage.setItem("captureSession_designTabs", JSON.stringify(designTabs))
-    console.log('Saved design tabs to session')
+    if (!isInitialLoadRef.current) {
+      localStorage.setItem("captureSession_designTabs", JSON.stringify(designTabs))
+      console.log('Saved design tabs to session')
+    }
   }, [designTabs])
 
   // Save active tab ID whenever it changes
@@ -1275,7 +1295,7 @@ export default function CapturePage() {
               </div>
             </div>
           </div>
-
+S
         {/* Image Modal */}
         {selectedImageModal && (
           <div 
