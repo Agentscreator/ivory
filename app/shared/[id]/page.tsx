@@ -95,7 +95,7 @@ export default function SharedDesignPage() {
       localStorage.setItem("currentEditingImage", look.originalImageUrl || look.imageUrl)
       localStorage.setItem("generatedPreview", look.imageUrl)
     }
-    router.push("/editor")
+    router.push("/capture")
   }
 
   const handleRemix = () => {
@@ -116,7 +116,7 @@ export default function SharedDesignPage() {
       localStorage.setItem("isRemix", "true") // Flag to indicate this is a remix
       toast.success('Loading design for remix!')
     }
-    router.push("/editor")
+    router.push("/capture")
   }
 
   const handleDownload = async () => {
