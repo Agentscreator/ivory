@@ -115,17 +115,17 @@ export default function SharedDesignPage() {
           styleVibe: 'elegant',
           accentColor: '#FFFFFF'
         },
-        selectedDesignImages: [],
+        selectedDesignImages: [look.imageUrl], // Use the generated image as a reference
         drawingImageUrl: null,
         aiPrompt: look.aiPrompt || null,
         influenceWeights: {
-          nailEditor_designImage: 0,
-          nailEditor_baseColor: 100,
+          nailEditor_designImage: 100, // Set to 100 since we're using the design image
+          nailEditor_baseColor: 0,
           nailEditor_finish: 100,
           nailEditor_texture: 100
         },
         handReference: 3,
-        designMode: null,
+        designMode: 'design', // Set to design mode
         colorLightness: 65
       }
       
