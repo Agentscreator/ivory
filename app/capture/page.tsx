@@ -242,21 +242,20 @@ export default function CapturePage() {
         }
       }
 
-      // Check for loaded design metadata (from edit/remix)
+      // Check for loaded design metadata (from edit)
       const loadedMetadata = localStorage.getItem("loadedDesignMetadata")
       const loadedEditingImage = localStorage.getItem("currentEditingImage")
       const loadedPreview = localStorage.getItem("generatedPreview")
-      const isRemix = localStorage.getItem("isRemix") === "true"
       
       if (loadedMetadata && loadedEditingImage) {
         try {
           const metadata = JSON.parse(loadedMetadata)
-          console.log('Loading design metadata for edit/remix:', metadata)
+          console.log('Loading design metadata for editing:', metadata)
           
           // Create a new tab with the loaded design
           const newTab: DesignTab = {
             id: '1',
-            name: isRemix ? 'Remix' : 'Edit',
+            name: 'Edit',
             finalPreviews: loadedPreview ? [loadedPreview] : [],
             designSettings: metadata.designSettings || designSettings,
             selectedDesignImages: metadata.selectedDesignImages || [],
@@ -291,9 +290,8 @@ export default function CapturePage() {
           localStorage.removeItem("loadedDesignMetadata")
           localStorage.removeItem("currentEditingImage")
           localStorage.removeItem("generatedPreview")
-          localStorage.removeItem("isRemix")
           
-          toast.success(isRemix ? 'Design loaded for remix!' : 'Design loaded for editing!')
+          toast.success('Design loaded for editing!')
           return
         } catch (e) {
           console.error('Error loading design metadata:', e)

@@ -16,6 +16,7 @@ type Look = {
   originalImageUrl: string | null
   userId: number
   createdAt: string
+  aiPrompt?: string | null
   designMetadata?: any
   user?: {
     username: string
@@ -124,55 +125,6 @@ export default function SharedDesignPage() {
       localStorage.setItem("loadedDesignMetadata", JSON.stringify(metadata))
       
       toast.success('Loading design for editing!')
-    }
-    router.push("/capture")
-  }
-
-  const handleRemix = () => {
-    // Check if user is logged in
-    const userStr = localStorage.getItem("ivoryUser")
-    if (!userStr) {
-      localStorage.setItem('returnUrl', window.location.pathname)
-      toast.info('Sign in to remix this design')
-      router.push("/auth")
-      return
-    }
-
-    // Store the design for remixing - load it into the capture page with all settings
-    if (look) {
-      // Store both the original and generated images so they can remix it
-      localStorage.setItem("currentEditingImage", look.originalImageUrl || look.imageUrl)
-      localStorage.setItem("generatedPreview", look.imageUrl)
-      localStorage.setItem("isRemix", "true") // Flag to indicate this is a remix
-      
-      // Store all design metadata if available, otherwise create basic metadata
-      const metadata = look.designMetadata || {
-        designSettings: {
-          nailLength: 'medium',
-          nailShape: 'oval',
-          baseColor: '#FF6B9D',
-          finish: 'glossy',
-          texture: 'smooth',
-          patternType: 'solid',
-          styleVibe: 'elegant',
-          accentColor: '#FFFFFF'
-        },
-        selectedDesignImages: [],
-        drawingImageUrl: null,
-        aiPrompt: look.aiPrompt || null,
-        influenceWeights: {
-          nailEditor_designImage: 0,
-          nailEditor_baseColor: 100,
-          nailEditor_finish: 100,
-          nailEditor_texture: 100
-        },
-        handReference: 3,
-        designMode: null,
-        colorLightness: 65
-      }
-      localStorage.setItem("loadedDesignMetadata", JSON.stringify(metadata))
-      
-      toast.success('Loading design for remix!')
     }
     router.push("/capture")
   }
