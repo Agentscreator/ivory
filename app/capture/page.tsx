@@ -283,6 +283,7 @@ export default function CapturePage() {
           setDesignTabs([newTab])
           setActiveTabId('1')
           setCapturedImage(loadedEditingImage)
+          console.log('✅ Set capturedImage to:', loadedEditingImage?.substring(0, 50) + '...')
           setDesignSettings(metadata.designSettings || designSettings)
           setSelectedDesignImages(metadata.selectedDesignImages || [])
           setDrawingImageUrl(metadata.drawingImageUrl || null)
@@ -302,6 +303,9 @@ export default function CapturePage() {
             setColorLightness(metadata.colorLightness)
           }
           
+          // Set initializing to false immediately so UI updates
+          setIsInitializing(false)
+          
           // Clear the loaded metadata after a delay to ensure state is set
           setTimeout(() => {
             localStorage.removeItem("loadedDesignMetadata")
@@ -316,7 +320,6 @@ export default function CapturePage() {
           // Mark initial load as complete after a short delay
           setTimeout(() => {
             isInitialLoadRef.current = false
-            setIsInitializing(false)
           }, 200)
           
           return
