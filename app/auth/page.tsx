@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Capacitor } from "@capacitor/core"
 import { Browser } from "@capacitor/browser"
 import { Haptics, ImpactStyle } from "@capacitor/haptics"
-import { signInWithAppleNative } from "@/lib/native-apple-auth"
+// import { signInWithAppleNative } from "@/lib/native-apple-auth" // Temporarily disabled - waiting for Capacitor 8 compatible version
 
 function AuthPageContent() {
   const router = useRouter()
@@ -220,76 +220,78 @@ function AuthPageContent() {
         // Web: redirect in same window
         window.location.href = googleAuthUrl.toString();
       }
-    } else if (provider === 'apple') {
-      // Use native Sign in with Apple on iOS
-      if (isIOS) {
-        try {
-          const result = await signInWithAppleNative();
-          
-          if (result.success && result.user) {
-            // Send to native endpoint
-            const response = await fetch('/api/auth/apple-native', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                identityToken: result.user.identityToken,
-                authorizationCode: result.user.authorizationCode,
-                email: result.user.email,
-                givenName: result.user.givenName,
-                familyName: result.user.familyName,
-                referralCode: referralCode || undefined,
-              }),
-            });
-
-            if (!response.ok) {
-              const error = await response.json();
-              alert(error.error || 'Failed to sign in with Apple');
-              return;
-            }
-
-            const data = await response.json();
-            console.log('Apple sign-in successful, user data:', data.user);
-            localStorage.setItem("ivoryUser", JSON.stringify(data.user));
-
-            // Check if there's a return URL stored
-            const returnUrl = localStorage.getItem('returnUrl');
-            if (returnUrl) {
-              localStorage.removeItem('returnUrl');
-              console.log('Redirecting to return URL:', returnUrl);
-              window.location.href = returnUrl;
-              return;
-            }
-
-            // Navigate based on user type - use window.location for more reliable navigation
-            if (data.user.userType === 'tech') {
-              console.log('Redirecting to tech dashboard');
-              window.location.href = '/tech/dashboard';
-            } else if (data.user.userType === 'client') {
-              console.log('Redirecting to home');
-              window.location.href = '/home';
-            } else {
-              console.log('Redirecting to user type selection');
-              window.location.href = '/user-type';
-            }
-          } else {
-            alert(result.error || 'Failed to sign in with Apple');
-          }
-        } catch (error) {
-          console.error('Native Apple Sign In error:', error);
-          alert('Failed to sign in with Apple');
-        }
-      } else {
-        // Web: Use web OAuth flow
-        const appleAuthUrl = new URL('https://appleid.apple.com/auth/authorize');
-        appleAuthUrl.searchParams.set('client_id', process.env.NEXT_PUBLIC_APPLE_CLIENT_ID || '');
-        appleAuthUrl.searchParams.set('redirect_uri', redirectUri);
-        appleAuthUrl.searchParams.set('response_type', 'code id_token');
-        appleAuthUrl.searchParams.set('response_mode', 'form_post');
-        appleAuthUrl.searchParams.set('scope', 'name email');
-        
-        window.location.href = appleAuthUrl.toString();
-      }
     }
+    // TEMPORARILY DISABLED: Apple Sign In - waiting for @capacitor-community/apple-sign-in to support Capacitor 8
+    // else if (provider === 'apple') {
+    //   // Use native Sign in with Apple on iOS
+    //   if (isIOS) {
+    //     try {
+    //       const result = await signInWithAppleNative();
+    //       
+    //       if (result.success && result.user) {
+    //         // Send to native endpoint
+    //         const response = await fetch('/api/auth/apple-native', {
+    //           method: 'POST',
+    //           headers: { 'Content-Type': 'application/json' },
+    //           body: JSON.stringify({
+    //             identityToken: result.user.identityToken,
+    //             authorizationCode: result.user.authorizationCode,
+    //             email: result.user.email,
+    //             givenName: result.user.givenName,
+    //             familyName: result.user.familyName,
+    //             referralCode: referralCode || undefined,
+    //           }),
+    //         });
+
+    //         if (!response.ok) {
+    //           const error = await response.json();
+    //           alert(error.error || 'Failed to sign in with Apple');
+    //           return;
+    //         }
+
+    //         const data = await response.json();
+    //         console.log('Apple sign-in successful, user data:', data.user);
+    //         localStorage.setItem("ivoryUser", JSON.stringify(data.user));
+
+    //         // Check if there's a return URL stored
+    //         const returnUrl = localStorage.getItem('returnUrl');
+    //         if (returnUrl) {
+    //           localStorage.removeItem('returnUrl');
+    //           console.log('Redirecting to return URL:', returnUrl);
+    //           window.location.href = returnUrl;
+    //           return;
+    //         }
+
+    //         // Navigate based on user type - use window.location for more reliable navigation
+    //         if (data.user.userType === 'tech') {
+    //           console.log('Redirecting to tech dashboard');
+    //           window.location.href = '/tech/dashboard';
+    //         } else if (data.user.userType === 'client') {
+    //           console.log('Redirecting to home');
+    //           window.location.href = '/home';
+    //         } else {
+    //           console.log('Redirecting to user type selection');
+    //           window.location.href = '/user-type';
+    //         }
+    //       } else {
+    //         alert(result.error || 'Failed to sign in with Apple');
+    //       }
+    //     } catch (error) {
+    //       console.error('Native Apple Sign In error:', error);
+    //       alert('Failed to sign in with Apple');
+    //     }
+    //   } else {
+    //     // Web: Use web OAuth flow
+    //     const appleAuthUrl = new URL('https://appleid.apple.com/auth/authorize');
+    //     appleAuthUrl.searchParams.set('client_id', process.env.NEXT_PUBLIC_APPLE_CLIENT_ID || '');
+    //     appleAuthUrl.searchParams.set('redirect_uri', redirectUri);
+    //     appleAuthUrl.searchParams.set('response_type', 'code id_token');
+    //     appleAuthUrl.searchParams.set('response_mode', 'form_post');
+    //     appleAuthUrl.searchParams.set('scope', 'name email');
+    //     
+    //     window.location.href = appleAuthUrl.toString();
+    //   }
+    // }
   }
 
   // Show loading state while checking session
@@ -455,7 +457,8 @@ function AuthPageContent() {
               <span className="tracking-wider uppercase">Continue with Google</span>
             </Button>
 
-            <Button
+            {/* TEMPORARILY DISABLED: Apple Sign In - waiting for Capacitor 8 compatible version */}
+            {/* <Button
               type="button"
               variant="outline"
               className="w-full h-14 border-[#E8E8E8] hover:border-[#8B7355] hover:bg-transparent text-[#1A1A1A] rounded-none text-xs font-light transition-all duration-300 touch-manipulation"
@@ -465,7 +468,7 @@ function AuthPageContent() {
                 <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
               </svg>
               <span className="tracking-wider uppercase">Continue with Apple</span>
-            </Button>
+            </Button> */}
           </div>
 
           <div className="mt-6 text-center text-xs tracking-wider text-[#6B6B6B] space-x-3 font-light">
