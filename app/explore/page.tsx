@@ -15,8 +15,8 @@ const sampleDesigns = [
   { id: "french-2", imageUrl: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=600&h=800&fit=crop&q=80", title: "Modern French", description: "Contemporary take on the classic", style: "French Manicure" },
   { id: "french-3", imageUrl: "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=600&h=800&fit=crop&q=80", title: "Nude French", description: "Subtle elegance with nude base", style: "French Manicure" },
   { id: "french-4", imageUrl: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=800&fit=crop&q=80", title: "Pink French", description: "Soft pink with white tips", style: "French Manicure" },
-  { id: "french-5", imageUrl: "https://images.unsplash.com/photo-1604654894609-b5c0a2c39a9e?w=600&h=800&fit=crop&q=80", title: "Reverse French", description: "Tips at the base", style: "French Manicure" },
-  { id: "french-6", imageUrl: "https://images.unsplash.com/photo-1599948128020-9a44d19e148b?w=600&h=800&fit=crop&q=80", title: "Colored French", description: "Bold colored tips", style: "French Manicure" },
+  { id: "french-5", imageUrl: "https://images.unsplash.com/photo-1604902396830-aca29e19b067?w=600&h=800&fit=crop&q=80", title: "Reverse French", description: "Tips at the base", style: "French Manicure" },
+  { id: "french-6", imageUrl: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600&h=800&fit=crop&q=80", title: "Colored French", description: "Bold colored tips", style: "French Manicure" },
   { id: "french-7", imageUrl: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&h=800&fit=crop&q=80", title: "Double French", description: "Two-tone tip design", style: "French Manicure" },
   { id: "french-8", imageUrl: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&h=800&fit=crop&q=80", title: "Diagonal French", description: "Angled tip line", style: "French Manicure" },
   { id: "french-9", imageUrl: "https://images.unsplash.com/photo-1515688594390-b649af70d282?w=600&h=800&fit=crop&q=80", title: "V-Tip French", description: "V-shaped tips", style: "French Manicure" },
@@ -29,8 +29,8 @@ const sampleDesigns = [
   { id: "floral-4", imageUrl: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=600&h=800&fit=crop&q=80&hue=60", title: "Tropical Hibiscus", description: "Exotic island vibes", style: "Floral Art" },
   { id: "floral-5", imageUrl: "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=600&h=800&fit=crop&q=80&hue=90", title: "Lavender Fields", description: "Purple floral elegance", style: "Floral Art" },
   { id: "floral-6", imageUrl: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=800&fit=crop&q=80&hue=120", title: "Daisy Chain", description: "White petals and yellow centers", style: "Floral Art" },
-  { id: "floral-7", imageUrl: "https://images.unsplash.com/photo-1604654894609-b5c0a2c39a9e?w=600&h=800&fit=crop&q=80&hue=150", title: "Botanical Leaves", description: "Green foliage accents", style: "Floral Art" },
-  { id: "floral-8", imageUrl: "https://images.unsplash.com/photo-1599948128020-9a44d19e148b?w=600&h=800&fit=crop&q=80&hue=180", title: "Watercolor Blooms", description: "Soft painted flowers", style: "Floral Art" },
+  { id: "floral-7", imageUrl: "https://images.unsplash.com/photo-1596704017254-9b121068ec31?w=600&h=800&fit=crop&q=80", title: "Botanical Leaves", description: "Green foliage accents", style: "Floral Art" },
+  { id: "floral-8", imageUrl: "https://images.unsplash.com/photo-1598452963314-b09f397a5c48?w=600&h=800&fit=crop&q=80", title: "Watercolor Blooms", description: "Soft painted flowers", style: "Floral Art" },
   { id: "floral-9", imageUrl: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&h=800&fit=crop&q=80&hue=210", title: "Pressed Flowers", description: "Dried flower art", style: "Floral Art" },
   { id: "floral-10", imageUrl: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&h=800&fit=crop&q=80&hue=240", title: "3D Floral", description: "Raised petal details", style: "Floral Art" },
   
@@ -43,8 +43,8 @@ const sampleDesigns = [
   { id: "geo-6", imageUrl: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=600&h=800&fit=crop&q=80&contrast=20", title: "Dot Matrix", description: "Polka dot precision", style: "Geometric" },
   { id: "geo-7", imageUrl: "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=600&h=800&fit=crop&q=80&contrast=20", title: "Grid Lines", description: "Intersecting lines", style: "Geometric" },
   { id: "geo-8", imageUrl: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=800&fit=crop&q=80&contrast=20", title: "Abstract Art", description: "Modern shapes", style: "Geometric" },
-  { id: "geo-9", imageUrl: "https://images.unsplash.com/photo-1604654894609-b5c0a2c39a9e?w=600&h=800&fit=crop&q=80&contrast=20", title: "Half Moon", description: "Curved geometric design", style: "Geometric" },
-  { id: "geo-10", imageUrl: "https://images.unsplash.com/photo-1599948128020-9a44d19e148b?w=600&h=800&fit=crop&q=80&contrast=20", title: "Metallic Lines", description: "Gold and silver accents", style: "Geometric" },
+  { id: "geo-9", imageUrl: "https://images.unsplash.com/photo-1604902396830-aca29e19b067?w=600&h=800&fit=crop&q=80", title: "Half Moon", description: "Curved geometric design", style: "Geometric" },
+  { id: "geo-10", imageUrl: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600&h=800&fit=crop&q=80", title: "Metallic Lines", description: "Gold and silver accents", style: "Geometric" },
   
   // Minimalist (10 designs)
   { id: "min-1", imageUrl: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&h=800&fit=crop&q=80", title: "Bare Nude", description: "Natural nail perfection", style: "Minimalist" },
@@ -59,8 +59,8 @@ const sampleDesigns = [
   { id: "min-10", imageUrl: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=800&fit=crop&q=80&sat=-80", title: "Subtle Shimmer", description: "Hint of pearl", style: "Minimalist" },
   
   // Glitter (10 designs)
-  { id: "glitter-1", imageUrl: "https://images.unsplash.com/photo-1604654894609-b5c0a2c39a9e?w=600&h=800&fit=crop&q=80&brightness=10", title: "Full Sparkle", description: "All-over glitter", style: "Glitter" },
-  { id: "glitter-2", imageUrl: "https://images.unsplash.com/photo-1599948128020-9a44d19e148b?w=600&h=800&fit=crop&q=80&brightness=10", title: "Glitter Gradient", description: "Fading sparkle", style: "Glitter" },
+  { id: "glitter-1", imageUrl: "https://images.unsplash.com/photo-1596704017254-9b121068ec31?w=600&h=800&fit=crop&q=80", title: "Full Sparkle", description: "All-over glitter", style: "Glitter" },
+  { id: "glitter-2", imageUrl: "https://images.unsplash.com/photo-1598452963314-b09f397a5c48?w=600&h=800&fit=crop&q=80", title: "Glitter Gradient", description: "Fading sparkle", style: "Glitter" },
   { id: "glitter-3", imageUrl: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&h=800&fit=crop&q=80&brightness=10", title: "Accent Glitter", description: "One sparkly nail", style: "Glitter" },
   { id: "glitter-4", imageUrl: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&h=800&fit=crop&q=80&brightness=10", title: "Chunky Glitter", description: "Large glitter pieces", style: "Glitter" },
   { id: "glitter-5", imageUrl: "https://images.unsplash.com/photo-1515688594390-b649af70d282?w=600&h=800&fit=crop&q=80&brightness=10", title: "Fine Shimmer", description: "Micro glitter dust", style: "Glitter" },
@@ -73,8 +73,8 @@ const sampleDesigns = [
   // Ombre (10 designs)
   { id: "ombre-1", imageUrl: "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=600&h=800&fit=crop&q=80&hue=330", title: "Pink Fade", description: "Light to dark pink", style: "Ombre" },
   { id: "ombre-2", imageUrl: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=800&fit=crop&q=80&hue=330", title: "Sunset Ombre", description: "Orange to pink blend", style: "Ombre" },
-  { id: "ombre-3", imageUrl: "https://images.unsplash.com/photo-1604654894609-b5c0a2c39a9e?w=600&h=800&fit=crop&q=80&hue=200", title: "Ocean Blue", description: "Blue gradient waves", style: "Ombre" },
-  { id: "ombre-4", imageUrl: "https://images.unsplash.com/photo-1599948128020-9a44d19e148b?w=600&h=800&fit=crop&q=80&hue=270", title: "Purple Dream", description: "Lavender to violet", style: "Ombre" },
+  { id: "ombre-3", imageUrl: "https://images.unsplash.com/photo-1604902396830-aca29e19b067?w=600&h=800&fit=crop&q=80", title: "Ocean Blue", description: "Blue gradient waves", style: "Ombre" },
+  { id: "ombre-4", imageUrl: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600&h=800&fit=crop&q=80", title: "Purple Dream", description: "Lavender to violet", style: "Ombre" },
   { id: "ombre-5", imageUrl: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&h=800&fit=crop&q=80&hue=90", title: "Mint Green", description: "Fresh green fade", style: "Ombre" },
   { id: "ombre-6", imageUrl: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&h=800&fit=crop&q=80&hue=30", title: "Peach Gradient", description: "Soft peach blend", style: "Ombre" },
   { id: "ombre-7", imageUrl: "https://images.unsplash.com/photo-1515688594390-b649af70d282?w=600&h=800&fit=crop&q=80&hue=0", title: "Red to Black", description: "Dramatic dark fade", style: "Ombre" },
