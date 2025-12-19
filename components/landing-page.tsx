@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 export default function LandingPage() {
   const router = useRouter()
   const [scrolled, setScrolled] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -186,22 +185,23 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=500&fit=crop",
-              "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=400&h=500&fit=crop",
-              "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=400&h=500&fit=crop",
-              "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=400&h=500&fit=crop",
-              "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=400&h=500&fit=crop",
-              "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=400&h=500&fit=crop",
-              "https://images.unsplash.com/photo-1604654894609-b5c0a2c39a9e?w=400&h=500&fit=crop",
-              "https://images.unsplash.com/photo-1515688594390-b649af70d282?w=400&h=500&fit=crop"
+              "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=500&fit=crop&q=80",
+              "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=400&h=500&fit=crop&q=80",
+              "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=400&h=500&fit=crop&q=80",
+              "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=400&h=500&fit=crop&q=80",
+              "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=400&h=500&fit=crop&q=80",
+              "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=400&h=500&fit=crop&q=80",
+              "https://images.unsplash.com/photo-1604654894609-b5c0a2c39a9e?w=400&h=500&fit=crop&q=80",
+              "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=500&fit=crop&q=80&sat=-100"
             ].map((src, idx) => (
-              <div key={idx} className="relative aspect-[4/5] overflow-hidden group cursor-pointer">
+              <div key={idx} className="relative aspect-[4/5] overflow-hidden group cursor-pointer" onClick={() => router.push('/explore')}>
                 <Image
                   src={src}
                   alt={`Nail design inspiration ${idx + 1}`}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  unoptimized
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
