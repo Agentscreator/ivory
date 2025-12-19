@@ -5,11 +5,12 @@ import { eq, and, sql } from 'drizzle-orm';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await request.json();
-    const lookId = parseInt(params.id);
+    const { id } = await params;
+    const lookId = parseInt(id);
 
     if (!userId || !lookId) {
       return NextResponse.json(
@@ -66,12 +67,13 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
-    const lookId = parseInt(params.id);
+    const { id } = await params;
+    const lookId = parseInt(id);
 
     if (!userId || !lookId) {
       return NextResponse.json(
@@ -122,12 +124,13 @@ export async function DELETE(
 // Check if user has liked a design
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
-    const lookId = parseInt(params.id);
+    const { id } = await params;
+    const lookId = parseInt(id);
 
     if (!userId) {
       return NextResponse.json({ liked: false, likeCount: 0 });
