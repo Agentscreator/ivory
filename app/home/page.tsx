@@ -239,17 +239,9 @@ export default function HomePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
-                <div className={isWatch ? 'p-2' : 'p-3 sm:p-4 relative'}>
-                  <div className="flex items-start justify-between gap-2">
-                    <button 
-                      className={`font-serif text-[#1A1A1A] font-light hover:text-[#8B7355] transition-all duration-300 cursor-pointer flex-1 text-left hover:translate-x-1 ${
-                        isWatch ? 'text-[10px]' : 'text-sm sm:text-base'
-                      }`}
-                      onClick={() => router.push(`/look/${look.id}`)}
-                    >
-                      View Design
-                    </button>
-                    {!isWatch && currentUserId && look.userId && look.userId !== currentUserId && (
+                {!isWatch && currentUserId && look.userId && look.userId !== currentUserId && (
+                  <div className={isWatch ? 'p-2' : 'p-3 sm:p-4 relative'}>
+                    <div className="flex items-end justify-end">
                       <ContentModerationMenu
                         currentUserId={currentUserId}
                         contentType="look"
@@ -258,9 +250,9 @@ export default function HomePage() {
                         contentOwnerUsername={look.username || `User ${look.userId}`}
                         showBlockOption={true}
                       />
-                    )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ))}
           </WatchGrid>
