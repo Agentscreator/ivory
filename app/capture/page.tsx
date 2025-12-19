@@ -1113,103 +1113,103 @@ export default function CapturePage() {
 
   if (capturedImage) {
     return (
-      <div className="fixed inset-0 z-[100] bg-white flex flex-col">
-        {/* Header */}
-        <div className="absolute top-0 left-0 right-0 pt-14 px-4 sm:px-6 pb-4 z-10 bg-white border-b border-[#E8E8E8]">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <h1 className="font-serif text-base sm:text-xl font-light text-[#1A1A1A] tracking-tight hidden xs:block">
-                Design Your Nails
-              </h1>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-3 ml-auto">
-              <button
-                onClick={changePhoto}
-                className="h-10 px-3 sm:px-4 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center gap-2"
-              >
-                <Upload className="w-4 h-4" strokeWidth={1} />
-                <span className="hidden sm:inline">Change</span>
-              </button>
-              <div className="flex items-center">
-                <CreditsDisplay showLabel={true} credits={credits} />
+      <div className="fixed inset-0 z-[100] bg-gradient-to-b from-[#F8F7F5] via-white to-white flex flex-col">
+        {/* Elegant Header */}
+        <div className="absolute top-0 left-0 right-0 pt-12 sm:pt-14 px-4 sm:px-8 lg:px-12 pb-5 sm:pb-6 z-10 bg-white/95 backdrop-blur-md border-b border-[#E8E8E8]/50 transition-all duration-500">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-4 sm:mb-5">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <h1 className="font-serif text-lg sm:text-2xl lg:text-3xl font-light text-[#1A1A1A] tracking-[-0.01em] leading-tight">
+                  Design Your Nails
+                </h1>
               </div>
-            </div>
-          </div>
-          
-          {/* Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:justify-end">
-            {designTabs.map((tab) => (
-              <div key={tab.id} className="flex items-center gap-1">
+              <div className="flex items-center gap-2 sm:gap-4 ml-auto">
                 <button
-                  onClick={() => setActiveTabId(tab.id)}
-                  className={`h-8 px-3 font-light text-xs tracking-wider uppercase transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${
-                    activeTabId === tab.id
-                      ? 'bg-[#1A1A1A] text-white'
-                      : 'border border-[#E8E8E8] text-[#1A1A1A] hover:bg-[#F8F7F5]'
-                  }`}
+                  onClick={changePhoto}
+                  className="h-10 sm:h-11 px-4 sm:px-6 border border-[#E8E8E8] text-[#1A1A1A] font-light text-[10px] sm:text-[11px] tracking-[0.2em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center gap-2 rounded-none"
                 >
-                  {tab.name}
-                  {tab.finalPreviews.length > 0 && (
-                    <span className={`text-[10px] px-1.5 py-0.5 ${
-                      activeTabId === tab.id ? 'bg-white/20' : 'bg-[#F8F7F5]'
-                    }`}>
-                      {tab.finalPreviews.length}
-                    </span>
-                  )}
+                  <Upload className="w-4 h-4" strokeWidth={1} />
+                  <span className="hidden sm:inline">Change Photo</span>
+                  <span className="sm:hidden">Change</span>
                 </button>
-                {designTabs.length > 1 && (
-                  <button
-                    onClick={() => removeTab(tab.id)}
-                    className="w-6 h-6 border border-[#E8E8E8] text-[#6B6B6B] hover:bg-[#F8F7F5] hover:text-[#1A1A1A] transition-all duration-300 flex items-center justify-center"
-                  >
-                    <X className="w-3 h-3" strokeWidth={1} />
-                  </button>
-                )}
+                <div className="flex items-center">
+                  <CreditsDisplay showLabel={true} credits={credits} />
+                </div>
               </div>
-            ))}
-            {designTabs.length < 5 && (
-              <button
-                onClick={addNewTab}
-                className="h-8 px-3 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] transition-all duration-300 flex items-center gap-1 whitespace-nowrap"
-              >
-                <span className="text-lg leading-none">+</span>
-                New
-              </button>
-            )}
+            </div>
+            
+            {/* Elegant Tabs */}
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-1 sm:justify-end scrollbar-hide">
+              {designTabs.map((tab) => (
+                <div key={tab.id} className="flex items-center gap-1.5 sm:gap-2">
+                  <button
+                    onClick={() => setActiveTabId(tab.id)}
+                    className={`h-9 sm:h-10 px-4 sm:px-5 font-light text-[10px] sm:text-[11px] tracking-[0.2em] uppercase transition-all duration-500 flex items-center gap-2 whitespace-nowrap rounded-none ${
+                      activeTabId === tab.id
+                        ? 'bg-[#1A1A1A] text-white shadow-sm'
+                        : 'border border-[#E8E8E8] text-[#1A1A1A] hover:bg-[#F8F7F5] hover:border-[#8B7355]'
+                    }`}
+                  >
+                    {tab.name}
+                    {tab.finalPreviews.length > 0 && (
+                      <span className={`text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-sm ${
+                        activeTabId === tab.id ? 'bg-white/20' : 'bg-[#F8F7F5]'
+                      }`}>
+                        {tab.finalPreviews.length}
+                      </span>
+                    )}
+                  </button>
+                  {designTabs.length > 1 && (
+                    <button
+                      onClick={() => removeTab(tab.id)}
+                      className="w-7 h-7 sm:w-8 sm:h-8 border border-[#E8E8E8] text-[#6B6B6B] hover:bg-[#F8F7F5] hover:text-[#1A1A1A] hover:border-[#8B7355] transition-all duration-500 flex items-center justify-center rounded-none"
+                    >
+                      <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" strokeWidth={1} />
+                    </button>
+                  )}
+                </div>
+              ))}
+              {designTabs.length < 5 && (
+                <button
+                  onClick={addNewTab}
+                  className="h-9 sm:h-10 px-4 sm:px-5 border border-[#E8E8E8] text-[#1A1A1A] font-light text-[10px] sm:text-[11px] tracking-[0.2em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] transition-all duration-500 flex items-center gap-2 whitespace-nowrap rounded-none"
+                >
+                  <span className="text-base sm:text-lg leading-none">+</span>
+                  <span className="hidden sm:inline">New Design</span>
+                  <span className="sm:hidden">New</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Image Preview - Original on left, generated thumbnails on right */}
+        {/* Elegant Image Preview Section */}
         <div 
-          className="pt-32 pb-4 px-4 overflow-y-auto transition-all duration-300" 
+          className="pt-36 sm:pt-40 lg:pt-44 pb-4 sm:pb-6 px-4 sm:px-8 lg:px-12 overflow-y-auto transition-all duration-700" 
           style={{ 
             height: expandedSection ? 'calc(35vh - 80px)' : 'calc(65vh - 80px)', 
-            minHeight: expandedSection ? '200px' : '400px' 
+            minHeight: expandedSection ? '220px' : '420px' 
           }}
         >
-          <div className="max-w-2xl mx-auto h-full">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 h-full">
-                {/* Original Image */}
-                <div className="relative overflow-hidden border border-[#E8E8E8] group h-full bg-white">
-                  <div className="relative bg-[#F8F7F5] h-full">
-                    <Image src={capturedImage} alt="Original" fill className="object-contain" />
-                    {/* Change Photo Overlay */}
+          <div className="max-w-6xl mx-auto h-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 h-full">
+                {/* Original Image Card */}
+                <div className="relative overflow-hidden border border-[#E8E8E8]/50 group h-full bg-white shadow-sm hover:shadow-lg transition-all duration-700 rounded-sm animate-fade-in">
+                  <div className="relative bg-gradient-to-br from-[#F8F7F5] to-white h-full">
+                    <Image src={capturedImage} alt="Original" fill className="object-contain p-4 sm:p-6 transition-transform duration-700 group-hover:scale-[1.02]" />
+                    {/* Elegant Change Photo Overlay */}
                     <button
                       onClick={changePhoto}
-                      className="absolute inset-0 bg-black/0 hover:bg-black/50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 active:scale-95"
+                      className="absolute inset-0 bg-black/0 hover:bg-black/60 transition-all duration-700 flex items-center justify-center opacity-0 group-hover:opacity-100 active:scale-[0.98]"
                     >
-                      <div className="bg-white p-4">
-                        <Upload className="w-7 h-7 text-[#1A1A1A]" strokeWidth={1} />
+                      <div className="bg-white p-5 sm:p-6 shadow-2xl transform group-hover:scale-105 transition-transform duration-500 rounded-sm">
+                        <Upload className="w-7 h-7 sm:w-8 sm:h-8 text-[#1A1A1A]" strokeWidth={0.8} />
                       </div>
                     </button>
-                    {/* Label */}
-                    <div className="absolute top-3 left-3 bg-white border border-[#E8E8E8] px-3 py-1.5">
-                      <span className="text-xs font-light tracking-wider uppercase text-[#1A1A1A]">Original</span>
-                    </div>
-                    {/* Draw Button */}
+                    {/* Elegant Draw Button */}
                     <button
                       onClick={() => setShowDrawingCanvas(true)}
-                      className="absolute bottom-3 right-3 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white p-3 active:scale-95 transition-all"
+                      className="absolute bottom-4 sm:bottom-5 right-4 sm:right-5 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white p-3 sm:p-4 active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl rounded-sm"
                       title={drawingImageUrl ? 'Drawing added - click to edit' : 'Draw on image'}
                     >
                       <Pencil className="w-5 h-5" strokeWidth={1} />
@@ -1217,28 +1217,28 @@ export default function CapturePage() {
                   </div>
                 </div>
 
-                {/* Preview Placeholder or Generated Thumbnails */}
-                <div className="relative overflow-hidden border border-[#E8E8E8] h-full bg-white">
+                {/* AI Designs Card */}
+                <div className="relative overflow-hidden border border-[#E8E8E8]/50 h-full bg-white shadow-sm hover:shadow-lg transition-all duration-700 rounded-sm animate-fade-in-delayed">
                   {finalPreviews.length > 0 ? (
-                    /* Show generated images as thumbnails */
-                    <div className="relative bg-[#F8F7F5] h-full p-4 flex flex-col gap-3">
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm font-light tracking-wider uppercase text-[#1A1A1A]">AI Designs</div>
-                        <div className="bg-white border border-[#E8E8E8] px-2.5 py-1">
-                          <span className="text-xs font-light text-[#1A1A1A]">{finalPreviews.length}</span>
+                    /* Generated Designs Gallery */
+                    <div className="relative bg-gradient-to-br from-[#F8F7F5] to-white h-full p-4 sm:p-6 flex flex-col gap-4">
+                      <div className="flex items-center justify-end">
+                        <div className="bg-[#1A1A1A] text-white px-3 sm:px-4 py-1.5 sm:py-2 shadow-sm rounded-sm">
+                          <span className="text-xs sm:text-sm font-light tracking-wider">{finalPreviews.length}</span>
                         </div>
                       </div>
-                      <div className="flex-1 flex flex-col gap-2.5 overflow-y-auto">
+                      <div className="flex-1 flex flex-col gap-3 sm:gap-4 overflow-y-auto scrollbar-hide">
                         {finalPreviews.map((imageUrl, index) => (
                           <button
                             key={index}
                             onClick={() => setSelectedImageModal(imageUrl)}
-                            className="relative overflow-hidden border border-[#E8E8E8] hover:border-[#8B7355] transition-all active:scale-95 aspect-[3/2] group"
+                            className="relative overflow-hidden border border-[#E8E8E8]/50 hover:border-[#8B7355] transition-all duration-500 active:scale-[0.98] aspect-[3/2] group shadow-sm hover:shadow-md rounded-sm animate-fade-in"
+                            style={{ animationDelay: `${index * 100}ms` }}
                           >
-                            <Image src={imageUrl} alt={`Design ${index + 1}`} fill className="object-cover" />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                              <div className="bg-white p-2.5 border border-[#E8E8E8]">
-                                <Sparkles className="w-5 h-5 text-[#8B7355]" strokeWidth={1} />
+                            <Image src={imageUrl} alt={`Design ${index + 1}`} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                              <div className="bg-white p-3 sm:p-4 border border-[#E8E8E8]/50 shadow-lg transform group-hover:scale-110 transition-transform duration-500 rounded-sm">
+                                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#8B7355]" strokeWidth={1} />
                               </div>
                             </div>
                           </button>
@@ -1246,11 +1246,11 @@ export default function CapturePage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="relative bg-[#F8F7F5] flex items-center justify-center h-full">
+                    <div className="relative bg-gradient-to-br from-[#F8F7F5] to-white flex items-center justify-center h-full">
                       {isGenerating ? (
                         <div className="absolute inset-0 flex items-center justify-center">
-                      {/* Dimmed GIF Background */}
-                      <div className="absolute inset-0 opacity-30">
+                      {/* Elegant Loading State */}
+                      <div className="absolute inset-0 opacity-20">
                         <Image 
                           src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGdkNWtib3JrcXhvcHFiaHdraHR5aDJsN3Bzcmx2ajZyNWJlemM1biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ljj4pInW5JllK/giphy.gif"
                           alt="Generating..."
@@ -1266,74 +1266,67 @@ export default function CapturePage() {
                         />
                       </div>
                       
-                      {/* Loading Overlay with Percentage */}
-                      <div className="relative z-10 flex flex-col items-center justify-center gap-4 px-6">
-                        {/* Circular Progress */}
-                        <div className="relative w-32 h-32">
-                          {/* Background Circle */}
-                          <svg className="w-32 h-32 transform -rotate-90">
+                      {/* Elegant Progress Indicator */}
+                      <div className="relative z-10 flex flex-col items-center justify-center gap-6 sm:gap-8 px-6">
+                        <div className="relative w-32 h-32 sm:w-40 sm:h-40">
+                          <svg className="w-full h-full transform -rotate-90">
                             <circle
-                              cx="64"
-                              cy="64"
-                              r="56"
-                              stroke="rgba(255, 255, 255, 0.2)"
-                              strokeWidth="8"
+                              cx="50%"
+                              cy="50%"
+                              r="45%"
+                              stroke="rgba(255, 255, 255, 0.3)"
+                              strokeWidth="6"
                               fill="none"
                             />
-                            {/* Progress Circle */}
                             <circle
-                              cx="64"
-                              cy="64"
-                              r="56"
+                              cx="50%"
+                              cy="50%"
+                              r="45%"
                               stroke="url(#gradient)"
-                              strokeWidth="8"
+                              strokeWidth="6"
                               fill="none"
                               strokeLinecap="round"
-                              strokeDasharray={`${2 * Math.PI * 56}`}
-                              strokeDashoffset={`${2 * Math.PI * 56 * (1 - generationProgress / 100)}`}
-                              className="transition-all duration-300 ease-out"
+                              strokeDasharray={`${2 * Math.PI * 64}`}
+                              strokeDashoffset={`${2 * Math.PI * 64 * (1 - generationProgress / 100)}`}
+                              className="transition-all duration-500 ease-out"
                             />
                             <defs>
                               <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#FF6B9D" />
-                                <stop offset="100%" stopColor="#C44569" />
+                                <stop offset="0%" stopColor="#8B7355" />
+                                <stop offset="100%" stopColor="#1A1A1A" />
                               </linearGradient>
                             </defs>
                           </svg>
-                          
-                          {/* Percentage Text */}
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="text-center">
-                              <div className="text-4xl font-bold text-white drop-shadow-lg">
+                              <div className="text-4xl sm:text-5xl font-serif font-light text-white drop-shadow-2xl">
                                 {Math.round(generationProgress)}%
                               </div>
                             </div>
                           </div>
                         </div>
                         
-                        {/* Loading Text */}
-                        <div className="text-center">
-                          <p className="text-white font-semibold text-lg drop-shadow-lg mb-1">
+                        <div className="text-center space-y-2">
+                          <p className="text-white font-light text-base sm:text-lg drop-shadow-lg tracking-wide">
                             Creating Your Design
                           </p>
-                          <p className="text-white/80 text-sm drop-shadow">
+                          <p className="text-white/70 text-xs sm:text-sm drop-shadow font-light tracking-wider">
                             This may take a moment...
                           </p>
                         </div>
                         
-                        {/* Animated Sparkles */}
-                        <div className="flex gap-2">
+                        <div className="flex gap-3">
                           <Sparkles className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '0ms' }} />
-                          <Sparkles className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '150ms' }} />
-                          <Sparkles className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '300ms' }} />
+                          <Sparkles className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '200ms' }} />
+                          <Sparkles className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '400ms' }} />
                         </div>
                       </div>
                     </div>
                       ) : (
-                        <div className="text-center px-4">
-                          <Sparkles className="w-8 h-8 mx-auto mb-2 text-[#8B7355]" strokeWidth={1} />
-                          <p className="text-xs text-[#6B6B6B] font-light tracking-wider uppercase">
-                            Configure design below
+                        <div className="text-center px-6 space-y-4">
+                          <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-[#8B7355]" strokeWidth={0.8} />
+                          <p className="text-xs sm:text-sm text-[#6B6B6B] font-light tracking-[0.15em] uppercase">
+                            Configure Your Design Below
                           </p>
                         </div>
                       )}
@@ -1378,9 +1371,9 @@ S
           </div>
         )}
 
-        {/* Bottom Drawer */}
+        {/* Elegant Bottom Drawer with Mobile Optimization */}
         <div 
-          className="fixed left-0 right-0 bg-white border-t border-[#E8E8E8] z-20 touch-action-pan-y transition-all duration-300" 
+          className="fixed left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#E8E8E8]/50 z-20 touch-action-pan-y transition-all duration-500 shadow-2xl" 
           style={{ 
             bottom: '80px', 
             height: expandedSection ? 'calc(65vh - 80px)' : 'calc(35vh - 80px)', 
@@ -1388,26 +1381,27 @@ S
             maxHeight: expandedSection ? '600px' : '370px' 
           }}
         >
-          <div className="max-w-2xl mx-auto h-full flex flex-col">
-            <div className="h-1 w-16 bg-[#E8E8E8] mx-auto my-3 flex-shrink-0"></div>
+          <div className="max-w-4xl mx-auto h-full flex flex-col">
+            {/* Elegant Drag Handle */}
+            <div className="h-1.5 w-20 bg-[#E8E8E8] rounded-full mx-auto my-4 flex-shrink-0 transition-all duration-300 hover:bg-[#8B7355]"></div>
 
             <div className="w-full flex-1 flex flex-col overflow-hidden">
               {(designMode === 'design' || designMode === null) && (
-                <div className="p-6 space-y-4 overflow-y-auto overscroll-contain flex-1">
+                <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-5 overflow-y-auto overscroll-contain flex-1 scrollbar-hide">
                   {/* Low Credits Warning */}
                   {credits !== null && credits <= 2 && credits > 0 && (
-                    <div className="bg-[#FFF9E6] border border-[#E8E8E8] p-4 text-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 border border-[#E8E8E8] bg-white flex items-center justify-center flex-shrink-0">
-                          <span className="text-lg">⚠️</span>
+                    <div className="bg-gradient-to-r from-[#FFF9E6] to-[#FFF9E6]/50 border border-[#E8E8E8]/50 p-4 sm:p-5 text-sm rounded-sm shadow-sm animate-fade-in">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 border border-[#E8E8E8] bg-white flex items-center justify-center flex-shrink-0 rounded-sm shadow-sm">
+                          <span className="text-lg sm:text-xl">⚠️</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-[#1A1A1A] font-light tracking-wider uppercase mb-1 text-xs">Low on credits!</p>
-                          <p className="text-[#6B6B6B] text-xs leading-relaxed font-light">
+                          <p className="text-[#1A1A1A] font-light tracking-[0.15em] uppercase mb-2 text-[10px] sm:text-xs">Low on credits!</p>
+                          <p className="text-[#6B6B6B] text-xs sm:text-sm leading-relaxed font-light">
                             You have {credits} credit{credits !== 1 ? 's' : ''} left. 
                             <button 
                               onClick={() => router.push('/settings/credits')}
-                              className="underline ml-1 hover:text-[#1A1A1A]"
+                              className="underline ml-1 hover:text-[#1A1A1A] transition-colors duration-300"
                             >
                               Get more
                             </button>
@@ -1419,18 +1413,18 @@ S
 
                   {/* No Credits Warning */}
                   {credits !== null && credits === 0 && (
-                    <div className="bg-[#FFF0F0] border border-[#E8E8E8] p-4 text-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 border border-[#E8E8E8] bg-white flex items-center justify-center flex-shrink-0">
-                          <span className="text-lg">❌</span>
+                    <div className="bg-gradient-to-r from-[#FFF0F0] to-[#FFF0F0]/50 border border-[#E8E8E8]/50 p-4 sm:p-5 text-sm rounded-sm shadow-sm animate-fade-in">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 border border-[#E8E8E8] bg-white flex items-center justify-center flex-shrink-0 rounded-sm shadow-sm">
+                          <span className="text-lg sm:text-xl">❌</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-[#1A1A1A] font-light tracking-wider uppercase mb-1 text-xs">No credits remaining</p>
-                          <p className="text-[#6B6B6B] text-xs leading-relaxed font-light">
+                          <p className="text-[#1A1A1A] font-light tracking-[0.15em] uppercase mb-2 text-[10px] sm:text-xs">No credits remaining</p>
+                          <p className="text-[#6B6B6B] text-xs sm:text-sm leading-relaxed font-light">
                             Refer 3 friends to earn 1 free credit!
                             <button 
                               onClick={() => router.push('/settings/credits')}
-                              className="underline ml-1 hover:text-[#1A1A1A]"
+                              className="underline ml-1 hover:text-[#1A1A1A] transition-colors duration-300"
                             >
                               Learn more
                             </button>
@@ -1440,17 +1434,17 @@ S
                     </div>
                   )}
 
-                  {/* Generate Preview Button */}
+                  {/* Elegant Generate Preview Button */}
                   {!isGenerating ? (
                     <button 
                       onClick={() => generateAIPreview(designSettings)} 
-                      className="w-full h-12 bg-[#1A1A1A] text-white font-light text-sm tracking-wider uppercase hover:bg-[#1A1A1A]/90 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
+                      className="w-full h-12 sm:h-14 bg-[#1A1A1A] text-white font-light text-[11px] sm:text-sm tracking-[0.2em] uppercase hover:bg-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={!hasCredits(1)}
                     >
                       <Sparkles className="w-5 h-5" strokeWidth={1} />
                       Generate Preview
                       {credits !== null && (
-                        <span className="ml-2 text-xs opacity-80 font-light">
+                        <span className="ml-2 text-[10px] sm:text-xs opacity-70 font-light">
                           (1 credit)
                         </span>
                       )}
@@ -1458,7 +1452,7 @@ S
                   ) : (
                     <button 
                       onClick={cancelGeneration}
-                      className="w-full h-12 border border-[#E8E8E8] text-[#1A1A1A] font-light text-sm tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
+                      className="w-full h-12 sm:h-14 border border-[#E8E8E8] text-[#1A1A1A] font-light text-[11px] sm:text-sm tracking-[0.2em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 sm:gap-3 rounded-sm"
                     >
                       <X className="w-5 h-5" strokeWidth={1} />
                       Cancel Generation
@@ -1467,20 +1461,20 @@ S
 
                   {/* Drawing Status */}
                   {drawingImageUrl && (
-                    <div className="bg-[#F0FFF4] border border-[#E8E8E8] p-4 text-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 border border-[#E8E8E8] bg-white flex items-center justify-center flex-shrink-0">
-                          <Pencil className="w-4 h-4 text-[#2D7A4F]" strokeWidth={1} />
+                    <div className="bg-gradient-to-r from-[#F0FFF4] to-[#F0FFF4]/50 border border-[#E8E8E8]/50 p-4 sm:p-5 text-sm rounded-sm shadow-sm animate-fade-in">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 border border-[#E8E8E8] bg-white flex items-center justify-center flex-shrink-0 rounded-sm shadow-sm">
+                          <Pencil className="w-4 h-4 sm:w-5 sm:h-5 text-[#2D7A4F]" strokeWidth={1} />
                         </div>
                         <div className="flex-1">
-                          <p className="text-[#1A1A1A] font-light tracking-wider uppercase mb-1 text-xs">Drawing added</p>
-                          <p className="text-[#6B6B6B] text-xs leading-relaxed font-light">
+                          <p className="text-[#1A1A1A] font-light tracking-[0.15em] uppercase mb-2 text-[10px] sm:text-xs">Drawing added</p>
+                          <p className="text-[#6B6B6B] text-xs sm:text-sm leading-relaxed font-light">
                             Your drawing will guide the AI to create designs following your outline
                           </p>
                         </div>
                         <button
                           onClick={() => setDrawingImageUrl(null)}
-                          className="text-[#6B6B6B] hover:text-[#1A1A1A]"
+                          className="text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors duration-300 p-1"
                         >
                           <X className="w-5 h-5" strokeWidth={1} />
                         </button>
@@ -1488,14 +1482,16 @@ S
                     </div>
                   )}
 
-                  {/* Upload Design Image */}
+                  {/* Elegant Upload Design Image Button */}
                   <button 
                     onClick={() => designUploadRef.current?.click()}
-                    className="w-full h-11 border border-[#E8E8E8] text-[#1A1A1A] font-light text-xs tracking-wider uppercase hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
+                    className="w-full h-11 sm:h-12 border border-[#E8E8E8] text-[#1A1A1A] font-light text-[10px] sm:text-[11px] tracking-[0.2em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isGenerating || selectedDesignImages.length >= 5}
                   >
                     <Upload className="w-4 h-4" strokeWidth={1} />
-                    Upload Design Images ({selectedDesignImages.length}/5)
+                    <span className="hidden sm:inline">Upload Design Images</span>
+                    <span className="sm:hidden">Upload Images</span>
+                    <span className="text-[10px] opacity-70">({selectedDesignImages.length}/5)</span>
                   </button>
 
                   {/* Uploaded Design Previews with Influence Control */}
