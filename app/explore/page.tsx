@@ -13,65 +13,86 @@ const sampleDesigns = [
   {
     id: "sample-1",
     imageUrl: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&h=800&fit=crop&q=80",
-    title: "Classic French Elegance",
-    description: "Timeless sophistication with a modern twist",
+    title: "Classic French Tips",
+    description: "Timeless white tips on natural nails",
     style: "French Manicure"
   },
   {
     id: "sample-2",
-    imageUrl: "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=600&h=800&fit=crop&q=80",
-    title: "Spring Blossom",
-    description: "Delicate floral patterns for the season",
-    style: "Floral Art"
+    imageUrl: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=600&h=800&fit=crop&q=80",
+    title: "Modern French",
+    description: "Contemporary take on the classic",
+    style: "French Manicure"
   },
   {
     id: "sample-3",
-    imageUrl: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=600&h=800&fit=crop&q=80",
-    title: "Geometric Precision",
-    description: "Bold lines and contemporary design",
-    style: "Geometric"
+    imageUrl: "https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=600&h=800&fit=crop&q=80",
+    title: "Delicate Florals",
+    description: "Hand-painted flower details",
+    style: "Floral Art"
   },
   {
     id: "sample-4",
-    imageUrl: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=800&fit=crop&q=80",
-    title: "Minimalist Nude",
-    description: "Understated elegance in neutral tones",
-    style: "Minimalist"
+    imageUrl: "https://images.unsplash.com/photo-1604654894609-b5c0a2c39a9e?w=600&h=800&fit=crop&q=80",
+    title: "Spring Garden",
+    description: "Blooming petals and leaves",
+    style: "Floral Art"
   },
   {
     id: "sample-5",
-    imageUrl: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&h=800&fit=crop&q=80",
-    title: "Evening Glamour",
-    description: "Sparkle and shine for special occasions",
-    style: "Glitter"
+    imageUrl: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&h=800&fit=crop&q=80",
+    title: "Clean Lines",
+    description: "Bold geometric patterns",
+    style: "Geometric"
   },
   {
     id: "sample-6",
-    imageUrl: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&h=800&fit=crop&q=80",
-    title: "Sunset Ombre",
-    description: "Gradient perfection in warm hues",
-    style: "Ombre"
+    imageUrl: "https://images.unsplash.com/photo-1515688594390-b649af70d282?w=600&h=800&fit=crop&q=80",
+    title: "Abstract Shapes",
+    description: "Modern geometric art",
+    style: "Geometric"
   },
   {
     id: "sample-7",
     imageUrl: "https://images.unsplash.com/photo-1599948128020-9a44d19e148b?w=600&h=800&fit=crop&q=80",
-    title: "Modern Minimalist",
-    description: "Clean lines and subtle elegance",
+    title: "Nude Perfection",
+    description: "Barely-there elegance",
     style: "Minimalist"
   },
   {
     id: "sample-8",
-    imageUrl: "https://images.unsplash.com/photo-1515688594390-b649af70d282?w=600&h=800&fit=crop&q=80",
-    title: "Bold Statement",
-    description: "Make an impression with dramatic design",
-    style: "Geometric"
+    imageUrl: "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=600&h=800&fit=crop&q=80",
+    title: "Simple Chic",
+    description: "Less is more",
+    style: "Minimalist"
   },
   {
     id: "sample-9",
-    imageUrl: "https://images.unsplash.com/photo-1604654894609-b5c0a2c39a9e?w=600&h=800&fit=crop&q=80",
-    title: "Soft Romance",
-    description: "Delicate and feminine touches",
-    style: "Floral Art"
+    imageUrl: "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&h=800&fit=crop&q=80",
+    title: "Sparkle & Shine",
+    description: "Glitter accent nails",
+    style: "Glitter"
+  },
+  {
+    id: "sample-10",
+    imageUrl: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&h=800&fit=crop&q=80",
+    title: "Full Glam",
+    description: "All-over shimmer",
+    style: "Glitter"
+  },
+  {
+    id: "sample-11",
+    imageUrl: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=600&h=800&fit=crop&q=80",
+    title: "Sunset Fade",
+    description: "Warm gradient blend",
+    style: "Ombre"
+  },
+  {
+    id: "sample-12",
+    imageUrl: "https://images.unsplash.com/photo-1562572159-4efc207f5aff?w=600&h=800&fit=crop&q=80",
+    title: "Pink to White",
+    description: "Soft color transition",
+    style: "Ombre"
   }
 ]
 
