@@ -159,6 +159,9 @@ export default function CapturePage() {
   
   // Sync current state with active tab
   useEffect(() => {
+    // Don't sync during initial load - let the initialization logic handle it
+    if (isInitializing) return
+    
     if (activeTab) {
       setFinalPreviews(activeTab.finalPreviews)
       setDesignSettings(activeTab.designSettings)
@@ -172,7 +175,7 @@ export default function CapturePage() {
         stopCamera()
       }
     }
-  }, [activeTabId])
+  }, [activeTabId, isInitializing])
   
   // Update active tab when state changes
   useEffect(() => {
