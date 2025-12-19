@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { ArrowLeft, Share2, Trash2, Send } from "lucide-react"
 import Image from "next/image"
 
@@ -69,54 +68,68 @@ export default function LookDetailPage() {
 
   if (!look) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-[#6B6B6B] font-light tracking-wide">Loading...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush">
+    <div className="min-h-screen bg-white pb-safe">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-border sticky top-0 z-10 safe-top">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="active:scale-95 transition-transform">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="font-serif text-lg sm:text-xl font-bold text-charcoal line-clamp-1">{look.title}</h1>
+      <header className="bg-white border-b border-[#E8E8E8] sticky top-0 z-10 pt-safe">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-5">
+          <button 
+            onClick={() => router.back()} 
+            className="flex items-center gap-2 sm:gap-3 text-[#1A1A1A] hover:text-[#8B7355] transition-colors duration-500 group active:scale-95 min-h-[44px] -ml-2 pl-2 pr-4"
+          >
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform duration-500" strokeWidth={1} />
+            <span className="text-[10px] sm:text-xs tracking-[0.25em] sm:tracking-[0.3em] uppercase font-light">Back</span>
+          </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-safe">
-        <Card className="overflow-hidden border-0 bg-white shadow-xl mb-4 sm:mb-6">
-          <div className="aspect-square relative">
-            <Image src={look.imageUrl || "/placeholder.svg"} alt={look.title} fill className="object-cover" />
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-12 lg:py-16 pb-8 sm:pb-12">
+        {/* Image Container */}
+        <div className="mb-8 sm:mb-14 lg:mb-16">
+          <div className="aspect-square relative overflow-hidden border border-[#E8E8E8] bg-[#F8F7F5] shadow-sm">
+            <Image 
+              src={look.imageUrl || "/placeholder.svg"} 
+              alt="Your Design" 
+              fill 
+              className="object-cover" 
+              priority
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 896px"
+            />
           </div>
-        </Card>
+        </div>
 
-        <div className="space-y-2.5 sm:space-y-3">
-          <Button size="lg" className="w-full h-12 sm:h-14 text-base font-semibold active:scale-95 transition-transform" onClick={handleSendToTech}>
-            <Send className="w-5 h-5 mr-2" />
+        {/* Action Buttons */}
+        <div className="space-y-3 sm:space-y-4 max-w-2xl mx-auto px-2 sm:px-0">
+          <Button 
+            onClick={handleSendToTech}
+            className="w-full bg-[#1A1A1A] text-white hover:bg-[#8B7355] transition-all duration-500 ease-out h-12 sm:h-14 lg:h-16 text-[10px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] uppercase rounded-none font-light active:scale-[0.98] touch-manipulation"
+          >
+            <Send className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" strokeWidth={1.5} />
             Send to Nail Tech
           </Button>
 
-          <Button size="lg" variant="outline" className="w-full h-12 sm:h-14 text-base bg-transparent active:scale-95 transition-transform" onClick={handleShare}>
-            <Share2 className="w-5 h-5 mr-2" />
+          <Button 
+            onClick={handleShare}
+            className="w-full bg-transparent border-2 border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all duration-500 ease-out h-12 sm:h-14 lg:h-16 text-[10px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] uppercase rounded-none font-light active:scale-[0.98] touch-manipulation"
+          >
+            <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" strokeWidth={1.5} />
             Share with Friends
           </Button>
 
-          <Button size="lg" variant="outline" className="w-full h-12 sm:h-14 text-base bg-transparent text-destructive active:scale-95 transition-transform" onClick={handleDelete}>
-            <Trash2 className="w-5 h-5 mr-2" />
+          <Button 
+            onClick={handleDelete}
+            className="w-full bg-transparent border border-[#E8E8E8] text-[#6B6B6B] hover:border-red-500 hover:text-red-500 transition-all duration-500 ease-out h-12 sm:h-14 lg:h-16 text-[10px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] uppercase rounded-none font-light active:scale-[0.98] touch-manipulation"
+          >
+            <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" strokeWidth={1.5} />
             Delete Design
           </Button>
-        </div>
-
-        <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-white/60 backdrop-blur-sm rounded-lg">
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Created on{" "}
-            {new Date(look.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-          </p>
         </div>
       </main>
     </div>

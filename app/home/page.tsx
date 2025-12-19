@@ -214,15 +214,15 @@ export default function HomePage() {
                   />
                 </div>
                 <div className={isWatch ? 'p-2' : 'p-3 sm:p-4 relative'}>
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 
-                      className={`font-serif text-[#1A1A1A] line-clamp-1 font-light cursor-pointer flex-1 ${
+                  <div className="flex items-start justify-between gap-2">
+                    <button 
+                      className={`font-serif text-[#1A1A1A] font-light hover:text-[#8B7355] transition-colors cursor-pointer flex-1 text-left ${
                         isWatch ? 'text-[10px]' : 'text-sm sm:text-base'
                       }`}
                       onClick={() => router.push(`/look/${look.id}`)}
                     >
-                      {look.title}
-                    </h3>
+                      View Design
+                    </button>
                     {!isWatch && currentUserId && look.userId && look.userId !== currentUserId && (
                       <ContentModerationMenu
                         currentUserId={currentUserId}
@@ -234,17 +234,6 @@ export default function HomePage() {
                       />
                     )}
                   </div>
-                  <HideOnWatch>
-                    <div className="flex items-center gap-1.5 text-xs text-[#6B6B6B] font-light">
-                      <Sparkles className="w-3 h-3" strokeWidth={1} />
-                      <span>
-                        {new Date(look.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </span>
-                    </div>
-                  </HideOnWatch>
                 </div>
               </div>
             ))}
