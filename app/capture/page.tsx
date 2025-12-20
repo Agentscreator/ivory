@@ -820,10 +820,10 @@ export default function CapturePage() {
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 
-    // Check if adding these files would exceed max (5 images)
-    if (selectedDesignImages.length + files.length > 5) {
-      toast.error('Maximum 5 design images', {
-        description: 'You can upload up to 5 reference images',
+    // Check if adding these files would exceed max (3 images)
+    if (selectedDesignImages.length + files.length > 3) {
+      toast.error('Maximum 3 design images', {
+        description: 'You can upload up to 3 reference images',
       })
       return
     }
@@ -1531,12 +1531,12 @@ S
                   <button 
                     onClick={() => designUploadRef.current?.click()}
                     className="w-full h-11 sm:h-12 border border-[#E8E8E8] text-[#1A1A1A] font-light text-[10px] sm:text-[11px] tracking-[0.2em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={isGenerating || selectedDesignImages.length >= 5}
+                    disabled={isGenerating || selectedDesignImages.length >= 3}
                   >
                     <Upload className="w-4 h-4" strokeWidth={1} />
                     <span className="hidden sm:inline">Upload Design Images</span>
                     <span className="sm:hidden">Upload Images</span>
-                    <span className="text-[10px] opacity-70">({selectedDesignImages.length}/5)</span>
+                    <span className="text-[10px] opacity-70">({selectedDesignImages.length}/3)</span>
                   </button>
 
                   {/* Uploaded Design Previews with Influence Control */}
