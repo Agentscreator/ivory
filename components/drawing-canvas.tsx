@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useRef, useState, useEffect, useCallback } from 'react'
-import { Undo, Redo, Trash2, Palette, X } from 'lucide-react'
+import { Undo, Redo, Trash2, Palette, X, ZoomIn, ZoomOut, Maximize2, Move, Eye, EyeOff } from 'lucide-react'
 
 interface DrawingCanvasProps {
   imageUrl: string
@@ -30,9 +30,14 @@ const COLORS = [
   '#0000FF', // Blue
   '#FF00FF', // Magenta
   '#FFA500', // Orange
+  '#C44569', // Dark Pink
+  '#A8E6CF', // Mint
+  '#6C5CE7', // Purple
+  '#E17055', // Coral
+  '#FDCB6E', // Gold
 ]
 
-const BRUSH_SIZES = [2, 4, 6, 8, 12, 16, 20, 24]
+const BRUSH_SIZES = [1, 2, 4, 6, 8, 12, 16, 20, 24, 32]
 
 const BRUSH_TEXTURES: { value: BrushTexture; label: string; icon: string }[] = [
   { value: 'solid', label: 'Solid', icon: '●' },
@@ -58,6 +63,15 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [canvasDimensions, setCanvasDimensions] = useState({ width: 0, height: 0 })
   const imageRef = useRef<HTMLImageElement | null>(null)
+  
+  // Zoom and pan state
+  const [zoom, setZoom] = useState(1)
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 })
+  const [showDrawing, setShowDrawing] = useState(true)
+  const lastTouchDistanceRef = useRef<number>(0)
+  const [showZoomIndicator, setShowZoomIndicator] = useState(false)
 
   // Load and setup canvas
   useEffect(() => {
@@ -117,18 +131,30 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
     // Clear canvas
     ctx.clearRect(0, 0, width, height)
     
+    // Save context state
+    ctx.save()
+    
+    // Apply zoom and pan transformations
+    ctx.translate(pan.x, pan.y)
+    ctx.scale(zoom, zoom)
+    
     // Draw image
     if (image) {
       ctx.drawImage(image, 0, 0, width, height)
     }
     
-    // Draw all lines
-    linesToDraw.forEach(line => {
-      if (line.points.length < 2) return
-      
-      drawLineWithTexture(ctx, line)
-    })
-  }, [canvasDimensions])
+    // Draw all lines (only if showDrawing is true)
+    if (showDrawing) {
+      linesToDraw.forEach(line => {
+        if (line.points.length < 2) return
+        
+        drawLineWithTexture(ctx, line)
+      })
+    }
+    
+    // Restore context state
+    ctx.restore()
+  }, [canvasDimensions, zoom, pan, showDrawing])
 
   // Draw line with texture
   const drawLineWithTexture = (ctx: CanvasRenderingContext2D, line: DrawingLine) => {
@@ -264,14 +290,21 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
       clientY = e.clientY
     }
     
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top
-    }
+    // Convert screen coordinates to canvas coordinates accounting for zoom and pan
+    const x = (clientX - rect.left - pan.x) / zoom
+    const y = (clientY - rect.top - pan.y) / zoom
+    
+    return { x, y }
   }
 
   const startDrawing = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault()
+    
+    // Check if this is a two-finger gesture (for pinch zoom)
+    if ('touches' in e && e.touches.length === 2) {
+      return
+    }
+    
     const coords = getCoordinates(e)
     if (!coords) return
     
@@ -279,7 +312,7 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
     setCurrentLine({
       points: [coords],
       color: currentColor,
-      width: brushSize,
+      width: brushSize / zoom, // Adjust brush size for zoom
       texture: brushTexture
     })
     setUndoneLines([]) // Clear redo stack when starting new drawing
@@ -287,6 +320,12 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
 
   const draw = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault()
+    
+    // Check if this is a two-finger gesture (for pinch zoom)
+    if ('touches' in e && e.touches.length === 2) {
+      return
+    }
+    
     if (!isDrawing || !currentLine) return
     
     const coords = getCoordinates(e)
@@ -330,8 +369,94 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
     const canvas = canvasRef.current
     if (!canvas) return
     
-    const dataUrl = canvas.toDataURL('image/png')
+    // Create a temporary canvas to render the final image without zoom/pan
+    const tempCanvas = document.createElement('canvas')
+    tempCanvas.width = canvasDimensions.width
+    tempCanvas.height = canvasDimensions.height
+    const tempCtx = tempCanvas.getContext('2d')
+    
+    if (!tempCtx || !imageRef.current) return
+    
+    // Draw image
+    tempCtx.drawImage(imageRef.current, 0, 0, canvasDimensions.width, canvasDimensions.height)
+    
+    // Draw all lines
+    lines.forEach(line => {
+      if (line.points.length < 2) return
+      drawLineWithTexture(tempCtx, line)
+    })
+    
+    const dataUrl = tempCanvas.toDataURL('image/png')
     onSave(dataUrl)
+  }
+
+  // Zoom controls
+  const handleZoomIn = () => {
+    setZoom(prev => Math.min(prev + 0.5, 5))
+    setShowZoomIndicator(true)
+    setTimeout(() => setShowZoomIndicator(false), 1500)
+  }
+
+  const handleZoomOut = () => {
+    setZoom(prev => Math.max(prev - 0.5, 0.5))
+    setShowZoomIndicator(true)
+    setTimeout(() => setShowZoomIndicator(false), 1500)
+  }
+
+  const handleResetZoom = () => {
+    setZoom(1)
+    setPan({ x: 0, y: 0 })
+    setShowZoomIndicator(true)
+    setTimeout(() => setShowZoomIndicator(false), 1500)
+  }
+
+  // Touch zoom (pinch)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      e.preventDefault()
+      const touch1 = e.touches[0]
+      const touch2 = e.touches[1]
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      )
+      lastTouchDistanceRef.current = distance
+      setShowZoomIndicator(true)
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      e.preventDefault()
+      const touch1 = e.touches[0]
+      const touch2 = e.touches[1]
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      )
+
+      if (lastTouchDistanceRef.current > 0) {
+        const delta = distance - lastTouchDistanceRef.current
+        const zoomChange = delta * 0.01
+        setZoom(prev => Math.min(Math.max(prev + zoomChange, 0.5), 5))
+      }
+
+      lastTouchDistanceRef.current = distance
+    }
+  }
+
+  const handleTouchEnd = () => {
+    lastTouchDistanceRef.current = 0
+    setTimeout(() => setShowZoomIndicator(false), 1500)
+  }
+
+  // Mouse wheel zoom
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault()
+    const delta = e.deltaY > 0 ? -0.1 : 0.1
+    setZoom(prev => Math.min(Math.max(prev + delta, 0.5), 5))
+    setShowZoomIndicator(true)
+    setTimeout(() => setShowZoomIndicator(false), 1500)
   }
 
   return (
@@ -356,30 +481,84 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
       {/* Canvas Container */}
       <div 
         ref={containerRef}
-        className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-[#F8F7F5]"
+        className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-[#F8F7F5] relative"
       >
+        {/* Zoom Indicator */}
+        {showZoomIndicator && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-full text-sm font-light z-50 animate-fade-in">
+            {Math.round(zoom * 100)}%
+          </div>
+        )}
+
+        {/* Zoom Controls - Floating on Canvas */}
+        <div className="absolute top-4 right-4 flex flex-col gap-2 z-40">
+          <button
+            onClick={handleZoomIn}
+            className="w-10 h-10 bg-white border border-[#E8E8E8] text-[#1A1A1A] hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg"
+            title="Zoom In"
+          >
+            <ZoomIn className="w-5 h-5" strokeWidth={1} />
+          </button>
+          <button
+            onClick={handleZoomOut}
+            className="w-10 h-10 bg-white border border-[#E8E8E8] text-[#1A1A1A] hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg"
+            title="Zoom Out"
+          >
+            <ZoomOut className="w-5 h-5" strokeWidth={1} />
+          </button>
+          <button
+            onClick={handleResetZoom}
+            className="w-10 h-10 bg-white border border-[#E8E8E8] text-[#1A1A1A] hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg"
+            title="Reset Zoom"
+          >
+            <Maximize2 className="w-5 h-5" strokeWidth={1} />
+          </button>
+          <button
+            onClick={() => setShowDrawing(!showDrawing)}
+            className="w-10 h-10 bg-white border border-[#E8E8E8] text-[#1A1A1A] hover:bg-[#F8F7F5] active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg"
+            title={showDrawing ? "Hide Drawing" : "Show Drawing"}
+          >
+            {showDrawing ? <Eye className="w-5 h-5" strokeWidth={1} /> : <EyeOff className="w-5 h-5" strokeWidth={1} />}
+          </button>
+        </div>
+
+        {/* Help Text */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 text-white px-4 py-2 rounded-full text-xs font-light z-40">
+          Pinch to zoom • Scroll to zoom • Two fingers to pan
+        </div>
+
         <canvas
           ref={canvasRef}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
-          onTouchStart={startDrawing}
-          onTouchMove={draw}
-          onTouchEnd={stopDrawing}
-          className="touch-none max-w-full max-h-full border border-[#E8E8E8]"
+          onTouchStart={(e) => {
+            handleTouchStart(e)
+            if (e.touches.length === 1) startDrawing(e)
+          }}
+          onTouchMove={(e) => {
+            handleTouchMove(e)
+            if (e.touches.length === 1) draw(e)
+          }}
+          onTouchEnd={(e) => {
+            handleTouchEnd()
+            stopDrawing()
+          }}
+          onWheel={handleWheel}
+          className="touch-none max-w-full max-h-full border border-[#E8E8E8] shadow-lg"
           style={{
             width: canvasDimensions.width,
             height: canvasDimensions.height,
-            cursor: 'crosshair'
+            cursor: isDrawing ? 'crosshair' : zoom > 1 ? 'move' : 'crosshair'
           }}
         />
       </div>
 
       {/* Controls */}
-      <div className="p-4 bg-white border-t border-[#E8E8E8] space-y-3">
+      <div className="p-4 bg-white border-t border-[#E8E8E8] space-y-3 max-h-[40vh] overflow-y-auto">
         {/* Action Buttons */}
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           <button
             onClick={undo}
             disabled={lines.length === 0}
@@ -406,6 +585,13 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
           </button>
         </div>
 
+        {/* Quick Info */}
+        <div className="bg-[#F8F7F5] p-3 border border-[#E8E8E8] text-center">
+          <p className="text-xs text-[#6B6B6B] font-light">
+            <span className="font-medium text-[#1A1A1A]">Tip:</span> Use zoom to draw precise details on nails
+          </p>
+        </div>
+
         {/* Color Picker */}
         <div className="space-y-2">
           <button
@@ -421,13 +607,13 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
               <span className="text-[#1A1A1A] font-light tracking-wider uppercase text-sm">Color</span>
             </div>
             <div 
-              className="w-8 h-8 border-2 border-[#E8E8E8]"
+              className="w-8 h-8 border-2 border-[#E8E8E8] shadow-sm"
               style={{ backgroundColor: currentColor }}
             />
           </button>
           
           {showColorPicker && (
-            <div className="grid grid-cols-5 gap-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
+            <div className="grid grid-cols-6 gap-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
               {COLORS.map(color => (
                 <button
                   key={color}
@@ -435,8 +621,8 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
                     setCurrentColor(color)
                     setShowColorPicker(false)
                   }}
-                  className={`w-full aspect-square border-2 transition-all active:scale-95 ${
-                    currentColor === color ? 'border-[#8B7355] scale-110' : 'border-[#E8E8E8]'
+                  className={`w-full aspect-square border-2 transition-all active:scale-95 shadow-sm ${
+                    currentColor === color ? 'border-[#8B7355] scale-110 shadow-md' : 'border-[#E8E8E8]'
                   }`}
                   style={{ backgroundColor: color }}
                 />
@@ -474,7 +660,7 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
                     setShowTexturePicker(false)
                   }}
                   className={`flex flex-col items-center p-2 border transition-all active:scale-95 ${
-                    brushTexture === texture.value ? 'border-[#8B7355] bg-white scale-110' : 'border-[#E8E8E8] bg-white'
+                    brushTexture === texture.value ? 'border-[#8B7355] bg-white scale-110 shadow-md' : 'border-[#E8E8E8] bg-white'
                   }`}
                 >
                   <span className="text-[#1A1A1A] text-2xl mb-1">{texture.icon}</span>
@@ -497,8 +683,8 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
           >
             <div className="flex items-center gap-3">
               <div 
-                className="bg-[#1A1A1A]"
-                style={{ width: Math.min(brushSize + 8, 24), height: Math.min(brushSize + 8, 24), borderRadius: '50%' }}
+                className="bg-[#1A1A1A] rounded-full"
+                style={{ width: Math.min(brushSize + 8, 24), height: Math.min(brushSize + 8, 24) }}
               />
               <span className="text-[#1A1A1A] font-light tracking-wider uppercase text-sm">Brush Size</span>
             </div>
@@ -506,7 +692,7 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
           </button>
           
           {showBrushPicker && (
-            <div className="grid grid-cols-4 gap-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
+            <div className="grid grid-cols-5 gap-2 p-3 bg-[#F8F7F5] border border-[#E8E8E8]">
               {BRUSH_SIZES.map(size => (
                 <button
                   key={size}
@@ -515,12 +701,12 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
                     setShowBrushPicker(false)
                   }}
                   className={`w-full aspect-square border flex items-center justify-center transition-all active:scale-95 ${
-                    brushSize === size ? 'border-[#8B7355] bg-white scale-110' : 'border-[#E8E8E8] bg-white'
+                    brushSize === size ? 'border-[#8B7355] bg-white scale-110 shadow-md' : 'border-[#E8E8E8] bg-white'
                   }`}
                 >
                   <div 
-                    className="bg-[#1A1A1A]"
-                    style={{ width: Math.min(size, 20), height: Math.min(size, 20), borderRadius: '50%' }}
+                    className="bg-[#1A1A1A] rounded-full"
+                    style={{ width: Math.min(size, 20), height: Math.min(size, 20) }}
                   />
                 </button>
               ))}
