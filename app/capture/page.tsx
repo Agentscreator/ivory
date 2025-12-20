@@ -1227,27 +1227,42 @@ export default function CapturePage() {
             <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:gap-8 h-full">
                 {/* Original Image Card */}
                 <div className="relative overflow-hidden border border-[#E8E8E8]/50 group h-full bg-white shadow-sm hover:shadow-lg transition-all duration-700 rounded-sm animate-fade-in">
-                  <div className="relative bg-gradient-to-br from-[#F8F7F5] to-white h-full">
-                    <Image src={capturedImage} alt="Original" fill className="object-contain p-2 sm:p-4 md:p-6 transition-transform duration-700 group-hover:scale-[1.02]" />
-                    {/* Elegant Change Photo Overlay */}
-                    <button
-                      onClick={changePhoto}
-                      className="absolute inset-0 bg-black/0 hover:bg-black/60 transition-all duration-700 flex items-center justify-center opacity-0 group-hover:opacity-100 active:scale-[0.98]"
-                    >
-                      <div className="bg-white p-3 sm:p-5 md:p-6 shadow-2xl transform group-hover:scale-105 transition-transform duration-500 rounded-sm">
-                        <Upload className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 text-[#1A1A1A]" strokeWidth={0.8} />
+                  <button
+                    onClick={() => setShowDrawingCanvas(true)}
+                    className="relative bg-gradient-to-br from-[#F8F7F5] to-white h-full w-full cursor-pointer"
+                    title="Click to draw on image"
+                  >
+                    <Image src={capturedImage} alt="Original" fill className="object-contain p-2 sm:p-4 md:p-6 transition-transform duration-700 group-hover:scale-[1.02] pointer-events-none" />
+                    
+                    {/* Draw Indicator Overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-700 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <div className="bg-white/90 backdrop-blur-sm p-4 sm:p-6 md:p-8 shadow-2xl transform group-hover:scale-105 transition-transform duration-500 rounded-sm border border-[#E8E8E8]">
+                        <Pencil className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[#2D7A4F]" strokeWidth={1.5} />
+                        <p className="text-[10px] sm:text-xs md:text-sm text-[#1A1A1A] font-light tracking-wider uppercase mt-2">
+                          {drawingImageUrl ? 'Edit Drawing' : 'Draw on Image'}
+                        </p>
                       </div>
-                    </button>
-                    {/* Elegant Draw Button - Circular at Top Left */}
+                    </div>
+                    
+                    {/* Drawing Status Badge */}
+                    {drawingImageUrl && (
+                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-[#2D7A4F] text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-light tracking-wide shadow-lg z-10 pointer-events-none">
+                        ✓ Drawing Added
+                      </div>
+                    )}
+                    
+                    {/* Change Photo Button - Top Right */}
                     <button
-                      onClick={() => setShowDrawingCanvas(true)}
-                      className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl flex flex-col items-center justify-center gap-0.5 z-10"
-                      title={drawingImageUrl ? 'Drawing added - click to edit' : 'Draw on image'}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        changePhoto()
+                      }}
+                      className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 bg-white/90 backdrop-blur-sm hover:bg-white text-[#1A1A1A] w-10 h-10 sm:w-12 sm:h-12 rounded-full active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl flex items-center justify-center z-10 border border-[#E8E8E8]"
+                      title="Change photo"
                     >
-                      <Pencil className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" strokeWidth={1.5} />
-                      <span className="text-[8px] sm:text-[9px] md:text-[10px] font-light tracking-wide">Draw</span>
+                      <Upload className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
                     </button>
-                  </div>
+                  </button>
                 </div>
 
                 {/* AI Designs Card - Side by Side */}
