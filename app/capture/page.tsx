@@ -1299,27 +1299,27 @@ export default function CapturePage() {
                       </div>
                       
                       {/* Elegant Progress Indicator */}
-                      <div className="relative z-10 flex flex-col items-center justify-center gap-6 sm:gap-8 px-6">
-                        <div className="relative w-32 h-32 sm:w-40 sm:h-40">
-                          <svg className="w-full h-full transform -rotate-90">
+                      <div className="relative z-10 flex flex-col items-center justify-center gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6">
+                        <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                             <circle
-                              cx="50%"
-                              cy="50%"
-                              r="45%"
+                              cx="50"
+                              cy="50"
+                              r="42"
                               stroke="rgba(255, 255, 255, 0.3)"
-                              strokeWidth="6"
+                              strokeWidth="8"
                               fill="none"
                             />
                             <circle
-                              cx="50%"
-                              cy="50%"
-                              r="45%"
+                              cx="50"
+                              cy="50"
+                              r="42"
                               stroke="url(#gradient)"
-                              strokeWidth="6"
+                              strokeWidth="8"
                               fill="none"
                               strokeLinecap="round"
-                              strokeDasharray={`${2 * Math.PI * 64}`}
-                              strokeDashoffset={`${2 * Math.PI * 64 * (1 - generationProgress / 100)}`}
+                              strokeDasharray={`${2 * Math.PI * 42}`}
+                              strokeDashoffset={`${2 * Math.PI * 42 * (1 - generationProgress / 100)}`}
                               className="transition-all duration-500 ease-out"
                             />
                             <defs>
@@ -1331,15 +1331,15 @@ export default function CapturePage() {
                           </svg>
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="text-center">
-                              <div className="text-4xl sm:text-5xl font-serif font-light text-white drop-shadow-2xl">
+                              <div className="text-3xl sm:text-4xl md:text-5xl font-serif font-light text-white drop-shadow-2xl">
                                 {Math.round(generationProgress)}%
                               </div>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="text-center space-y-2">
-                          <p className="text-white font-light text-base sm:text-lg drop-shadow-lg tracking-wide">
+                        <div className="text-center space-y-1.5 sm:space-y-2">
+                          <p className="text-white font-light text-sm sm:text-base md:text-lg drop-shadow-lg tracking-wide">
                             Creating Your Design
                           </p>
                           <p className="text-white/70 text-xs sm:text-sm drop-shadow font-light tracking-wider">
@@ -1347,10 +1347,10 @@ export default function CapturePage() {
                           </p>
                         </div>
                         
-                        <div className="flex gap-3">
-                          <Sparkles className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '0ms' }} />
-                          <Sparkles className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '200ms' }} />
-                          <Sparkles className="w-5 h-5 text-white animate-pulse" style={{ animationDelay: '400ms' }} />
+                        <div className="flex gap-2 sm:gap-3">
+                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white animate-pulse" style={{ animationDelay: '0ms' }} />
+                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white animate-pulse" style={{ animationDelay: '200ms' }} />
+                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white animate-pulse" style={{ animationDelay: '400ms' }} />
                         </div>
                       </div>
                     </div>
