@@ -1272,18 +1272,6 @@ export default function CapturePage() {
                         ✓ Drawing Added
                       </div>
                     )}
-                    
-                    {/* Change Photo Button - Top Right */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        changePhoto()
-                      }}
-                      className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 bg-white/90 backdrop-blur-sm hover:bg-white text-[#1A1A1A] w-10 h-10 sm:w-12 sm:h-12 rounded-full active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl flex items-center justify-center z-10 border border-[#E8E8E8]"
-                      title="Change photo"
-                    >
-                      <Upload className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
-                    </button>
                   </div>
                 </div>
 
