@@ -391,6 +391,22 @@ export default function CapturePage() {
             
             // Find the active tab and check if it needs camera
             const activeTabToRestore = tabs.find((t: DesignTab) => t.id === savedActiveTabId) || tabs[0]
+            
+            // Restore the active tab's state immediately
+            if (activeTabToRestore.originalImage) {
+              setCapturedImage(activeTabToRestore.originalImage)
+              console.log('✅ Restored capturedImage from session')
+            }
+            if (activeTabToRestore.finalPreviews.length > 0) {
+              setFinalPreviews(activeTabToRestore.finalPreviews)
+            }
+            setDesignSettings(activeTabToRestore.designSettings)
+            setSelectedDesignImages(activeTabToRestore.selectedDesignImages)
+            setDrawingImageUrl(activeTabToRestore.drawingImageUrl)
+            setAiPrompt(activeTabToRestore.aiPrompt)
+            setIsGenerating(activeTabToRestore.isGenerating)
+            setGenerationProgress(activeTabToRestore.generationProgress)
+            
             // Only start camera if the active tab has no content (no image AND no designs)
             if (!activeTabToRestore.originalImage && activeTabToRestore.finalPreviews.length === 0) {
               console.log('⚠️ Active tab has no content, starting camera')
