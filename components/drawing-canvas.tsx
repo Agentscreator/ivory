@@ -128,15 +128,20 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
     const width = w || canvasDimensions.width
     const height = h || canvasDimensions.height
     
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height)
+    // Clear entire canvas including any overflow from zoom
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
     
     // Save context state
     ctx.save()
     
-    // Apply zoom and pan transformations
-    ctx.translate(pan.x, pan.y)
+    // Center the zoom transformation
+    const centerX = width / 2
+    const centerY = height / 2
+    
+    // Apply transformations: translate to center, scale, translate back, then apply pan
+    ctx.translate(centerX + pan.x, centerY + pan.y)
     ctx.scale(zoom, zoom)
+    ctx.translate(-centerX, -centerY)
     
     // Draw image
     if (image) {
@@ -290,9 +295,16 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
       clientY = e.clientY
     }
     
-    // Convert screen coordinates to canvas coordinates accounting for zoom and pan
-    const x = (clientX - rect.left - pan.x) / zoom
-    const y = (clientY - rect.top - pan.y) / zoom
+    // Convert screen coordinates to canvas coordinates accounting for centered zoom and pan
+    const canvasX = clientX - rect.left
+    const canvasY = clientY - rect.top
+    
+    const centerX = canvasDimensions.width / 2
+    const centerY = canvasDimensions.height / 2
+    
+    // Reverse the transformation: account for pan, then zoom around center
+    const x = (canvasX - pan.x - centerX) / zoom + centerX
+    const y = (canvasY - pan.y - centerY) / zoom + centerY
     
     return { x, y }
   }
@@ -522,11 +534,6 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
           </button>
         </div>
 
-        {/* Help Text */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 text-white px-4 py-2 rounded-full text-xs font-light z-40">
-          Pinch to zoom • Scroll to zoom • Two fingers to pan
-        </div>
-
         <canvas
           ref={canvasRef}
           onMouseDown={startDrawing}
@@ -583,13 +590,6 @@ export function DrawingCanvas({ imageUrl, onSave, onClose }: DrawingCanvasProps)
             <Trash2 className="w-4 h-4" strokeWidth={1} />
             Clear
           </button>
-        </div>
-
-        {/* Quick Info */}
-        <div className="bg-[#F8F7F5] p-3 border border-[#E8E8E8] text-center">
-          <p className="text-xs text-[#6B6B6B] font-light">
-            <span className="font-medium text-[#1A1A1A]">Tip:</span> Use zoom to draw precise details on nails
-          </p>
         </div>
 
         {/* Color Picker */}
