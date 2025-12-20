@@ -1206,14 +1206,13 @@ export default function CapturePage() {
                         <Upload className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 text-[#1A1A1A]" strokeWidth={0.8} />
                       </div>
                     </button>
-                    {/* Elegant Draw Button */}
+                    {/* Elegant Draw Button - Circular at Top Left */}
                     <button
                       onClick={() => setShowDrawingCanvas(true)}
-                      className="absolute bottom-2 sm:bottom-4 md:bottom-5 right-2 sm:right-4 md:right-5 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4 active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl rounded-sm flex items-center gap-2"
+                      className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl flex items-center justify-center z-10"
                       title={drawingImageUrl ? 'Drawing added - click to edit' : 'Draw on image'}
                     >
-                      <Pencil className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1} />
-                      <span className="text-xs sm:text-sm font-light tracking-wide">Draw</span>
+                      <Pencil className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" strokeWidth={1.5} />
                     </button>
                   </div>
                 </div>
@@ -1324,12 +1323,24 @@ export default function CapturePage() {
                       </div>
                     </div>
                       ) : (
-                        <div className="text-center px-6 space-y-4">
-                          <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-[#8B7355]" strokeWidth={0.8} />
+                        <button 
+                          onClick={() => {
+                            // Scroll to bottom drawer
+                            const drawer = document.querySelector('[data-drawer="bottom"]');
+                            if (drawer) {
+                              drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }}
+                          className="text-center px-6 space-y-3 cursor-pointer hover:opacity-80 transition-opacity duration-300 w-full"
+                        >
+                          <div className="flex flex-col items-center gap-2">
+                            <ChevronDown className="w-6 h-6 text-[#8B7355] animate-bounce" strokeWidth={1.5} />
+                            <ChevronDown className="w-6 h-6 text-[#8B7355] animate-bounce -mt-4" style={{ animationDelay: '150ms' }} strokeWidth={1.5} />
+                          </div>
                           <p className="text-xs sm:text-sm text-[#6B6B6B] font-light tracking-[0.15em] uppercase">
-                            Configure Your Design Below
+                            Scroll Down to Create Your Design
                           </p>
-                        </div>
+                        </button>
                       )}
                     </div>
                   )}
@@ -1374,6 +1385,7 @@ S
 
         {/* Elegant Bottom Drawer with Mobile Optimization */}
         <div 
+          data-drawer="bottom"
           className="fixed left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#E8E8E8]/50 z-20 touch-action-pan-y transition-all duration-500 shadow-2xl" 
           style={{ 
             bottom: '80px', 
