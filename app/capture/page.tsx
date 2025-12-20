@@ -1112,8 +1112,22 @@ export default function CapturePage() {
   }
 
   if (capturedImage) {
+    // Handle scroll to reveal drawer
+    const handleWheel = (e: React.WheelEvent) => {
+      if (e.deltaY > 0) {
+        // Scrolling down - scroll to drawer
+        const drawer = document.querySelector('[data-drawer="bottom"]');
+        if (drawer) {
+          drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    };
+
     return (
-      <div className="fixed inset-0 z-[100] bg-gradient-to-b from-[#F8F7F5] via-white to-white flex flex-col">
+      <div 
+        className="fixed inset-0 z-[100] bg-gradient-to-b from-[#F8F7F5] via-white to-white flex flex-col"
+        onWheel={handleWheel}
+      >
         {/* Elegant Header */}
         <div className="absolute top-0 left-0 right-0 pt-12 sm:pt-14 px-4 sm:px-8 lg:px-12 pb-5 sm:pb-6 z-10 bg-white/95 backdrop-blur-md border-b border-[#E8E8E8]/50 transition-all duration-500">
           <div className="max-w-7xl mx-auto">
@@ -1209,10 +1223,11 @@ export default function CapturePage() {
                     {/* Elegant Draw Button - Circular at Top Left */}
                     <button
                       onClick={() => setShowDrawingCanvas(true)}
-                      className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl flex items-center justify-center z-10"
+                      className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl flex flex-col items-center justify-center gap-0.5 z-10"
                       title={drawingImageUrl ? 'Drawing added - click to edit' : 'Draw on image'}
                     >
                       <Pencil className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" strokeWidth={1.5} />
+                      <span className="text-[8px] sm:text-[9px] md:text-[10px] font-light tracking-wide">Draw</span>
                     </button>
                   </div>
                 </div>
