@@ -1209,10 +1209,11 @@ export default function CapturePage() {
                     {/* Elegant Draw Button */}
                     <button
                       onClick={() => setShowDrawingCanvas(true)}
-                      className="absolute bottom-2 sm:bottom-4 md:bottom-5 right-2 sm:right-4 md:right-5 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white p-2 sm:p-3 md:p-4 active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl rounded-sm"
+                      className="absolute bottom-2 sm:bottom-4 md:bottom-5 right-2 sm:right-4 md:right-5 bg-[#2D7A4F] hover:bg-[#2D7A4F]/90 text-white px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4 active:scale-[0.95] transition-all duration-500 shadow-lg hover:shadow-xl rounded-sm flex items-center gap-2"
                       title={drawingImageUrl ? 'Drawing added - click to edit' : 'Draw on image'}
                     >
                       <Pencil className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1} />
+                      <span className="text-xs sm:text-sm font-light tracking-wide">Draw</span>
                     </button>
                   </div>
                 </div>
