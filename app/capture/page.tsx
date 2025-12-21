@@ -729,8 +729,14 @@ export default function CapturePage() {
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log('Generation cancelled by user')
+        toast.info('Generation cancelled', {
+          description: 'Your design generation was cancelled. No credits were charged.',
+        })
       } else {
         console.error('Error generating AI preview:', error)
+        toast.error('Generation failed', {
+          description: 'An unexpected error occurred. Please try again.',
+        })
       }
     } finally {
       clearInterval(progressInterval)
@@ -745,6 +751,9 @@ export default function CapturePage() {
       abortControllerRef.current.abort()
       setIsGenerating(false)
       setGenerationProgress(0)
+      toast.info('Cancelling...', {
+        description: 'Stopping design generation',
+      })
     }
   }
 
@@ -865,8 +874,14 @@ export default function CapturePage() {
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log('AI design generation cancelled by user')
+        toast.info('Generation cancelled', {
+          description: 'Design search was cancelled',
+        })
       } else {
         console.error("Error generating designs:", error)
+        toast.error('Generation failed', {
+          description: 'Failed to search for designs. Please try again.',
+        })
       }
     } finally {
       clearInterval(progressInterval)
@@ -1372,10 +1387,10 @@ export default function CapturePage() {
             ) : (
               <button 
                 onClick={cancelGeneration}
-                className="w-full h-12 sm:h-14 border-2 border-[#E8E8E8] text-[#1A1A1A] font-light text-xs sm:text-sm tracking-[0.2em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 rounded-sm bg-white shadow-lg"
+                className="w-full h-12 sm:h-14 border-2 border-red-300 bg-white text-red-600 font-light text-xs sm:text-sm tracking-[0.2em] uppercase hover:bg-red-50 hover:border-red-400 active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 rounded-sm shadow-lg"
               >
                 <X className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
-                <span>Cancel</span>
+                <span>Cancel Generation</span>
               </button>
             )}
           </div>
