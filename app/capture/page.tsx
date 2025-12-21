@@ -1282,221 +1282,59 @@ export default function CapturePage() {
             height: expandedSection ? 'calc(35vh - 80px)' : 'calc(65vh - 80px)', 
             minHeight: expandedSection ? '220px' : '420px' 
           }}
-          onWheel={(e) => {
-            // Only scroll to drawer if scrolling down
-            if (e.deltaY > 0) {
-              const drawer = document.querySelector('[data-drawer="bottom"]');
-              if (drawer) {
-                drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }
-          }}
-          onTouchMove={(e) => {
-            // Handle touch scroll on mobile
-            const touch = e.touches[0];
-            const startY = touch.clientY;
-            
-            const handleTouchEnd = (endEvent: TouchEvent) => {
-              const endTouch = endEvent.changedTouches[0];
-              const deltaY = startY - endTouch.clientY;
-              
-              // If swiping up (scrolling down)
-              if (deltaY > 50) {
-                const drawer = document.querySelector('[data-drawer="bottom"]');
-                if (drawer) {
-                  drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-              }
-              
-              document.removeEventListener('touchend', handleTouchEnd);
-            };
-            
-            document.addEventListener('touchend', handleTouchEnd, { once: true });
-          }}
         >
-          <div className="max-w-6xl mx-auto h-full">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:gap-8 h-full">
-                {/* Original Image Card */}
-                <div className="relative overflow-hidden border border-[#E8E8E8]/50 group h-full bg-white shadow-sm hover:shadow-lg transition-all duration-700 rounded-sm animate-fade-in">
-                  <div
-                    onClick={() => setShowDrawingCanvas(true)}
-                    className="relative bg-gradient-to-br from-[#F8F7F5] to-white h-full w-full cursor-pointer"
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        setShowDrawingCanvas(true)
-                      }
-                    }}
-                    title="Click to draw on image"
-                  >
-                    <Image src={capturedImage} alt="Original" fill className="object-contain p-2 sm:p-4 md:p-6 transition-transform duration-700 group-hover:scale-[1.02] pointer-events-none" />
-                    
-                    {/* Elegant Blinking "Tap to draw" Text Overlay - At Top */}
-                    <div className="absolute top-0 left-0 right-0 flex items-center justify-center pointer-events-none z-10 pt-3 sm:pt-4 md:pt-6 px-3">
-                      <div className="relative">
-                        <div className="bg-gradient-to-br from-[#8B7355]/95 via-[#A0826D]/95 to-[#8B7355]/95 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 rounded-lg shadow-2xl animate-blink border border-white/30">
-                          <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-                            <Pencil className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={1.5} />
-                            <p className="text-white text-[10px] sm:text-xs font-light tracking-[0.25em] uppercase text-center leading-tight">
-                              Tap to Draw
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Draw Indicator Overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-700 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-                      <div className="bg-white/90 backdrop-blur-sm p-4 sm:p-6 md:p-8 shadow-2xl transform group-hover:scale-105 transition-transform duration-500 rounded-sm border border-[#E8E8E8]">
-                        <Pencil className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[#2D7A4F]" strokeWidth={1.5} />
-                        <p className="text-[10px] sm:text-xs md:text-sm text-[#1A1A1A] font-light tracking-wider uppercase mt-2">
-                          {drawingImageUrl ? 'Edit Drawing' : 'Draw on Image'}
+          <div className="max-w-4xl mx-auto h-full">
+            {/* Original Image Card - Full Width */}
+            <div className="relative overflow-hidden border border-[#E8E8E8]/50 group h-full bg-white shadow-sm hover:shadow-lg transition-all duration-700 rounded-sm animate-fade-in">
+              <div
+                onClick={() => setShowDrawingCanvas(true)}
+                className="relative bg-gradient-to-br from-[#F8F7F5] to-white h-full w-full cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setShowDrawingCanvas(true)
+                  }
+                }}
+                title="Click to draw on image"
+              >
+                <Image src={capturedImage} alt="Original" fill className="object-contain p-2 sm:p-4 md:p-6 transition-transform duration-700 group-hover:scale-[1.02] pointer-events-none" />
+                
+                {/* Elegant Blinking "Tap to draw" Text Overlay - At Top */}
+                <div className="absolute top-0 left-0 right-0 flex items-center justify-center pointer-events-none z-10 pt-3 sm:pt-4 md:pt-6 px-3">
+                  <div className="relative">
+                    <div className="bg-gradient-to-br from-[#8B7355]/95 via-[#A0826D]/95 to-[#8B7355]/95 backdrop-blur-md px-4 py-3 sm:px-6 sm:py-4 rounded-lg shadow-2xl animate-blink border border-white/30">
+                      <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                        <Pencil className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={1.5} />
+                        <p className="text-white text-[10px] sm:text-xs font-light tracking-[0.25em] uppercase text-center leading-tight">
+                          Tap to Draw
                         </p>
                       </div>
                     </div>
-                    
-                    {/* Drawing Status Badge */}
-                    {drawingImageUrl && (
-                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-[#2D7A4F] text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-light tracking-wide shadow-lg z-10 pointer-events-none">
-                        ✓ Drawing Added
-                      </div>
-                    )}
                   </div>
                 </div>
-
-                {/* AI Designs Card - Side by Side */}
-                <div className="relative overflow-hidden border border-[#E8E8E8]/50 h-full bg-white shadow-sm hover:shadow-lg transition-all duration-700 rounded-sm animate-fade-in-delayed">
-                  {finalPreviews.length > 0 ? (
-                    /* Generated Designs Gallery */
-                    <div className="relative bg-gradient-to-br from-[#F8F7F5] to-white h-full p-2 sm:p-4 md:p-6 flex flex-col gap-2 sm:gap-3 md:gap-4">
-                      <div className="flex items-center justify-end">
-                        <div className="bg-[#1A1A1A] text-white px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 shadow-sm rounded-sm">
-                          <span className="text-[10px] sm:text-xs md:text-sm font-light tracking-wider">{finalPreviews.length}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 flex flex-col gap-2 sm:gap-3 md:gap-4 overflow-y-auto scrollbar-hide">
-                        {finalPreviews.map((imageUrl, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setSelectedImageModal(imageUrl)}
-                            className="relative overflow-hidden border border-[#E8E8E8]/50 hover:border-[#8B7355] transition-all duration-500 active:scale-[0.98] aspect-[3/2] group shadow-sm hover:shadow-md rounded-sm animate-fade-in"
-                            style={{ animationDelay: `${index * 100}ms` }}
-                          >
-                            <Image src={imageUrl} alt={`Design ${index + 1}`} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                              <div className="bg-white p-2 sm:p-3 md:p-4 border border-[#E8E8E8]/50 shadow-lg transform group-hover:scale-110 transition-transform duration-500 rounded-sm">
-                                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#8B7355]" strokeWidth={1} />
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="relative bg-gradient-to-br from-[#F8F7F5] to-white flex items-center justify-center h-full">
-                      {isGenerating ? (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                      {/* Elegant Loading State */}
-                      <div className="absolute inset-0 opacity-20">
-                        <Image 
-                          src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGdkNWtib3JrcXhvcHFiaHdraHR5aDJsN3Bzcmx2ajZyNWJlemM1biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ljj4pInW5JllK/giphy.gif"
-                          alt="Generating..."
-                          fill
-                          className="object-cover"
-                          unoptimized
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            if (target.src !== "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbjZlOXJvZThrOXpndThicm83NXM5N2V4cWpjaXFkNXQ1MHNiZ2dwaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QaDc2Wn7tfLFu/giphy.gif") {
-                              target.src = "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExbjZlOXJvZThrOXpndThicm83NXM5N2V4cWpjaXFkNXQ1MHNiZ2dwaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QaDc2Wn7tfLFu/giphy.gif";
-                            }
-                          }}
-                        />
-                      </div>
-                      
-                      {/* Elegant Progress Indicator */}
-                      <div className="relative z-10 flex flex-col items-center justify-center gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6">
-                        <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40">
-                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="42"
-                              stroke="rgba(255, 255, 255, 0.3)"
-                              strokeWidth="8"
-                              fill="none"
-                            />
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="42"
-                              stroke="url(#gradient)"
-                              strokeWidth="8"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeDasharray={`${2 * Math.PI * 42}`}
-                              strokeDashoffset={`${2 * Math.PI * 42 * (1 - generationProgress / 100)}`}
-                              className="transition-all duration-500 ease-out"
-                            />
-                            <defs>
-                              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="#8B7355" />
-                                <stop offset="100%" stopColor="#1A1A1A" />
-                              </linearGradient>
-                            </defs>
-                          </svg>
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center">
-                              <div className="text-3xl sm:text-4xl md:text-5xl font-serif font-light text-white drop-shadow-2xl">
-                                {Math.round(generationProgress)}%
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="text-center space-y-1.5 sm:space-y-2">
-                          <p className="text-white font-light text-sm sm:text-base md:text-lg drop-shadow-lg tracking-wide">
-                            Creating Your Design
-                          </p>
-                          <p className="text-white/70 text-xs sm:text-sm drop-shadow font-light tracking-wider">
-                            This may take a moment...
-                          </p>
-                        </div>
-                        
-                        <div className="flex gap-2 sm:gap-3">
-                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white animate-pulse" style={{ animationDelay: '0ms' }} />
-                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white animate-pulse" style={{ animationDelay: '200ms' }} />
-                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white animate-pulse" style={{ animationDelay: '400ms' }} />
-                        </div>
-                      </div>
-                    </div>
-                      ) : (
-                        <button 
-                          onClick={() => {
-                            // Scroll to bottom drawer
-                            const drawer = document.querySelector('[data-drawer="bottom"]');
-                            if (drawer) {
-                              drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }
-                          }}
-                          className="text-center px-6 space-y-3 cursor-pointer hover:opacity-80 transition-opacity duration-300 w-full"
-                        >
-                          <div className="flex flex-col items-center gap-2">
-                            <ChevronDown className="w-6 h-6 text-[#8B7355] animate-bounce" strokeWidth={1.5} />
-                            <ChevronDown className="w-6 h-6 text-[#8B7355] animate-bounce -mt-4" style={{ animationDelay: '150ms' }} strokeWidth={1.5} />
-                          </div>
-                          <p className="text-xs sm:text-sm text-[#6B6B6B] font-light tracking-[0.15em] uppercase">
-                            Scroll Down to Create Your Design
-                          </p>
-                        </button>
-                      )}
-                    </div>
-                  )}
+                
+                {/* Draw Indicator Overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-700 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                  <div className="bg-white/90 backdrop-blur-sm p-4 sm:p-6 md:p-8 shadow-2xl transform group-hover:scale-105 transition-transform duration-500 rounded-sm border border-[#E8E8E8]">
+                    <Pencil className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[#2D7A4F]" strokeWidth={1.5} />
+                    <p className="text-[10px] sm:text-xs md:text-sm text-[#1A1A1A] font-light tracking-wider uppercase mt-2">
+                      {drawingImageUrl ? 'Edit Drawing' : 'Draw on Image'}
+                    </p>
+                  </div>
                 </div>
+                
+                {/* Drawing Status Badge */}
+                {drawingImageUrl && (
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-[#2D7A4F] text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-light tracking-wide shadow-lg z-10 pointer-events-none">
+                    ✓ Drawing Added
+                  </div>
+                )}
               </div>
             </div>
           </div>
+        </div>
 S
         {/* Image Modal */}
         {selectedImageModal && (
