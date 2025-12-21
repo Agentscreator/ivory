@@ -21,11 +21,11 @@ type DrawingLine = {
 }
 
 type BrushTexture = 'solid' | 'soft' | 'spray' | 'marker' | 'pencil'
-type ToolMode = 'draw' | 'pan' | 'eraser' | 'rect' | 'circle' | 'text' | 'select' | 'crop' | 'sticker'
+type ToolMode = 'draw' | 'pan' | 'eraser' | 'rect' | 'circle' | 'text' | 'select' | 'crop' | 'sticker' | 'cutout'
 
 type Shape = {
   id: string
-  type: 'rect' | 'circle' | 'text' | 'image'
+  type: 'rect' | 'circle' | 'text' | 'image' | 'sticker'
   x: number
   y: number
   width?: number
@@ -36,6 +36,20 @@ type Shape = {
   fill: string
   stroke: string
   strokeWidth: number
+  rotation?: number
+  scaleX?: number
+  scaleY?: number
+}
+
+type Sticker = {
+  id: string
+  image: HTMLImageElement
+  thumbnail: string
+}
+
+type CutoutPath = {
+  points: number[]
+  closed: boolean
 }
 
 type CropArea = {
@@ -81,6 +95,10 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
   const [showBrushSize, setShowBrushSize] = useState(false)
   const [cropArea, setCropArea] = useState<CropArea | null>(null)
   const [isCropping, setIsCropping] = useState(false)
+  const [stickers, setStickers] = useState<Sticker[]>([])
+  const [cutoutPath, setCutoutPath] = useState<CutoutPath | null>(null)
+  const [isDrawingCutout, setIsDrawingCutout] = useState(false)
+  const [showStickerLibrary, setShowStickerLibrary] = useState(false)
   const lastTouchDistanceRef = useRef<number>(0)
   const lastTouchCenterRef = useRef<{ x: number; y: number } | null>(null)
   const lastTapTimeRef = useRef<number>(0)
@@ -514,8 +532,16 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
     reader.onload = (event) => {
       const img = new window.Image()
       img.onload = () => {
-        // Add as a sticker/overlay
-        const maxSize = 200 // Max width/height for sticker
+        // Add to sticker library
+        const newSticker: Sticker = {
+          id: `sticker-lib-${Date.now()}`,
+          image: img,
+          thumbnail: event.target?.result as string
+        }
+        setStickers([...stickers, newSticker])
+        
+        // Also add directly to canvas
+        const maxSize = 200
         let width = img.width
         let height = img.height
         
@@ -526,8 +552,8 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
         }
         
         const newShape: Shape = {
-          id: `image-${Date.now()}`,
-          type: 'image',
+          id: `sticker-${Date.now()}`,
+          type: 'sticker',
           x: canvasDimensions.width / 2 - width / 2,
           y: canvasDimensions.height / 2 - height / 2,
           width,
@@ -535,12 +561,19 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
           image: img,
           fill: 'transparent',
           stroke: 'transparent',
-          strokeWidth: 0
+          strokeWidth: 0,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1
         }
         
         setShapes([...shapes, newShape])
         setUndoneShapes([])
         setToolMode('select')
+        setSelectedShapeId(newShape.id)
+        setShowStickerLibrary(false)
+        
+        if ('vibrate' in navigator) navigator.vibrate(10)
       }
       img.src = event.target?.result as string
     }
@@ -757,7 +790,7 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                         />
                       )
                     }
-                    if (shape.type === 'image' && shape.image) {
+                    if (shape.type === 'image' || shape.type === 'sticker' && shape.image) {
                       return (
                         <KonvaImage
                           key={shape.id}
@@ -767,6 +800,9 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                           image={shape.image}
                           width={shape.width}
                           height={shape.height}
+                          rotation={shape.rotation || 0}
+                          scaleX={shape.scaleX || 1}
+                          scaleY={shape.scaleY || 1}
                           draggable={toolMode === 'select'}
                           onClick={() => toolMode === 'select' && setSelectedShapeId(shape.id)}
                         />
@@ -886,15 +922,16 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
           <Type className="w-5 h-5" />
         </button>
 
-        {/* Crop Tool */}
+        {/* Scissors/Sticker Tool */}
         <button
           onClick={() => {
-            setCropArea(null)
-            setToolMode('crop')
+            setShowStickerLibrary(!showStickerLibrary)
+            setShowColorPicker(false)
+            setShowBrushSize(false)
             if ('vibrate' in navigator) navigator.vibrate(5)
           }}
           className={`w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-full transition-all shadow-lg active:scale-95 ${
-            toolMode === 'crop' 
+            showStickerLibrary 
               ? 'bg-white text-[#8B7355]' 
               : 'bg-black/40 backdrop-blur-sm text-white hover:bg-black/60'
           }`}
@@ -1067,6 +1104,78 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Sticker Library Panel - Slides from right */}
+      {showStickerLibrary && (
+        <div className="absolute right-14 sm:right-20 top-1/2 -translate-y-1/2 w-64 sm:w-72 bg-gradient-to-br from-white to-gray-50 backdrop-blur-xl rounded-3xl shadow-2xl p-5 sm:p-6 z-50 max-h-[80vh] overflow-y-auto border border-white/20">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-base font-semibold text-gray-900">Stickers</span>
+            <button
+              onClick={() => setShowStickerLibrary(false)}
+              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all active:scale-95"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Upload Sticker Button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full py-3 px-4 bg-gradient-to-r from-[#8B7355] to-[#A0826D] text-white rounded-2xl font-medium text-sm shadow-lg hover:shadow-xl active:scale-95 transition-all mb-4 flex items-center justify-center gap-2"
+          >
+            <ImagePlus className="w-4 h-4" />
+            <span>Add Sticker</span>
+          </button>
+
+          {/* Sticker Grid */}
+          {stickers.length > 0 ? (
+            <div className="grid grid-cols-3 gap-3">
+              {stickers.map((sticker) => (
+                <button
+                  key={sticker.id}
+                  onClick={() => {
+                    // Add sticker to canvas
+                    const newShape: Shape = {
+                      id: `sticker-${Date.now()}`,
+                      type: 'sticker',
+                      x: canvasDimensions.width / 2 - 75,
+                      y: canvasDimensions.height / 2 - 75,
+                      width: 150,
+                      height: 150,
+                      image: sticker.image,
+                      fill: 'transparent',
+                      stroke: 'transparent',
+                      strokeWidth: 0,
+                      rotation: 0,
+                      scaleX: 1,
+                      scaleY: 1
+                    }
+                    setShapes([...shapes, newShape])
+                    setUndoneShapes([])
+                    setToolMode('select')
+                    setSelectedShapeId(newShape.id)
+                    setShowStickerLibrary(false)
+                    if ('vibrate' in navigator) navigator.vibrate(10)
+                  }}
+                  className="aspect-square rounded-2xl border-2 border-gray-200 hover:border-[#8B7355] active:scale-95 transition-all overflow-hidden bg-white shadow-sm hover:shadow-md"
+                >
+                  <img 
+                    src={sticker.thumbnail} 
+                    alt="Sticker" 
+                    className="w-full h-full object-contain p-2"
+                  />
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              <Scissors className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">No stickers yet</p>
+              <p className="text-xs mt-1">Upload an image to create a sticker</p>
             </div>
           )}
         </div>
