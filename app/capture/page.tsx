@@ -1211,20 +1211,9 @@ export default function CapturePage() {
                 Design Your Nails
               </h1>
               
-              {/* Right side - Replace Hand and Credits */}
-              <div className="flex items-center gap-2 sm:gap-4 ml-auto">
-                <button
-                  onClick={replaceHandPhoto}
-                  className="h-10 sm:h-11 px-3 sm:px-5 border border-[#8B7355] text-[#8B7355] font-light text-[10px] sm:text-[11px] tracking-[0.2em] uppercase hover:bg-[#8B7355] hover:text-white active:scale-[0.98] transition-all duration-500 flex items-center gap-2 rounded-none"
-                  title="Replace the hand reference photo for all designs"
-                >
-                  <Upload className="w-4 h-4" strokeWidth={1} />
-                  <span className="hidden md:inline">Replace Hand</span>
-                  <span className="md:hidden">Hand</span>
-                </button>
-                <div className="flex items-center">
-                  <CreditsDisplay showLabel={true} credits={credits} />
-                </div>
+              {/* Right side - Credits only */}
+              <div className="flex items-center ml-auto">
+                <CreditsDisplay showLabel={true} credits={credits} />
               </div>
             </div>
             
@@ -1332,6 +1321,20 @@ export default function CapturePage() {
                     ✓ Drawing Added
                   </div>
                 )}
+                
+                {/* Replace Hand Button - Bottom Right */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    replaceHandPhoto()
+                  }}
+                  className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 md:bottom-6 md:right-6 h-10 sm:h-11 px-3 sm:px-4 border-2 border-[#8B7355] bg-white/95 backdrop-blur-sm text-[#8B7355] font-light text-[10px] sm:text-[11px] tracking-[0.2em] uppercase hover:bg-[#8B7355] hover:text-white active:scale-[0.98] transition-all duration-500 flex items-center gap-2 rounded-sm shadow-lg z-20 pointer-events-auto"
+                  title="Replace the hand reference photo for all designs"
+                >
+                  <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.5} />
+                  <span className="hidden sm:inline">Replace Hand</span>
+                  <span className="sm:hidden">Replace</span>
+                </button>
               </div>
             </div>
           </div>
