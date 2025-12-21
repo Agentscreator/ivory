@@ -14,7 +14,7 @@ import { CreditsDisplay } from "@/components/credits-display"
 import { useCredits } from "@/hooks/use-credits"
 import { toast } from "sonner"
 import { BottomNav } from "@/components/bottom-nav"
-import { DrawingCanvas } from "@/components/drawing-canvas"
+import { DrawingCanvasKonva as DrawingCanvas } from "@/components/drawing-canvas-konva"
 import { Pencil } from "lucide-react"
 
 type DesignMode = 'design' | 'ai-design' | null
