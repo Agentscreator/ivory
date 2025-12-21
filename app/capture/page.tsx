@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Palette, Sparkles, Upload, Loader2, X, ChevronDown, Share2 } from "lucide-react"
+import { Palette, Sparkles, Upload, Loader2, X, ChevronDown, Share2, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { Slider } from "@/components/ui/slider"
 import { CreditsDisplay } from "@/components/credits-display"
@@ -1197,11 +1197,21 @@ export default function CapturePage() {
         <div className="absolute top-0 left-0 right-0 pt-12 sm:pt-14 px-4 sm:px-8 lg:px-12 pb-5 sm:pb-6 z-10 bg-white/95 backdrop-blur-md border-b border-[#E8E8E8]/50 transition-all duration-500">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-4 sm:mb-5">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <h1 className="font-serif text-lg sm:text-2xl lg:text-3xl font-light text-[#1A1A1A] tracking-[-0.01em] leading-tight">
-                  Design Your Nails
-                </h1>
-              </div>
+              {/* Left side - Delete button */}
+              <button
+                onClick={changePhoto}
+                className="h-10 sm:h-11 w-10 sm:w-11 border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white active:scale-[0.98] transition-all duration-500 flex items-center justify-center rounded-none"
+                title="Delete this design and start over"
+              >
+                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
+              </button>
+              
+              {/* Center - Title */}
+              <h1 className="font-serif text-lg sm:text-2xl lg:text-3xl font-light text-[#1A1A1A] tracking-[-0.01em] leading-tight absolute left-1/2 -translate-x-1/2">
+                Design Your Nails
+              </h1>
+              
+              {/* Right side - Replace Hand and Credits */}
               <div className="flex items-center gap-2 sm:gap-4 ml-auto">
                 <button
                   onClick={replaceHandPhoto}
@@ -1211,15 +1221,6 @@ export default function CapturePage() {
                   <Upload className="w-4 h-4" strokeWidth={1} />
                   <span className="hidden md:inline">Replace Hand</span>
                   <span className="md:hidden">Hand</span>
-                </button>
-                <button
-                  onClick={changePhoto}
-                  className="h-10 sm:h-11 px-3 sm:px-5 border border-[#E8E8E8] text-[#1A1A1A] font-light text-[10px] sm:text-[11px] tracking-[0.2em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center gap-2 rounded-none"
-                  title="Clear this design and start over"
-                >
-                  <X className="w-4 h-4" strokeWidth={1} />
-                  <span className="hidden md:inline">Clear Design</span>
-                  <span className="md:hidden">Clear</span>
                 </button>
                 <div className="flex items-center">
                   <CreditsDisplay showLabel={true} credits={credits} />
