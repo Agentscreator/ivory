@@ -83,6 +83,7 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
   const [isCropping, setIsCropping] = useState(false)
   const lastTouchDistanceRef = useRef<number>(0)
   const lastTouchCenterRef = useRef<{ x: number; y: number } | null>(null)
+  const lastTapTimeRef = useRef<number>(0)
   
   // Color picker state (HSL)
   const [hue, setHue] = useState(0) // 0-360
@@ -140,6 +141,28 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
   }, [imageUrl])
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+    // Handle double-tap to reset zoom
+    if ('touches' in e.evt && e.evt.touches.length === 1) {
+      const now = Date.now()
+      const timeSinceLastTap = now - lastTapTimeRef.current
+      
+      if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
+        // Double tap detected - reset zoom and position
+        const stage = stageRef.current
+        if (stage) {
+          stage.scale({ x: 1, y: 1 })
+          stage.position({ x: 0, y: 0 })
+          setZoom(1)
+          if ('vibrate' in navigator) {
+            navigator.vibrate(10)
+          }
+        }
+        lastTapTimeRef.current = 0
+        return
+      }
+      lastTapTimeRef.current = now
+    }
+    
     // Handle pinch zoom on touch devices
     if ('touches' in e.evt && e.evt.touches.length === 2) {
       e.evt.preventDefault()
@@ -157,7 +180,14 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
       return
     }
     
-    if (toolMode === 'pan') return
+    // Allow panning when not in drawing/eraser mode or when middle mouse button
+    const isMiddleButton = 'button' in e.evt && e.evt.button === 1
+    const shouldPan = toolMode === 'pan' || isMiddleButton
+    
+    if (shouldPan) {
+      // Stage will handle dragging automatically
+      return
+    }
     
     if (e.target === e.target.getStage()) {
       setSelectedShapeId(null)
@@ -236,7 +266,7 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
   }
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-    // Handle pinch zoom
+    // Handle pinch zoom with simultaneous pan
     if ('touches' in e.evt && e.evt.touches.length === 2) {
       e.evt.preventDefault()
       const touch1 = e.evt.touches[0]
@@ -245,37 +275,48 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
         touch2.clientX - touch1.clientX,
         touch2.clientY - touch1.clientY
       )
+      
+      const currentCenter = {
+        x: (touch1.clientX + touch2.clientX) / 2,
+        y: (touch1.clientY + touch2.clientY) / 2
+      }
 
-      if (lastTouchDistanceRef.current > 0) {
+      if (lastTouchDistanceRef.current > 0 && lastTouchCenterRef.current) {
         const stage = stageRef.current
         if (!stage) return
 
+        // Calculate zoom
         const delta = distance - lastTouchDistanceRef.current
         const scaleBy = 1 + delta * 0.01
         const oldScale = stage.scaleX()
         const newScale = Math.min(Math.max(oldScale * scaleBy, 0.5), 5)
 
-        // Get center point for zoom
-        const center = lastTouchCenterRef.current
-        if (center) {
-          const stagePos = stage.position()
-          const mousePointTo = {
-            x: (center.x - stagePos.x) / oldScale,
-            y: (center.y - stagePos.y) / oldScale,
-          }
-
-          const newPos = {
-            x: center.x - mousePointTo.x * newScale,
-            y: center.y - mousePointTo.y * newScale,
-          }
-
-          stage.scale({ x: newScale, y: newScale })
-          stage.position(newPos)
-          setZoom(newScale)
+        // Calculate pan (movement of center point)
+        const centerDelta = {
+          x: currentCenter.x - lastTouchCenterRef.current.x,
+          y: currentCenter.y - lastTouchCenterRef.current.y
         }
+
+        // Get the point we're zooming around
+        const stagePos = stage.position()
+        const mousePointTo = {
+          x: (currentCenter.x - stagePos.x) / oldScale,
+          y: (currentCenter.y - stagePos.y) / oldScale,
+        }
+
+        // Apply zoom and pan together
+        const newPos = {
+          x: currentCenter.x - mousePointTo.x * newScale + centerDelta.x,
+          y: currentCenter.y - mousePointTo.y * newScale + centerDelta.y,
+        }
+
+        stage.scale({ x: newScale, y: newScale })
+        stage.position(newPos)
+        setZoom(newScale)
       }
 
       lastTouchDistanceRef.current = distance
+      lastTouchCenterRef.current = currentCenter
       return
     }
     
@@ -544,8 +585,12 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
       y: (pointer.y - stage.y()) / oldScale,
     }
     
-    const delta = e.evt.deltaY > 0 ? -0.1 : 0.1
-    const newScale = Math.min(Math.max(oldScale + delta, 0.5), 5)
+    // Smoother zoom with smaller increments
+    const direction = e.evt.deltaY > 0 ? -1 : 1
+    const scaleBy = 1.05 // Smaller increment for smoother zoom
+    const newScale = direction > 0 
+      ? Math.min(oldScale * scaleBy, 5) 
+      : Math.max(oldScale / scaleBy, 0.5)
     
     setZoom(newScale)
     
@@ -642,7 +687,11 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
             onWheel={handleWheel}
             scaleX={zoom}
             scaleY={zoom}
-            draggable={true}
+            draggable={toolMode === 'pan' || toolMode === 'select'}
+            dragBoundFunc={(pos) => {
+              // Allow free dragging
+              return pos
+            }}
             className="shadow-lg max-w-full max-h-full"
             style={{
               cursor: toolMode === 'pan' ? 'grab' : toolMode === 'draw' || toolMode === 'eraser' ? 'crosshair' : 'default'
