@@ -112,6 +112,7 @@ export default function CapturePage() {
   const [finalPreviews, setFinalPreviews] = useState<string[]>([])
   const [colorLightness, setColorLightness] = useState(65) // 0-100 for lightness (matches initial color)
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false) // Bottom drawer toggle state
   const [selectedImageModal, setSelectedImageModal] = useState<string | null>(null)
   const [showDrawingCanvas, setShowDrawingCanvas] = useState(false)
   const [drawingImageUrl, setDrawingImageUrl] = useState<string | null>(null)
@@ -1267,10 +1268,10 @@ export default function CapturePage() {
 
         {/* Elegant Image Preview Section - Side by Side */}
         <div 
-          className="pt-36 sm:pt-40 lg:pt-44 pb-4 sm:pb-6 px-4 sm:px-8 lg:px-12 overflow-y-auto transition-all duration-700" 
+          className="pt-36 sm:pt-40 lg:pt-44 pb-24 sm:pb-28 px-4 sm:px-8 lg:px-12 overflow-y-auto transition-all duration-700" 
           style={{ 
-            height: expandedSection ? 'calc(35vh - 80px)' : 'calc(65vh - 80px)', 
-            minHeight: expandedSection ? '220px' : '420px' 
+            height: '100vh',
+            paddingBottom: '140px' // Space for button bar + bottom nav
           }}
         >
           <div className="max-w-4xl mx-auto h-full flex flex-col gap-4">
@@ -1337,37 +1338,53 @@ export default function CapturePage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Elegant Generate Design Button - Above Drawer with Animation */}
-            <div className="flex-shrink-0 animate-slide-up">
-              {!isGenerating ? (
-                <button 
-                  onClick={() => generateAIPreview(designSettings)} 
-                  className="w-full h-14 sm:h-16 bg-gradient-to-r from-[#1A1A1A] via-[#2D2D2D] to-[#1A1A1A] text-white font-light text-sm sm:text-base tracking-[0.25em] uppercase hover:from-[#8B7355] hover:via-[#A0826D] hover:to-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl rounded-sm disabled:opacity-50 disabled:cursor-not-allowed border border-[#E8E8E8]/20 backdrop-blur-sm animate-shimmer"
-                  disabled={!hasCredits(1)}
-                  style={{
-                    backgroundSize: '200% 100%',
-                    animation: 'shimmer 3s ease-in-out infinite'
-                  }}
-                >
-                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" strokeWidth={1.5} />
-                  <span>Generate Design</span>
-                  {credits !== null && (
-                    <span className="ml-2 text-xs sm:text-sm opacity-70 font-light">
-                      (1 credit)
-                    </span>
-                  )}
-                </button>
-              ) : (
-                <button 
-                  onClick={cancelGeneration}
-                  className="w-full h-14 sm:h-16 border-2 border-[#E8E8E8] text-[#1A1A1A] font-light text-sm sm:text-base tracking-[0.25em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-3 rounded-sm bg-white shadow-lg"
-                >
-                  <X className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />
-                  <span>Cancel Generation</span>
-                </button>
-              )}
-            </div>
+        {/* Fixed Generate Design Button Bar - At Bottom Above Nav */}
+        <div className="fixed left-0 right-0 bottom-20 z-30 px-3 pb-3 bg-gradient-to-t from-white via-white to-transparent pt-6 pointer-events-none">
+          <div className="max-w-4xl mx-auto flex items-center gap-2 pointer-events-auto">
+            {!isGenerating ? (
+              <button 
+                onClick={() => generateAIPreview(designSettings)} 
+                disabled={!hasCredits(1)}
+                className="flex-1 h-12 sm:h-14 bg-gradient-to-r from-[#1A1A1A] via-[#2D2D2D] to-[#1A1A1A] text-white font-light text-xs sm:text-sm tracking-[0.2em] uppercase hover:from-[#8B7355] hover:via-[#A0826D] hover:to-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl rounded-sm disabled:opacity-50 disabled:cursor-not-allowed border border-[#E8E8E8]/20 backdrop-blur-sm animate-shimmer"
+                style={{
+                  backgroundSize: '200% 100%',
+                  animation: 'shimmer 3s ease-in-out infinite'
+                }}
+              >
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" strokeWidth={1.5} />
+                <span className="hidden xs:inline">Generate Design</span>
+                <span className="xs:hidden">Generate</span>
+                {credits !== null && (
+                  <span className="ml-1 text-[10px] sm:text-xs opacity-70 font-light">
+                    (1 credit)
+                  </span>
+                )}
+              </button>
+            ) : (
+              <button 
+                onClick={cancelGeneration}
+                className="flex-1 h-12 sm:h-14 border-2 border-[#E8E8E8] text-[#1A1A1A] font-light text-xs sm:text-sm tracking-[0.2em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 rounded-sm bg-white shadow-lg"
+              >
+                <X className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
+                <span>Cancel</span>
+              </button>
+            )}
+
+            {/* Settings Toggle Button */}
+            <button
+              onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+              className={`h-12 sm:h-14 w-12 sm:w-14 flex-shrink-0 border-2 transition-all duration-500 flex items-center justify-center rounded-sm shadow-xl hover:shadow-2xl active:scale-[0.98] ${
+                isDrawerOpen 
+                  ? 'bg-[#8B7355] border-[#8B7355] text-white' 
+                  : 'bg-white border-[#E8E8E8] text-[#1A1A1A] hover:border-[#8B7355]'
+              }`}
+              aria-label="Toggle design settings"
+            >
+              <Palette className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />
+            </button>
           </div>
         </div>
 
@@ -1408,17 +1425,26 @@ export default function CapturePage() {
         {/* Elegant Bottom Drawer with Mobile Optimization */}
         <div 
           data-drawer="bottom"
-          className="fixed left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#E8E8E8]/50 z-20 touch-action-pan-y transition-all duration-500 shadow-2xl" 
+          className={`fixed left-0 right-0 bg-white/98 backdrop-blur-md z-40 touch-action-pan-y transition-all duration-500 ${
+            isDrawerOpen 
+              ? 'translate-y-0 opacity-100 border-t border-[#E8E8E8]/50 shadow-2xl pointer-events-auto' 
+              : 'translate-y-full opacity-0 border-t-0 shadow-none pointer-events-none'
+          }`}
           style={{ 
             bottom: '80px', 
             height: expandedSection ? 'calc(65vh - 80px)' : 'calc(35vh - 80px)', 
             minHeight: expandedSection ? '400px' : '240px', 
-            maxHeight: expandedSection ? '600px' : '370px' 
+            maxHeight: expandedSection ? '600px' : '370px',
+            visibility: isDrawerOpen ? 'visible' : 'hidden'
           }}
         >
           <div className="max-w-4xl mx-auto h-full flex flex-col">
             {/* Elegant Drag Handle */}
-            <div className="h-1.5 w-20 bg-[#E8E8E8] rounded-full mx-auto my-4 flex-shrink-0 transition-all duration-300 hover:bg-[#8B7355]"></div>
+            <button
+              onClick={() => setIsDrawerOpen(false)}
+              className="h-1.5 w-20 bg-[#E8E8E8] rounded-full mx-auto my-4 flex-shrink-0 transition-all duration-300 hover:bg-[#8B7355] cursor-pointer"
+              aria-label="Close drawer"
+            />
 
             <div className="w-full flex-1 flex flex-col overflow-hidden">
               {(designMode === 'design' || designMode === null) && (
