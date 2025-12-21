@@ -1273,9 +1273,9 @@ export default function CapturePage() {
             minHeight: expandedSection ? '220px' : '420px' 
           }}
         >
-          <div className="max-w-4xl mx-auto h-full">
+          <div className="max-w-4xl mx-auto h-full flex flex-col gap-4">
             {/* Original Image Card - Full Width */}
-            <div className="relative overflow-hidden border border-[#E8E8E8]/50 group h-full bg-white shadow-sm hover:shadow-lg transition-all duration-700 rounded-sm animate-fade-in">
+            <div className="relative overflow-hidden border border-[#E8E8E8]/50 group flex-1 bg-white shadow-sm hover:shadow-lg transition-all duration-700 rounded-sm animate-fade-in">
               <div
                 onClick={() => setShowDrawingCanvas(true)}
                 className="relative bg-gradient-to-br from-[#F8F7F5] to-white h-full w-full cursor-pointer"
@@ -1337,9 +1337,40 @@ export default function CapturePage() {
                 </button>
               </div>
             </div>
+
+            {/* Elegant Generate Design Button - Above Drawer with Animation */}
+            <div className="flex-shrink-0 animate-slide-up">
+              {!isGenerating ? (
+                <button 
+                  onClick={() => generateAIPreview(designSettings)} 
+                  className="w-full h-14 sm:h-16 bg-gradient-to-r from-[#1A1A1A] via-[#2D2D2D] to-[#1A1A1A] text-white font-light text-sm sm:text-base tracking-[0.25em] uppercase hover:from-[#8B7355] hover:via-[#A0826D] hover:to-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl rounded-sm disabled:opacity-50 disabled:cursor-not-allowed border border-[#E8E8E8]/20 backdrop-blur-sm animate-shimmer"
+                  disabled={!hasCredits(1)}
+                  style={{
+                    backgroundSize: '200% 100%',
+                    animation: 'shimmer 3s ease-in-out infinite'
+                  }}
+                >
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" strokeWidth={1.5} />
+                  <span>Generate Design</span>
+                  {credits !== null && (
+                    <span className="ml-2 text-xs sm:text-sm opacity-70 font-light">
+                      (1 credit)
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <button 
+                  onClick={cancelGeneration}
+                  className="w-full h-14 sm:h-16 border-2 border-[#E8E8E8] text-[#1A1A1A] font-light text-sm sm:text-base tracking-[0.25em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-3 rounded-sm bg-white shadow-lg"
+                >
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />
+                  <span>Cancel Generation</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
-S
+
         {/* Image Modal */}
         {selectedImageModal && (
           <div 
@@ -1438,30 +1469,7 @@ S
                     </div>
                   )}
 
-                  {/* Elegant Generate Preview Button */}
-                  {!isGenerating ? (
-                    <button 
-                      onClick={() => generateAIPreview(designSettings)} 
-                      className="w-full h-12 sm:h-14 bg-[#1A1A1A] text-white font-light text-[11px] sm:text-sm tracking-[0.2em] uppercase hover:bg-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 sm:gap-3 shadow-lg hover:shadow-xl rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={!hasCredits(1)}
-                    >
-                      <Sparkles className="w-5 h-5" strokeWidth={1} />
-                      Generate Preview
-                      {credits !== null && (
-                        <span className="ml-2 text-[10px] sm:text-xs opacity-70 font-light">
-                          (1 credit)
-                        </span>
-                      )}
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={cancelGeneration}
-                      className="w-full h-12 sm:h-14 border border-[#E8E8E8] text-[#1A1A1A] font-light text-[11px] sm:text-sm tracking-[0.2em] uppercase hover:bg-[#F8F7F5] hover:border-[#8B7355] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-2 sm:gap-3 rounded-sm"
-                    >
-                      <X className="w-5 h-5" strokeWidth={1} />
-                      Cancel Generation
-                    </button>
-                  )}
+
 
                   {/* Drawing Status */}
                   {drawingImageUrl && (
