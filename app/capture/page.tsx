@@ -88,6 +88,7 @@ export default function CapturePage() {
   const [capturedImage, setCapturedImage] = useState<string | null>(getInitialCapturedImage())
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment')
   const [isFlipping, setIsFlipping] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [zoom, setZoom] = useState(1)
   const [showZoomIndicator, setShowZoomIndicator] = useState(false)
   const [handReference, setHandReference] = useState<1 | 2 | 3>(3)
@@ -657,6 +658,7 @@ export default function CapturePage() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setIsUploadingImage(true)
       try {
         const formData = new FormData()
         formData.append('file', file)
@@ -684,6 +686,8 @@ export default function CapturePage() {
           setCapturedImage(e.target?.result as string)
         }
         reader.readAsDataURL(file)
+      } finally {
+        setIsUploadingImage(false)
       }
 
       stopCamera()
@@ -2177,10 +2181,19 @@ export default function CapturePage() {
         </div>
 
         {isFlipping && (
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A1A] to-black flex items-center justify-center backdrop-blur-sm">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A1A] to-black flex items-center justify-center backdrop-blur-sm z-50">
             <div className="flex flex-col items-center gap-4 animate-fade-in">
               <Loader2 className="w-10 h-10 text-white animate-spin" strokeWidth={1.5} />
               <p className="text-white/80 text-sm font-light tracking-[0.2em] uppercase">Switching Camera</p>
+            </div>
+          </div>
+        )}
+
+        {isUploadingImage && (
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A1A] to-black flex items-center justify-center backdrop-blur-sm z-50">
+            <div className="flex flex-col items-center gap-4 animate-fade-in">
+              <Loader2 className="w-10 h-10 text-white animate-spin" strokeWidth={1.5} />
+              <p className="text-white/80 text-sm font-light tracking-[0.2em] uppercase">Loading Image</p>
             </div>
           </div>
         )}
