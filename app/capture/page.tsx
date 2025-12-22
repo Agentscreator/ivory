@@ -501,6 +501,28 @@ export default function CapturePage() {
 
   const startCamera = async () => {
     try {
+      // Check if mediaDevices is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Camera is not supported on this device or browser.")
+        return
+      }
+
+      // Check current permission state
+      if (navigator.permissions && navigator.permissions.query) {
+        try {
+          const permissionStatus = await navigator.permissions.query({ name: 'camera' as PermissionName })
+          console.log('Camera permission status:', permissionStatus.state)
+          
+          if (permissionStatus.state === 'denied') {
+            alert("Camera access is blocked. Please enable camera permissions in your browser settings:\n\n1. Click the lock icon in the address bar\n2. Allow camera access\n3. Refresh the page")
+            return
+          }
+        } catch (permError) {
+          // Permission API might not be fully supported, continue anyway
+          console.log('Permission API not fully supported:', permError)
+        }
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode } 
       })
@@ -509,9 +531,33 @@ export default function CapturePage() {
         videoRef.current.srcObject = stream
         videoRef.current.play()
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error accessing camera:", error)
-      alert("Unable to access camera. Please check permissions.")
+      
+      // Provide specific error messages
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        alert("Camera access denied. Please allow camera permissions and refresh the page.\n\nTo enable:\n1. Click the lock/info icon in your browser's address bar\n2. Allow camera access\n3. Refresh this page")
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        alert("No camera found on this device.")
+      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+        alert("Camera is already in use by another application. Please close other apps using the camera and try again.")
+      } else if (error.name === 'OverconstrainedError') {
+        alert("Camera doesn't support the requested settings. Trying with default settings...")
+        // Try again with basic constraints
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+          streamRef.current = stream
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream
+            videoRef.current.play()
+          }
+        } catch (retryError) {
+          console.error("Retry failed:", retryError)
+          alert("Unable to access camera with any settings.")
+        }
+      } else {
+        alert("Unable to access camera. Please check permissions and try again.")
+      }
     }
   }
 
