@@ -26,14 +26,7 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-16">
           <div className="flex items-center justify-between h-20 sm:h-24 lg:h-28">
             {/* Logo */}
-            <div className="flex items-center gap-3">
-              <Image 
-                src="/logo-icon.png" 
-                alt="Ivory's Choice Logo" 
-                width={72} 
-                height={72} 
-                className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20"
-              />
+            <div className="flex items-center">
               <span className="font-serif text-xl sm:text-2xl lg:text-3xl tracking-tight text-[#1A1A1A] font-light">
                 IVORY'S CHOICE
               </span>
@@ -357,16 +350,7 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-16">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-10 sm:gap-14 lg:gap-16 mb-16 sm:mb-20">
             <div className="col-span-2 sm:col-span-1">
-              <div className="flex items-center gap-3 mb-5 sm:mb-7">
-                <Image 
-                  src="/logo-icon.png" 
-                  alt="Ivory's Choice Logo" 
-                  width={58} 
-                  height={58} 
-                  className="w-12 h-12 sm:w-14 sm:h-14"
-                />
-                <h3 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] tracking-tight">IVORY'S CHOICE</h3>
-              </div>
+              <h3 className="font-serif text-xl sm:text-2xl font-light mb-5 sm:mb-7 text-[#1A1A1A] tracking-tight">IVORY'S CHOICE</h3>
               <p className="text-sm sm:text-base text-[#6B6B6B] font-light leading-[1.7] tracking-wide">
                 Where artistry meets innovation
               </p>
