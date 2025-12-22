@@ -466,9 +466,13 @@ export default function CapturePage() {
         }
       }
       
-      // No existing tabs with content - auto-start camera
-      console.log('⚠️ No saved tabs with content, starting camera')
-      startCamera()
+      // No existing tabs with content - check if we have a capturedImage before starting camera
+      if (!capturedImage) {
+        console.log('⚠️ No saved tabs and no capturedImage, starting camera')
+        startCamera()
+      } else {
+        console.log('✅ Have capturedImage, NOT starting camera')
+      }
       
       // Mark initial load as complete
       setTimeout(() => {
