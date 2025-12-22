@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Palette, Sparkles, Upload, Loader2, X, ChevronDown, Share2, Trash2, Camera } from "lucide-react"
+import { Sparkles, Upload, Loader2, X, ChevronDown, Share2, Trash2, Camera } from "lucide-react"
 import Image from "next/image"
 import { Slider } from "@/components/ui/slider"
 import { CreditsDisplay } from "@/components/credits-display"
@@ -1465,7 +1465,13 @@ export default function CapturePage() {
                     }`}
                     title="Design settings"
                   >
-                    <Palette className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2} />
+                    <Image 
+                      src="/logo-icon.png" 
+                      alt="Design settings" 
+                      width={43} 
+                      height={43} 
+                      className={`w-8 h-8 sm:w-10 sm:h-10 ${isDrawerOpen ? 'brightness-0 invert' : ''}`}
+                    />
                   </button>
 
                   {/* Replace Hand Button */}
