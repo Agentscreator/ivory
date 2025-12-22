@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
-import { Home, Plus, User, Calendar, Settings } from 'lucide-react'
+import { Home, Plus, User, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useIsAppleWatch } from './watch-optimized-layout'
 import { haptics } from '@/lib/haptics'
@@ -19,8 +19,7 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
   const isActive = (path: string) => pathname === path || pathname.startsWith(path)
 
   const navItems = [
-    { icon: Home, label: 'Home', path: '/home' },
-    { icon: Calendar, label: 'Bookings', path: '/bookings', altPaths: ['/book', '/tech/bookings'] },
+    { icon: Home, label: 'Home', path: '/home', altPaths: ['/bookings', '/book', '/tech/dashboard', '/tech/bookings'] },
     { icon: User, label: 'Profile', path: '/profile' },
     { icon: Settings, label: 'Settings', path: '/settings', altPaths: ['/billing'] },
   ]
@@ -30,8 +29,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
       {/* Desktop Vertical Sidebar */}
       <nav className="vertical-sidebar hidden lg:flex fixed left-0 top-0 bottom-0 z-30 w-20 flex-col items-center justify-center bg-white/98 backdrop-blur-sm border-r border-[#E8E8E8]">
         <div className="flex flex-col items-center space-y-6">
-          {/* First two navigation items */}
-          {navItems.slice(0, 2).map((item) => {
+          {/* First navigation item - Home */}
+          {navItems.slice(0, 1).map((item) => {
             const Icon = item.icon
             const active = isActive(item.path) || item.altPaths?.some(p => isActive(p))
             
@@ -40,15 +39,13 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
                 key={item.path}
                 onClick={async () => {
                   haptics.light()
-                  // Special handling for bookings button
-                  if (item.path === '/bookings') {
-                    const userStr = localStorage.getItem("ivoryUser");
-                    if (userStr) {
-                      const user = JSON.parse(userStr);
-                      if (user.userType === 'tech') {
-                        router.push('/tech/bookings');
-                        return;
-                      }
+                  // Special handling for home button
+                  const userStr = localStorage.getItem("ivoryUser");
+                  if (userStr) {
+                    const user = JSON.parse(userStr);
+                    if (user.userType === 'tech') {
+                      router.push('/tech/dashboard');
+                      return;
                     }
                   }
                   router.push(item.path)
@@ -80,8 +77,8 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
             <Plus className="w-6 h-6 text-white" strokeWidth={1.5} />
           </button>
 
-          {/* Last two navigation items */}
-          {navItems.slice(2).map((item) => {
+          {/* Last two navigation items - Profile & Settings */}
+          {navItems.slice(1).map((item) => {
             const Icon = item.icon
             const active = isActive(item.path) || item.altPaths?.some(p => isActive(p))
             
@@ -131,53 +128,31 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
             <button
               onClick={() => {
                 haptics.light();
-                router.push('/home');
-              }}
-              className={cn(
-                'flex flex-col items-center justify-center transition-all duration-300 relative',
-                'active:scale-95',
-                isWatch ? 'w-10 h-10 watch-nav-item' : 'w-12 h-12',
-                isActive('/home') 
-                  ? 'text-[#1A1A1A]' 
-                  : 'text-[#6B6B6B] hover:text-[#8B7355]'
-              )}
-            >
-              <Home className={isWatch ? "w-4 h-4" : "w-6 h-6"} strokeWidth={isActive('/home') ? 1.5 : 1} />
-              {isWatch && <span className="text-[8px] mt-0.5">Home</span>}
-              {isActive('/home') && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#1A1A1A] rounded-full" />
-              )}
-            </button>
-
-            {/* Bookings Button */}
-            <button
-              onClick={async () => {
-                haptics.light();
                 // Check user type and route accordingly
                 const userStr = localStorage.getItem("ivoryUser");
                 if (userStr) {
                   const user = JSON.parse(userStr);
                   if (user.userType === 'tech') {
-                    router.push('/tech/bookings');
+                    router.push('/tech/dashboard');
                   } else {
-                    router.push('/bookings');
+                    router.push('/home');
                   }
                 } else {
-                  router.push('/bookings');
+                  router.push('/home');
                 }
               }}
               className={cn(
                 'flex flex-col items-center justify-center transition-all duration-300 relative',
                 'active:scale-95',
                 isWatch ? 'w-10 h-10 watch-nav-item' : 'w-12 h-12',
-                isActive('/bookings') || isActive('/book') || isActive('/tech/bookings')
+                isActive('/home') || isActive('/bookings') || isActive('/book') || isActive('/tech/dashboard') || isActive('/tech/bookings')
                   ? 'text-[#1A1A1A]' 
                   : 'text-[#6B6B6B] hover:text-[#8B7355]'
               )}
             >
-              <Calendar className={isWatch ? "w-4 h-4" : "w-6 h-6"} strokeWidth={(isActive('/bookings') || isActive('/book') || isActive('/tech/bookings')) ? 1.5 : 1} />
-              {isWatch && <span className="text-[8px] mt-0.5">Book</span>}
-              {(isActive('/bookings') || isActive('/book') || isActive('/tech/bookings')) && (
+              <Home className={isWatch ? "w-4 h-4" : "w-6 h-6"} strokeWidth={(isActive('/home') || isActive('/bookings') || isActive('/book') || isActive('/tech/dashboard') || isActive('/tech/bookings')) ? 1.5 : 1} />
+              {isWatch && <span className="text-[8px] mt-0.5">Home</span>}
+              {(isActive('/home') || isActive('/bookings') || isActive('/book') || isActive('/tech/dashboard') || isActive('/tech/bookings')) && (
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#1A1A1A] rounded-full" />
               )}
             </button>
