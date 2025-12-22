@@ -1761,71 +1761,96 @@ export default function CapturePage() {
                         <ChevronDown className={`w-5 h-5 text-[#6B6B6B] transition-transform duration-300 ml-2 ${expandedSection === 'color' ? 'rotate-180' : ''}`} strokeWidth={1.5} />
                       </button>
                       {expandedSection === 'color' && (
-                        <div className="mt-3 space-y-4 p-5 bg-gradient-to-br from-[#FAFAFA] to-white rounded-lg border border-[#E8E8E8] shadow-inner animate-fade-in">
+                        <div className="mt-3 space-y-5 p-5 sm:p-6 bg-gradient-to-br from-[#FAFAFA] to-white rounded-lg border border-[#E8E8E8] shadow-inner animate-fade-in">
+                          {/* Color Preview */}
+                          <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-[#E8E8E8] shadow-sm">
+                            <div 
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl shadow-lg ring-4 ring-white transition-all duration-300"
+                              style={{ backgroundColor: designSettings.baseColor }}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs text-[#6B6B6B] font-light uppercase tracking-wider mb-1">Current Color</p>
+                              <p className="text-base sm:text-lg font-medium text-[#1A1A1A] tracking-tight truncate">{designSettings.baseColor}</p>
+                              <p className="text-xs text-[#8B7355] font-light mt-0.5">
+                                HSL({hexToHsl(designSettings.baseColor).hue}°, 100%, {colorLightness}%)
+                              </p>
+                            </div>
+                          </div>
+
                           {/* Hue Slider */}
                           <div>
                             <div className="flex items-center justify-between mb-3">
-                              <label className="text-xs text-[#1A1A1A] font-medium tracking-wider uppercase">Hue</label>
-                              <span className="text-xs text-[#8B7355] font-medium">{hexToHsl(designSettings.baseColor).hue}°</span>
+                              <label className="text-xs sm:text-sm text-[#1A1A1A] font-medium tracking-wider uppercase">Hue</label>
+                              <span className="text-xs sm:text-sm text-white bg-[#8B7355] px-3 py-1.5 rounded-full font-medium shadow-sm min-w-[60px] text-center">
+                                {hexToHsl(designSettings.baseColor).hue}°
+                              </span>
                             </div>
-                            <div className="relative h-5 rounded-full overflow-hidden shadow-sm">
-                              <div className="absolute inset-0 rounded-full" style={{
-                                background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)',
-                              }} />
-                              <Slider
-                                value={[hexToHsl(designSettings.baseColor).hue]}
-                                onValueChange={handleHueChange}
-                                max={360}
-                                step={1}
-                                className="w-full relative z-10 slider-transparent"
-                              />
+                            <div className="relative py-1">
+                              <div className="relative h-7 sm:h-9 rounded-full overflow-hidden shadow-lg border-2 border-white ring-1 ring-[#E8E8E8]">
+                                <div className="absolute inset-0 rounded-full" style={{
+                                  background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)',
+                                }} />
+                                <Slider
+                                  value={[hexToHsl(designSettings.baseColor).hue]}
+                                  onValueChange={handleHueChange}
+                                  max={360}
+                                  step={1}
+                                  className="w-full relative z-10 slider-transparent h-full"
+                                />
+                              </div>
                             </div>
                           </div>
                           
                           {/* Lightness Slider */}
                           <div>
                             <div className="flex items-center justify-between mb-3">
-                              <label className="text-xs text-[#1A1A1A] font-medium tracking-wider uppercase">Lightness</label>
-                              <span className="text-xs text-[#8B7355] font-medium">{colorLightness}%</span>
+                              <label className="text-xs sm:text-sm text-[#1A1A1A] font-medium tracking-wider uppercase">Brightness</label>
+                              <span className="text-xs sm:text-sm text-white bg-[#8B7355] px-3 py-1.5 rounded-full font-medium shadow-sm min-w-[60px] text-center">
+                                {colorLightness}%
+                              </span>
                             </div>
-                            <div className="relative h-5 rounded-full overflow-hidden shadow-sm">
-                              <div className="absolute inset-0 rounded-full" style={{
-                                background: 'linear-gradient(to right, #1a1a1a 0%, #808080 50%, #ffffff 100%)',
-                              }} />
-                              <Slider
-                                value={[colorLightness]}
-                                onValueChange={handleLightnessChange}
-                                max={100}
-                                min={10}
-                                step={1}
-                                className="w-full relative z-10 slider-transparent"
-                              />
+                            <div className="relative py-1">
+                              <div className="relative h-7 sm:h-9 rounded-full overflow-hidden shadow-lg border-2 border-white ring-1 ring-[#E8E8E8]">
+                                <div className="absolute inset-0 rounded-full" style={{
+                                  background: `linear-gradient(to right, hsl(${hexToHsl(designSettings.baseColor).hue}, 100%, 10%), hsl(${hexToHsl(designSettings.baseColor).hue}, 100%, 50%), hsl(${hexToHsl(designSettings.baseColor).hue}, 100%, 90%))`,
+                                }} />
+                                <Slider
+                                  value={[colorLightness]}
+                                  onValueChange={handleLightnessChange}
+                                  max={100}
+                                  min={10}
+                                  step={1}
+                                  className="w-full relative z-10 slider-transparent h-full"
+                                />
+                              </div>
                             </div>
                           </div>
                           
                           {/* Influence Slider */}
                           <div className="pt-4 border-t border-[#E8E8E8]">
                             <div className="flex items-center justify-between mb-3">
-                              <label className="text-xs text-[#1A1A1A] font-medium tracking-wider uppercase">Color Influence</label>
-                              <span className="text-xs text-white bg-gradient-to-r from-[#8B7355] to-[#A0826D] px-2.5 py-1 rounded-full font-medium shadow-sm">
+                              <label className="text-xs sm:text-sm text-[#1A1A1A] font-medium tracking-wider uppercase">Color Influence</label>
+                              <span className="text-xs sm:text-sm text-white bg-gradient-to-r from-[#8B7355] to-[#A0826D] px-3 py-1.5 rounded-full font-medium shadow-sm min-w-[60px] text-center">
                                 {influenceWeights.nailEditor_baseColor}%
                               </span>
                             </div>
-                            <div className="relative h-5 rounded-full overflow-hidden shadow-sm">
-                              <div className="absolute inset-0 rounded-full" style={{
-                                background: 'linear-gradient(to right, #e0e0e0 0%, #FF6B9D 50%, #FF1493 100%)',
-                              }} />
-                              <Slider
-                                value={[influenceWeights.nailEditor_baseColor]}
-                                onValueChange={(value) => handleNailEditorBaseColorInfluence(value[0])}
-                                min={0}
-                                max={100}
-                                step={5}
-                                className="w-full relative z-10 slider-transparent"
-                              />
+                            <div className="relative py-1">
+                              <div className="relative h-7 sm:h-9 rounded-full overflow-hidden shadow-lg border-2 border-white ring-1 ring-[#E8E8E8]">
+                                <div className="absolute inset-0 rounded-full" style={{
+                                  background: 'linear-gradient(to right, #f5f5f5 0%, #8B7355 50%, #6B5345 100%)',
+                                }} />
+                                <Slider
+                                  value={[influenceWeights.nailEditor_baseColor]}
+                                  onValueChange={(value) => handleNailEditorBaseColorInfluence(value[0])}
+                                  min={0}
+                                  max={100}
+                                  step={5}
+                                  className="w-full relative z-10 slider-transparent h-full"
+                                />
+                              </div>
                             </div>
                             {selectedDesignImages.length > 0 && (
-                              <p className="text-[10px] text-[#6B6B6B] font-light mt-2 text-center">
+                              <p className="text-[10px] sm:text-xs text-[#6B6B6B] font-light mt-2 text-center">
                                 Design Images: {influenceWeights.nailEditor_designImage}%
                               </p>
                             )}
