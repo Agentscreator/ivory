@@ -1298,7 +1298,15 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
           </div>
 
           {/* Action Buttons */}
-          <div className="mb-4">
+          <div className="mb-4 space-y-3">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full py-3 px-4 bg-gradient-to-r from-[#8B7355] to-[#A0826D] text-white rounded-2xl font-medium text-sm shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+            >
+              <ImagePlus className="w-4 h-4" />
+              <span>Upload Image</span>
+            </button>
+            
             <button
               onClick={() => {
                 setToolMode('cutout')
@@ -1306,7 +1314,7 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                 setCutoutPath(null)
                 if ('vibrate' in navigator) navigator.vibrate(10)
               }}
-              className="w-full py-3 px-4 bg-gradient-to-r from-[#8B7355] to-[#A0826D] text-white rounded-2xl font-medium text-sm shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 bg-white border-2 border-[#8B7355] text-[#8B7355] rounded-2xl font-medium text-sm shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
             >
               <Scissors className="w-4 h-4" />
               <span>Draw Cutout</span>
@@ -1355,9 +1363,9 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
             </div>
           ) : (
             <div className="text-center py-8 text-gray-400">
-              <Scissors className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="text-sm">No stickers yet</p>
-              <p className="text-xs mt-1">Upload an image to create a sticker</p>
+              <ImagePlus className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p className="text-sm font-medium">No stickers yet</p>
+              <p className="text-xs mt-1">Upload an image or draw a cutout</p>
             </div>
           )}
         </div>
