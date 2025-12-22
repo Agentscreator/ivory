@@ -565,12 +565,43 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
+    if (!file) {
+      console.log('No file selected')
+      return
+    }
+    
+    console.log('File selected:', file.name, file.type, file.size)
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file')
+      return
+    }
+    
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image is too large. Please select an image under 10MB')
+      return
+    }
     
     const reader = new FileReader()
+    
+    reader.onerror = () => {
+      console.error('Error reading file')
+      alert('Error reading file. Please try again.')
+    }
+    
     reader.onload = (event) => {
       const img = new window.Image()
+      
+      img.onerror = () => {
+        console.error('Error loading image')
+        alert('Error loading image. Please try a different file.')
+      }
+      
       img.onload = () => {
+        console.log('Image loaded successfully:', img.width, 'x', img.height)
+        
         // Add to sticker library
         const newSticker: Sticker = {
           id: `sticker-lib-${Date.now()}`,
@@ -937,6 +968,7 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
         accept="image/*"
         onChange={handleImageUpload}
         className="hidden"
+        multiple={false}
       />
 
       {/* Canvas Container - Full Screen */}
@@ -1385,7 +1417,15 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
           {/* Action Buttons */}
           <div className="mb-4 space-y-3">
             <button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                console.log('Upload button clicked')
+                if (fileInputRef.current) {
+                  fileInputRef.current.click()
+                }
+              }}
+              type="button"
               className="w-full py-3 px-4 bg-gradient-to-r from-[#8B7355] to-[#A0826D] text-white rounded-2xl font-medium text-sm shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
             >
               <ImagePlus className="w-4 h-4" />
