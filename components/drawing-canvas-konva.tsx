@@ -233,6 +233,16 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
       return
     }
     
+    if (toolMode === 'cutout') {
+      // Start drawing cutout path
+      setIsDrawingCutout(true)
+      setCutoutPath({
+        points: [transformedPos.x, transformedPos.y],
+        closed: false
+      })
+      return
+    }
+    
     if (toolMode === 'rect' || toolMode === 'circle' || toolMode === 'crop') {
       setShapeStart(transformedPos)
       setIsDrawing(true)
@@ -338,7 +348,7 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
       return
     }
     
-    if (!isDrawing || toolMode === 'pan' || toolMode === 'select') return
+    if (!isDrawing && !isDrawingCutout || toolMode === 'pan' || toolMode === 'select') return
     
     const stage = e.target.getStage()
     if (!stage) return
@@ -348,6 +358,15 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
     
     const transform = stage.getAbsoluteTransform().copy().invert()
     const transformedPos = transform.point(pos)
+    
+    if (toolMode === 'cutout' && isDrawingCutout && cutoutPath) {
+      // Add point to cutout path
+      setCutoutPath({
+        ...cutoutPath,
+        points: [...cutoutPath.points, transformedPos.x, transformedPos.y]
+      })
+      return
+    }
     
     if ((toolMode === 'rect' || toolMode === 'circle') && shapeStart) {
       return
@@ -365,6 +384,14 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
     if ('touches' in e.evt && e.evt.touches.length < 2) {
       lastTouchDistanceRef.current = 0
       lastTouchCenterRef.current = null
+    }
+    
+    // Handle cutout completion
+    if (toolMode === 'cutout' && isDrawingCutout && cutoutPath) {
+      setIsDrawingCutout(false)
+      // Close the path and create sticker
+      createStickerFromCutout()
+      return
     }
     
     if (!isDrawing) return
@@ -585,6 +612,104 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
     }
   }
 
+  const createStickerFromCutout = () => {
+    if (!cutoutPath || !stageRef.current) return
+    
+    const stage = stageRef.current
+    
+    // Calculate bounding box of the cutout path
+    const points = cutoutPath.points
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+    
+    for (let i = 0; i < points.length; i += 2) {
+      minX = Math.min(minX, points[i])
+      maxX = Math.max(maxX, points[i])
+      minY = Math.min(minY, points[i + 1])
+      maxY = Math.max(maxY, points[i + 1])
+    }
+    
+    const width = maxX - minX
+    const height = maxY - minY
+    
+    if (width < 10 || height < 10) {
+      setCutoutPath(null)
+      setToolMode('draw')
+      return
+    }
+    
+    // Create a temporary canvas to extract the cutout
+    const tempCanvas = document.createElement('canvas')
+    tempCanvas.width = width
+    tempCanvas.height = height
+    const ctx = tempCanvas.getContext('2d')
+    
+    if (!ctx || !image) return
+    
+    // Draw the clipped image
+    ctx.save()
+    ctx.beginPath()
+    
+    // Translate path points relative to bounding box
+    for (let i = 0; i < points.length; i += 2) {
+      const x = points[i] - minX
+      const y = points[i + 1] - minY
+      if (i === 0) {
+        ctx.moveTo(x, y)
+      } else {
+        ctx.lineTo(x, y)
+      }
+    }
+    ctx.closePath()
+    ctx.clip()
+    
+    // Draw the image portion
+    ctx.drawImage(
+      image,
+      minX, minY, width, height,
+      0, 0, width, height
+    )
+    ctx.restore()
+    
+    // Convert to image
+    const dataUrl = tempCanvas.toDataURL('image/png')
+    const img = new window.Image()
+    img.onload = () => {
+      // Add to sticker library
+      const newSticker: Sticker = {
+        id: `cutout-${Date.now()}`,
+        image: img,
+        thumbnail: dataUrl
+      }
+      setStickers([...stickers, newSticker])
+      
+      // Add to canvas
+      const newShape: Shape = {
+        id: `sticker-${Date.now()}`,
+        type: 'sticker',
+        x: minX,
+        y: minY,
+        width,
+        height,
+        image: img,
+        fill: 'transparent',
+        stroke: 'transparent',
+        strokeWidth: 0,
+        rotation: 0,
+        scaleX: 1,
+        scaleY: 1
+      }
+      
+      setShapes([...shapes, newShape])
+      setUndoneShapes([])
+      setToolMode('select')
+      setSelectedShapeId(newShape.id)
+      setCutoutPath(null)
+      
+      if ('vibrate' in navigator) navigator.vibrate([10, 50, 10])
+    }
+    img.src = dataUrl
+  }
+
   const handleSave = () => {
     const stage = stageRef.current
     if (!stage) return
@@ -705,6 +830,12 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
         ref={containerRef}
         className="flex-1 flex items-center justify-center overflow-hidden relative touch-none"
       >
+        {/* Cutout Mode Instructions */}
+        {toolMode === 'cutout' && (
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-black/80 text-white px-6 py-3 rounded-full text-sm font-medium z-50 backdrop-blur-sm shadow-2xl">
+            Draw around an area to create a sticker
+          </div>
+        )}
 
         {image && (
           <Stage
@@ -813,6 +944,20 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                   {toolMode === 'select' && <Transformer ref={transformerRef} />}
                 </Layer>
               </>
+            )}
+            {/* Cutout path overlay */}
+            {cutoutPath && (
+              <Layer>
+                <Line
+                  points={cutoutPath.points}
+                  stroke="#8B7355"
+                  strokeWidth={3}
+                  dash={[10, 5]}
+                  lineCap="round"
+                  lineJoin="round"
+                  closed={false}
+                />
+              </Layer>
             )}
             {/* Crop overlay */}
             {(isCropping || cropArea) && shapeStart && (
@@ -1122,14 +1267,29 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
             </button>
           </div>
 
-          {/* Upload Sticker Button */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full py-3 px-4 bg-gradient-to-r from-[#8B7355] to-[#A0826D] text-white rounded-2xl font-medium text-sm shadow-lg hover:shadow-xl active:scale-95 transition-all mb-4 flex items-center justify-center gap-2"
-          >
-            <ImagePlus className="w-4 h-4" />
-            <span>Add Sticker</span>
-          </button>
+          {/* Action Buttons */}
+          <div className="space-y-2 mb-4">
+            <button
+              onClick={() => {
+                setToolMode('cutout')
+                setShowStickerLibrary(false)
+                setCutoutPath(null)
+                if ('vibrate' in navigator) navigator.vibrate(10)
+              }}
+              className="w-full py-3 px-4 bg-gradient-to-r from-[#8B7355] to-[#A0826D] text-white rounded-2xl font-medium text-sm shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+            >
+              <Scissors className="w-4 h-4" />
+              <span>Draw Cutout</span>
+            </button>
+            
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full py-3 px-4 bg-white border-2 border-[#8B7355] text-[#8B7355] rounded-2xl font-medium text-sm shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+            >
+              <ImagePlus className="w-4 h-4" />
+              <span>Upload Image</span>
+            </button>
+          </div>
 
           {/* Sticker Grid */}
           {stickers.length > 0 ? (
