@@ -165,7 +165,13 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     // Handle pinch zoom on touch devices - check this FIRST before other logic
+    // But NOT when a sticker is selected (let sticker handle pinch)
     if ('touches' in e.evt && e.evt.touches.length === 2) {
+      // If a sticker is selected, don't start canvas zoom tracking
+      if (selectedShapeId) {
+        return
+      }
+      
       e.evt.preventDefault()
       const touch1 = e.evt.touches[0]
       const touch2 = e.evt.touches[1]
@@ -300,8 +306,13 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
   }
 
   const handleMouseMove = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-    // Handle pinch zoom with simultaneous pan
+    // Handle pinch zoom with simultaneous pan - but NOT when a sticker is selected
     if ('touches' in e.evt && e.evt.touches.length === 2) {
+      // If a sticker is selected, don't zoom the canvas (let sticker handle pinch)
+      if (selectedShapeId) {
+        return
+      }
+      
       e.evt.preventDefault()
       const touch1 = e.evt.touches[0]
       const touch2 = e.evt.touches[1]
@@ -883,6 +894,11 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
 
   const handleWheel = (e: Konva.KonvaEventObject<WheelEvent>) => {
     e.evt.preventDefault()
+    
+    // Don't zoom canvas when a sticker is selected
+    if (selectedShapeId) {
+      return
+    }
     
     const stage = stageRef.current
     if (!stage) return
