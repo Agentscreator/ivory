@@ -615,77 +615,101 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
       return
     }
     
-    // Create a temporary canvas to extract the cutout
+    // Get the current stage scale and position
+    const originalScale = stage.scaleX()
+    const originalPosition = stage.position()
+    
+    // Reset scale and position for accurate extraction
+    stage.scale({ x: 1, y: 1 })
+    stage.position({ x: 0, y: 0 })
+    
+    // Create a temporary canvas to extract the cutout from the entire stage
     const tempCanvas = document.createElement('canvas')
     tempCanvas.width = width
     tempCanvas.height = height
     const ctx = tempCanvas.getContext('2d')
     
-    if (!ctx || !image) return
-    
-    // Draw the clipped image
-    ctx.save()
-    ctx.beginPath()
-    
-    // Translate path points relative to bounding box
-    for (let i = 0; i < points.length; i += 2) {
-      const x = points[i] - minX
-      const y = points[i + 1] - minY
-      if (i === 0) {
-        ctx.moveTo(x, y)
-      } else {
-        ctx.lineTo(x, y)
-      }
+    if (!ctx) {
+      stage.scale({ x: originalScale, y: originalScale })
+      stage.position(originalPosition)
+      return
     }
-    ctx.closePath()
-    ctx.clip()
     
-    // Draw the image portion
-    ctx.drawImage(
-      image,
-      minX, minY, width, height,
-      0, 0, width, height
-    )
-    ctx.restore()
+    // Export the stage to get all layers
+    const stageDataUrl = stage.toDataURL({ pixelRatio: 1 })
+    const stageImage = new window.Image()
     
-    // Convert to image
-    const dataUrl = tempCanvas.toDataURL('image/png')
-    const img = new window.Image()
-    img.onload = () => {
-      // Add to sticker library
-      const newSticker: Sticker = {
-        id: `cutout-${Date.now()}`,
-        image: img,
-        thumbnail: dataUrl
+    stageImage.onload = () => {
+      // Draw the clipped portion
+      ctx.save()
+      ctx.beginPath()
+      
+      // Translate path points relative to bounding box
+      for (let i = 0; i < points.length; i += 2) {
+        const x = points[i] - minX
+        const y = points[i + 1] - minY
+        if (i === 0) {
+          ctx.moveTo(x, y)
+        } else {
+          ctx.lineTo(x, y)
+        }
       }
-      setStickers([...stickers, newSticker])
+      ctx.closePath()
+      ctx.clip()
       
-      // Add to canvas
-      const newShape: Shape = {
-        id: `sticker-${Date.now()}`,
-        type: 'sticker',
-        x: minX,
-        y: minY,
-        width,
-        height,
-        image: img,
-        fill: 'transparent',
-        stroke: 'transparent',
-        strokeWidth: 0,
-        rotation: 0,
-        scaleX: 1,
-        scaleY: 1
+      // Draw the stage image portion
+      ctx.drawImage(
+        stageImage,
+        minX, minY, width, height,
+        0, 0, width, height
+      )
+      ctx.restore()
+      
+      // Restore stage scale and position
+      stage.scale({ x: originalScale, y: originalScale })
+      stage.position(originalPosition)
+      
+      // Convert to image
+      const dataUrl = tempCanvas.toDataURL('image/png')
+      const img = new window.Image()
+      img.onload = () => {
+        // Add to sticker library
+        const newSticker: Sticker = {
+          id: `cutout-${Date.now()}`,
+          image: img,
+          thumbnail: dataUrl
+        }
+        setStickers([...stickers, newSticker])
+        
+        // Add to canvas at center
+        const newShape: Shape = {
+          id: `sticker-${Date.now()}`,
+          type: 'sticker',
+          x: canvasDimensions.width / 2 - width / 2,
+          y: canvasDimensions.height / 2 - height / 2,
+          width,
+          height,
+          image: img,
+          fill: 'transparent',
+          stroke: 'transparent',
+          strokeWidth: 0,
+          rotation: 0,
+          scaleX: 1,
+          scaleY: 1
+        }
+        
+        setShapes([...shapes, newShape])
+        setUndoneShapes([])
+        setToolMode('select')
+        setSelectedShapeId(newShape.id)
+        setCutoutPath(null)
+        
+        if ('vibrate' in navigator) navigator.vibrate([10, 50, 10])
       }
-      
-      setShapes([...shapes, newShape])
-      setUndoneShapes([])
-      setToolMode('select')
-      setSelectedShapeId(newShape.id)
-      setCutoutPath(null)
-      
-      if ('vibrate' in navigator) navigator.vibrate([10, 50, 10])
+      img.src = dataUrl
     }
-    img.src = dataUrl
+    
+    stageImage.src = stageDataUrl
   }
 
   const handleSave = () => {
@@ -889,7 +913,10 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
         {/* Cutout Mode Instructions */}
         {toolMode === 'cutout' && (
           <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-black/80 text-white px-6 py-3 rounded-full text-sm font-medium z-50 backdrop-blur-sm shadow-2xl">
-            Draw around an area to create a sticker
+            <div className="flex items-center gap-2">
+              <Scissors className="w-4 h-4" />
+              <span>Draw around an area, then release to create sticker</span>
+            </div>
           </div>
         )}
 
@@ -997,7 +1024,28 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                     }
                     return null
                   })}
-                  {toolMode === 'select' && <Transformer ref={transformerRef} />}
+                  {toolMode === 'select' && (
+                    <Transformer 
+                      ref={transformerRef}
+                      enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
+                      rotateEnabled={true}
+                      borderStroke="#8B7355"
+                      borderStrokeWidth={2}
+                      anchorFill="#8B7355"
+                      anchorStroke="#ffffff"
+                      anchorStrokeWidth={2}
+                      anchorSize={12}
+                      anchorCornerRadius={6}
+                      keepRatio={false}
+                      boundBoxFunc={(oldBox, newBox) => {
+                        // Limit resize to prevent too small
+                        if (newBox.width < 20 || newBox.height < 20) {
+                          return oldBox
+                        }
+                        return newBox
+                      }}
+                    />
+                  )}
                 </Layer>
               </>
             )}
