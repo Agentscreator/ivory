@@ -126,6 +126,10 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
   const lastTouchCenterRef = useRef<{ x: number; y: number } | null>(null)
   const lastTapTimeRef = useRef<number>(0)
   
+  // Sticker pinch-to-resize state
+  const stickerPinchDistanceRef = useRef<number>(0)
+  const stickerInitialScaleRef = useRef<{ scaleX: number; scaleY: number } | null>(null)
+  
   // Color picker state (HSL)
   const [hue, setHue] = useState(0) // 0-360
   const [saturation, setSaturation] = useState(100) // Always 100 for vibrant colors
@@ -1119,6 +1123,80 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                             setSelectedShapeId(shape.id)
                             setToolMode('select')
                             if ('vibrate' in navigator) navigator.vibrate(5)
+                          }}
+                          onTouchStart={(e) => {
+                            const evt = e.evt as TouchEvent
+                            if (evt.touches.length === 2) {
+                              // Two finger touch - prepare for pinch resize
+                              e.cancelBubble = true
+                              setSelectedShapeId(shape.id)
+                              setToolMode('select')
+                              
+                              const touch1 = evt.touches[0]
+                              const touch2 = evt.touches[1]
+                              const distance = Math.hypot(
+                                touch2.clientX - touch1.clientX,
+                                touch2.clientY - touch1.clientY
+                              )
+                              stickerPinchDistanceRef.current = distance
+                              stickerInitialScaleRef.current = {
+                                scaleX: shape.scaleX || 1,
+                                scaleY: shape.scaleY || 1
+                              }
+                              
+                              // Disable dragging during pinch
+                              e.target.draggable(false)
+                              if ('vibrate' in navigator) navigator.vibrate(10)
+                            }
+                          }}
+                          onTouchMove={(e) => {
+                            const evt = e.evt as TouchEvent
+                            if (evt.touches.length === 2 && stickerPinchDistanceRef.current > 0 && stickerInitialScaleRef.current) {
+                              // Two finger move - pinch to resize
+                              e.cancelBubble = true
+                              
+                              const touch1 = evt.touches[0]
+                              const touch2 = evt.touches[1]
+                              const distance = Math.hypot(
+                                touch2.clientX - touch1.clientX,
+                                touch2.clientY - touch1.clientY
+                              )
+                              
+                              const scale = distance / stickerPinchDistanceRef.current
+                              const newScaleX = stickerInitialScaleRef.current.scaleX * scale
+                              const newScaleY = stickerInitialScaleRef.current.scaleY * scale
+                              
+                              // Apply scale to the node
+                              e.target.scaleX(newScaleX)
+                              e.target.scaleY(newScaleY)
+                              e.target.getLayer()?.batchDraw()
+                            }
+                          }}
+                          onTouchEnd={(e) => {
+                            const evt = e.evt as TouchEvent
+                            if (evt.touches.length < 2) {
+                              // Re-enable dragging
+                              e.target.draggable(true)
+                              
+                              // Save the new scale if we were pinching
+                              if (stickerPinchDistanceRef.current > 0) {
+                                const node = e.target
+                                const updatedShapes = shapes.map(s => 
+                                  s.id === shape.id 
+                                    ? { 
+                                        ...s, 
+                                        scaleX: node.scaleX(),
+                                        scaleY: node.scaleY()
+                                      }
+                                    : s
+                                )
+                                setShapes(updatedShapes)
+                                if ('vibrate' in navigator) navigator.vibrate(5)
+                              }
+                              
+                              stickerPinchDistanceRef.current = 0
+                              stickerInitialScaleRef.current = null
+                            }
                           }}
                           onDragStart={() => {
                             setSelectedShapeId(shape.id)
