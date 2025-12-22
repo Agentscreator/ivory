@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
-import { Home, Plus, User, Settings } from 'lucide-react'
+import { Home, Plus, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useIsAppleWatch } from './watch-optimized-layout'
 import { haptics } from '@/lib/haptics'
@@ -20,8 +20,7 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
 
   const navItems = [
     { icon: Home, label: 'Home', path: '/home', altPaths: ['/bookings', '/book', '/tech/dashboard', '/tech/bookings'] },
-    { icon: User, label: 'Profile', path: '/profile' },
-    { icon: Settings, label: 'Settings', path: '/settings', altPaths: ['/billing'] },
+    { icon: User, label: 'Profile', path: '/profile', altPaths: ['/settings', '/billing'] },
   ]
 
   return (
@@ -29,7 +28,7 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
       {/* Desktop Vertical Sidebar */}
       <nav className="vertical-sidebar hidden lg:flex fixed left-0 top-0 bottom-0 z-30 w-20 flex-col items-center justify-center bg-white/98 backdrop-blur-sm border-r border-[#E8E8E8]">
         <div className="flex flex-col items-center space-y-6">
-          {/* First navigation item - Home */}
+          {/* Home navigation item */}
           {navItems.slice(0, 1).map((item) => {
             const Icon = item.icon
             const active = isActive(item.path) || item.altPaths?.some(p => isActive(p))
@@ -77,7 +76,7 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
             <Plus className="w-6 h-6 text-white" strokeWidth={1.5} />
           </button>
 
-          {/* Last two navigation items - Profile & Settings */}
+          {/* Profile navigation item */}
           {navItems.slice(1).map((item) => {
             const Icon = item.icon
             const active = isActive(item.path) || item.altPaths?.some(p => isActive(p))
@@ -181,36 +180,14 @@ export function BottomNav({ onCenterAction, centerActionLabel = 'Create' }: Bott
                 'flex flex-col items-center justify-center transition-all duration-300 relative',
                 'active:scale-95',
                 isWatch ? 'w-10 h-10 watch-nav-item' : 'w-12 h-12',
-                isActive('/profile') 
+                isActive('/profile') || isActive('/settings') || isActive('/billing')
                   ? 'text-[#1A1A1A]' 
                   : 'text-[#6B6B6B] hover:text-[#8B7355]'
               )}
             >
-              <User className={isWatch ? "w-4 h-4" : "w-6 h-6"} strokeWidth={isActive('/profile') ? 1.5 : 1} />
+              <User className={isWatch ? "w-4 h-4" : "w-6 h-6"} strokeWidth={(isActive('/profile') || isActive('/settings') || isActive('/billing')) ? 1.5 : 1} />
               {isWatch && <span className="text-[8px] mt-0.5">Profile</span>}
-              {isActive('/profile') && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#1A1A1A] rounded-full" />
-              )}
-            </button>
-
-            {/* Settings Button */}
-            <button
-              onClick={() => {
-                haptics.light();
-                router.push('/settings');
-              }}
-              className={cn(
-                'flex flex-col items-center justify-center transition-all duration-300 relative',
-                'active:scale-95',
-                isWatch ? 'w-10 h-10 watch-nav-item' : 'w-12 h-12',
-                isActive('/settings') || isActive('/billing')
-                  ? 'text-[#1A1A1A]' 
-                  : 'text-[#6B6B6B] hover:text-[#8B7355]'
-              )}
-            >
-              <Settings className={isWatch ? "w-4 h-4" : "w-6 h-6"} strokeWidth={(isActive('/settings') || isActive('/billing')) ? 1.5 : 1} />
-              {isWatch && <span className="text-[8px] mt-0.5">Settings</span>}
-              {(isActive('/settings') || isActive('/billing')) && (
+              {(isActive('/profile') || isActive('/settings') || isActive('/billing')) && (
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#1A1A1A] rounded-full" />
               )}
             </button>
