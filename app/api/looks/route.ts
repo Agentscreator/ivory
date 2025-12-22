@@ -117,6 +117,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newLook[0], { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create look' }, { status: 500 });
+    console.error('Error creating look:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to create look';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

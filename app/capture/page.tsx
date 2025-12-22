@@ -1139,10 +1139,30 @@ export default function CapturePage() {
         }, 1500)
         return true
       } else {
-        const error = await responses[0].json()
-        console.error('Failed to save designs:', error)
+        // Find the first failed response
+        const failedResponse = responses.find(r => !r.ok)
+        let errorMessage = 'Please try again'
+        
+        if (failedResponse) {
+          try {
+            const errorData = await failedResponse.json()
+            errorMessage = errorData.error || errorMessage
+            console.error('Failed to save designs:', errorData)
+          } catch (parseError) {
+            // If JSON parsing fails, try to get text
+            try {
+              const errorText = await failedResponse.text()
+              console.error('Failed to save designs (text):', errorText)
+              errorMessage = errorText || `Server error (${failedResponse.status})`
+            } catch {
+              console.error('Failed to save designs (status):', failedResponse.status, failedResponse.statusText)
+              errorMessage = `Server error: ${failedResponse.statusText || failedResponse.status}`
+            }
+          }
+        }
+        
         toast.error('Failed to save designs', {
-          description: error.error || 'Please try again',
+          description: errorMessage,
         })
         return false
       }

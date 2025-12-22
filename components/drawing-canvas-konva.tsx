@@ -164,7 +164,24 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
   }, [imageUrl])
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-    // Handle double-tap to reset zoom
+    // Handle pinch zoom on touch devices - check this FIRST before other logic
+    if ('touches' in e.evt && e.evt.touches.length === 2) {
+      e.evt.preventDefault()
+      const touch1 = e.evt.touches[0]
+      const touch2 = e.evt.touches[1]
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      )
+      lastTouchDistanceRef.current = distance
+      lastTouchCenterRef.current = {
+        x: (touch1.clientX + touch2.clientX) / 2,
+        y: (touch1.clientY + touch2.clientY) / 2
+      }
+      return
+    }
+    
+    // Handle double-tap to reset zoom (only for single touch)
     if ('touches' in e.evt && e.evt.touches.length === 1) {
       const now = Date.now()
       const timeSinceLastTap = now - lastTapTimeRef.current
@@ -186,29 +203,40 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
       lastTapTimeRef.current = now
     }
     
-    // Handle pinch zoom on touch devices
-    if ('touches' in e.evt && e.evt.touches.length === 2) {
-      e.evt.preventDefault()
-      const touch1 = e.evt.touches[0]
-      const touch2 = e.evt.touches[1]
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      )
-      lastTouchDistanceRef.current = distance
-      lastTouchCenterRef.current = {
-        x: (touch1.clientX + touch2.clientX) / 2,
-        y: (touch1.clientY + touch2.clientY) / 2
-      }
-      return
-    }
-    
     // Allow panning when not in drawing/eraser mode or when middle mouse button
     const isMiddleButton = 'button' in e.evt && e.evt.button === 1
     const shouldPan = toolMode === 'pan' || isMiddleButton
     
     if (shouldPan) {
       // Stage will handle dragging automatically
+      return
+    }
+    
+    const stage = e.target.getStage()
+    if (!stage) return
+    
+    const pos = stage.getPointerPosition()
+    if (!pos) return
+    
+    const transform = stage.getAbsoluteTransform().copy().invert()
+    const transformedPos = transform.point(pos)
+    
+    // Handle drawing/eraser mode BEFORE checking for clicks on shapes
+    if (toolMode === 'draw' || toolMode === 'eraser') {
+      setIsDrawing(true)
+      const currentSize = toolMode === 'eraser' ? eraserSize : brushSize
+      
+      const newLine: DrawingLine = {
+        points: [transformedPos.x, transformedPos.y],
+        color: currentColor,
+        width: currentSize,
+        texture: brushTexture,
+        isEraser: toolMode === 'eraser',
+        globalCompositeOperation: toolMode === 'eraser' ? 'destination-out' : 'source-over'
+      }
+      
+      setLines([...lines, newLine])
+      setUndoneLines([])
       return
     }
     
@@ -224,15 +252,6 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
       }
       return
     }
-    
-    const stage = e.target.getStage()
-    if (!stage) return
-    
-    const pos = stage.getPointerPosition()
-    if (!pos) return
-    
-    const transform = stage.getAbsoluteTransform().copy().invert()
-    const transformedPos = transform.point(pos)
     
     if (toolMode === 'select') {
       const clickedShape = e.target
@@ -263,24 +282,6 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
         setIsCropping(true)
       }
       return
-    }
-    
-    
-    if (toolMode === 'draw' || toolMode === 'eraser') {
-      setIsDrawing(true)
-      const currentSize = toolMode === 'eraser' ? eraserSize : brushSize
-      
-      const newLine: DrawingLine = {
-        points: [transformedPos.x, transformedPos.y],
-        color: currentColor,
-        width: currentSize,
-        texture: brushTexture,
-        isEraser: toolMode === 'eraser',
-        globalCompositeOperation: toolMode === 'eraser' ? 'destination-out' : 'source-over'
-      }
-      
-      setLines([...lines, newLine])
-      setUndoneLines([])
     }
   }
 
