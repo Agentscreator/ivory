@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react'
 import { Stage, Layer, Image as KonvaImage, Line, Rect, Circle, Text, Transformer } from 'react-konva'
-import { Undo, Redo, X, Eye, EyeOff, Pencil, Eraser, Hand, Scissors, ImagePlus, Check, Palette } from 'lucide-react'
+import { Undo, Redo, X, Eye, EyeOff, Pencil, Eraser, Hand, Scissors, ImagePlus, Check, Palette, Trash2 } from 'lucide-react'
 import Konva from 'konva'
 
 interface DrawingCanvasProps {
@@ -1241,6 +1241,19 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
         >
           <Scissors className="w-5 h-5" />
         </button>
+
+        {/* Delete Selected Sticker */}
+        {selectedShapeId && (
+          <button
+            onClick={() => {
+              deleteSelected()
+              if ('vibrate' in navigator) navigator.vibrate(10)
+            }}
+            className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-full transition-all shadow-lg bg-red-500 text-white hover:bg-red-600 active:scale-95"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
+        )}
 
         {/* Undo/Redo */}
         <button
