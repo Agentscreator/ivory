@@ -1104,9 +1104,9 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                           opacity={isSelected ? 1 : 0.95}
                           shadowEnabled={isSelected}
                           shadowColor="#8B7355"
-                          shadowBlur={isSelected ? 15 : 0}
-                          shadowOpacity={0.5}
-                          hitStrokeWidth={20}
+                          shadowBlur={isSelected ? 20 : 0}
+                          shadowOpacity={0.6}
+                          hitStrokeWidth={30}
                           perfectDrawEnabled={false}
                           listening={true}
                           onClick={() => {
@@ -1154,6 +1154,7 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                             if (evt.touches.length === 2 && stickerPinchDistanceRef.current > 0 && stickerInitialScaleRef.current) {
                               // Two finger move - pinch to resize
                               e.cancelBubble = true
+                              evt.preventDefault()
                               
                               const touch1 = evt.touches[0]
                               const touch2 = evt.touches[1]
@@ -1162,9 +1163,10 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                                 touch2.clientY - touch1.clientY
                               )
                               
-                              const scale = distance / stickerPinchDistanceRef.current
-                              const newScaleX = stickerInitialScaleRef.current.scaleX * scale
-                              const newScaleY = stickerInitialScaleRef.current.scaleY * scale
+                              // More sensitive scaling (1.2x multiplier for easier resizing)
+                              const scale = (distance / stickerPinchDistanceRef.current) * 1.2
+                              const newScaleX = Math.max(0.1, Math.min(5, stickerInitialScaleRef.current.scaleX * scale))
+                              const newScaleY = Math.max(0.1, Math.min(5, stickerInitialScaleRef.current.scaleY * scale))
                               
                               // Apply scale to the node
                               e.target.scaleX(newScaleX)
@@ -1244,10 +1246,12 @@ export function DrawingCanvasKonva({ imageUrl, onSave, onClose }: DrawingCanvasP
                       enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
                       rotateEnabled={true}
                       borderStroke="#8B7355"
-                      borderStrokeWidth={4}
+                      borderStrokeWidth={3}
                       anchorFill="#8B7355"
                       anchorStroke="#ffffff"
-                      anchorStrokeWidth={4}
+                      anchorStrokeWidth={3}
+                      anchorSize={20}
+                      anchorCornerRadius={10}
                       anchorSize={35}
                       anchorCornerRadius={12}
                       keepRatio={false}
