@@ -30,7 +30,7 @@ if (isNative) {
 - ✅ Mac (Safari/Chrome web) - Uses Stripe
 
 **IAP Products:**
-- `com.yourcompany.ivory.business` - Pro Monthly ($20/month for clients)
+- `com.yourcompany.ivory.business2` - Pro Monthly ($20/month for clients)
 - `com.yourcompany.ivory.pro` - Business Monthly ($60/month for techs)
 
 ---
@@ -242,7 +242,7 @@ Apple Watch app exists but payment functionality is limited.
 ### Required IAP Products
 
 #### Subscriptions (Already Configured)
-1. **Pro Monthly** - `com.yourcompany.ivory.business`
+1. **Pro Monthly** - `com.yourcompany.ivory.business2`
    - Type: Auto-Renewable Subscription
    - Price: $19.99/month
    - For: Client users

@@ -213,7 +213,7 @@ This guide ensures the "Subscribe to Pro" functionality works correctly across a
 - **Notice:** "iOS In-App Purchase" banner visible
 - **Subscription Management:** Links to iOS Settings
 - **Product IDs:** 
-  - Pro: `com.yourcompany.ivory.business`
+  - Pro: `com.yourcompany.ivory.business2`
   - Business: `com.yourcompany.ivory.pro`
 
 ### Web (All Browsers)

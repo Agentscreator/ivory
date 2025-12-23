@@ -43,7 +43,7 @@ const IAP = registerPlugin<IAPPlugin>('IAPPlugin');
 // Product IDs - these must match what you configure in App Store Connect
 export const IAP_PRODUCT_IDS = {
   // Client Subscriptions
-  PRO_MONTHLY: 'com.yourcompany.ivory.business', // $20/month for clients
+  PRO_MONTHLY: 'com.yourcompany.ivory.business2', // $20/month for clients
   
   // Tech Subscriptions
   BUSINESS_MONTHLY: 'com.yourcompany.ivory.pro', // $60/month for techs
