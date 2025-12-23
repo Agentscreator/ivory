@@ -87,27 +87,49 @@ export function SubscriptionPlans({ currentTier = 'free', currentStatus = 'inact
   const handleSubscribeIAP = async (planId: string) => {
     try {
       setLoading(planId);
+      console.log('Starting IAP purchase for plan:', planId);
       
       // Map plan ID to IAP product ID
       const productId = planId === 'pro' 
         ? IAP_PRODUCT_IDS.PRO_MONTHLY 
         : IAP_PRODUCT_IDS.BUSINESS_MONTHLY;
 
+      console.log('Mapped to product ID:', productId);
+      console.log('Available IAP products:', iapProducts);
+
+      // Check if product is available
+      const product = iapProducts.find(p => p.productId === productId);
+      if (!product) {
+        console.error('Product not found in available products');
+        toast.error('This subscription is not available. Please try again later.');
+        setLoading(null);
+        return;
+      }
+
+      console.log('Initiating purchase for product:', product);
       await iapManager.purchase(productId);
+      console.log('Purchase initiated successfully');
       // Loading state will be cleared by purchase listener
     } catch (error) {
       console.error('IAP purchase error:', error);
-      toast.error('Failed to start purchase');
+      toast.error(error instanceof Error ? error.message : 'Failed to start purchase');
       setLoading(null);
     }
   };
 
   const handleSubscribe = async (planId: string) => {
+    console.log('handleSubscribe called with planId:', planId);
+    console.log('isNative:', isNative);
+    console.log('loading state:', loading);
+    
     if (isNative) {
+      console.log('Using IAP flow');
       return handleSubscribeIAP(planId);
     }
+    
     try {
       setLoading(planId);
+      console.log('Starting Stripe subscription flow for plan:', planId);
 
       const response = await fetch('/api/stripe/create-subscription', {
         method: 'POST',
@@ -117,20 +139,26 @@ export function SubscriptionPlans({ currentTier = 'free', currentStatus = 'inact
         body: JSON.stringify({ planId }),
       });
 
+      console.log('Stripe API response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to create subscription');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Stripe API error:', errorData);
+        throw new Error(errorData.error || 'Failed to create subscription');
       }
 
       const { url } = await response.json();
+      console.log('Checkout URL received:', url);
 
       if (url) {
+        console.log('Redirecting to Stripe checkout...');
         window.location.href = url;
       } else {
         throw new Error('No checkout URL returned');
       }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Failed to start subscription. Please try again.');
+      console.error('Subscription error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to start subscription. Please try again.');
       setLoading(null);
     }
   };
@@ -243,14 +271,32 @@ export function SubscriptionPlans({ currentTier = 'free', currentStatus = 'inact
               ))}
             </ul>
 
-            <button
-              onClick={() => handleSubscribe(plan.id)}
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Button clicked for plan:', plan.id);
+                console.log('Current loading state:', loading);
+                console.log('Is current plan:', isCurrentPlan(plan.id));
+                
+                if (!loading && !isCurrentPlan(plan.id)) {
+                  console.log('Calling handleSubscribe');
+                  handleSubscribe(plan.id);
+                } else {
+                  console.log('Button click ignored - loading or current plan');
+                }
+              }}
               disabled={loading !== null || isCurrentPlan(plan.id)}
-              className={`w-full h-12 font-light text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation ${
+              type="button"
+              className={`w-full h-14 sm:h-12 font-light text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 touch-manipulation cursor-pointer ${
                 isCurrentPlan(plan.id)
-                  ? 'bg-green-600 text-white cursor-default'
-                  : 'bg-[#1A1A1A] text-white hover:bg-[#1A1A1A]/90 active:scale-95'
+                  ? 'bg-green-600 text-white cursor-default hover:bg-green-600'
+                  : 'bg-[#1A1A1A] text-white hover:bg-[#1A1A1A]/90 active:scale-[0.97] active:bg-[#1A1A1A]/80'
               } disabled:opacity-50 disabled:cursor-not-allowed`}
+              style={{
+                WebkitTapHighlightColor: 'transparent',
+                touchAction: 'manipulation',
+              }}
             >
               {loading === plan.id ? (
                 <>
@@ -265,7 +311,7 @@ export function SubscriptionPlans({ currentTier = 'free', currentStatus = 'inact
               ) : (
                 `Subscribe to ${plan.name}`
               )}
-            </button>
+            </Button>
 
             {!isCurrentPlan(plan.id) && userType === 'client' && (
               <p className="text-xs text-center text-[#6B6B6B] font-light mt-4">
