@@ -704,7 +704,13 @@ export default function CapturePage() {
   }
 
   const buildPrompt = (settings: DesignSettings) => {
-    return `Ultra-detailed, high-resolution nail art design applied ONLY inside a fingernail area. Nail length: ${settings.nailLength}, Nail shape: ${settings.nailShape}. Base color: ${settings.baseColor}. Finish: ${settings.finish}. Texture: ${settings.texture}. Design style: ${settings.patternType} pattern, ${settings.styleVibe} aesthetic. Accent color: ${settings.accentColor}. Highly realistic nail polish appearance: smooth polish, crisp clean edges, even color distribution, professional salon quality with maximum detail, subtle natural reflections. Design must: stay strictly within the nail surface, follow realistic nail curvature, respect nail boundaries, appear physically painted onto the nail with expert precision. Ultra-high resolution rendering, realistic lighting, natural skin reflection preserved, sharp details, vibrant colors with accurate saturation.`
+    // Format nail shape for better prompt readability
+    const formattedShape = settings.nailShape
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+    
+    return `Ultra-detailed, high-resolution nail art design applied ONLY inside a fingernail area. Nail length: ${settings.nailLength}, Nail shape: ${formattedShape}. Base color: ${settings.baseColor}. Finish: ${settings.finish}. Texture: ${settings.texture}. Design style: ${settings.patternType} pattern, ${settings.styleVibe} aesthetic. Accent color: ${settings.accentColor}. Highly realistic nail polish appearance: smooth polish, crisp clean edges, even color distribution, professional salon quality with maximum detail, subtle natural reflections. Design must: stay strictly within the nail surface, follow realistic nail curvature, respect nail boundaries, appear physically painted onto the nail with expert precision. Ultra-high resolution rendering, realistic lighting, natural skin reflection preserved, sharp details, vibrant colors with accurate saturation.`
   }
 
   const generateAIPreview = async (settings: DesignSettings) => {
@@ -1813,7 +1819,7 @@ export default function CapturePage() {
                       )}
                     </div>
 
-                    {/* Nail Shape - Redesigned */}
+                    {/* Nail Shape - Image Slider */}
                     <div className="mb-4">
                       <button
                         onClick={() => setExpandedSection(expandedSection === 'shape' ? null : 'shape')}
@@ -1821,49 +1827,76 @@ export default function CapturePage() {
                       >
                         <div className="flex items-center gap-3 flex-1">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#8B7355] to-[#A0826D] flex items-center justify-center shadow-sm">
-                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z" />
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                           </div>
                           <div className="flex-1 text-left">
                             <span className="text-sm font-medium text-[#1A1A1A] tracking-wide block">Nail Shape</span>
-                            <span className="text-xs text-[#8B7355] capitalize font-light">{designSettings.nailShape}</span>
+                            <span className="text-xs text-[#8B7355] capitalize font-light">{designSettings.nailShape.replace('-', ' ')}</span>
                           </div>
                         </div>
                         <ChevronDown className={`w-5 h-5 text-[#6B6B6B] transition-transform duration-300 ${expandedSection === 'shape' ? 'rotate-180' : ''}`} strokeWidth={1.5} />
                       </button>
                       {expandedSection === 'shape' && (
-                        <div className="mt-3 p-4 bg-gradient-to-br from-[#FAFAFA] to-white rounded-lg border border-[#E8E8E8] shadow-inner animate-fade-in">
-                          <div className="grid grid-cols-3 gap-3">
-                            {[
-                              { value: 'oval', label: 'Oval', path: 'M12 4 C8 4 6 6 6 10 L6 18 C6 20 8 22 12 22 C16 22 18 20 18 18 L18 10 C18 6 16 4 12 4 Z' },
-                              { value: 'square', label: 'Square', path: 'M8 4 L16 4 L16 20 C16 21 15 22 12 22 C9 22 8 21 8 20 Z' },
-                              { value: 'round', label: 'Round', path: 'M12 4 C9 4 7 5 7 8 L7 18 C7 21 9 22 12 22 C15 22 17 21 17 18 L17 8 C17 5 15 4 12 4 Z' },
-                              { value: 'almond', label: 'Almond', path: 'M12 2 C9 2 7 4 7 8 L7 18 C7 20 9 22 12 22 C15 22 17 20 17 18 L17 8 C17 4 15 2 12 2 Z' },
-                              { value: 'stiletto', label: 'Stiletto', path: 'M12 2 L8 8 L8 18 C8 20 9 22 12 22 C15 22 16 20 16 18 L16 8 Z' },
-                              { value: 'coffin', label: 'Coffin', path: 'M10 4 L14 4 L16 8 L16 18 L14 22 L10 22 L8 18 L8 8 Z' }
-                            ].map((shape) => (
-                              <button
-                                key={shape.value}
-                                onClick={() => handleDesignSettingChange('nailShape', shape.value)}
-                                className={`group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300 ${
-                                  designSettings.nailShape === shape.value
-                                    ? 'border-[#8B7355] bg-gradient-to-br from-[#8B7355]/5 to-[#8B7355]/10 shadow-lg scale-105'
-                                    : 'border-[#E8E8E8] bg-white hover:border-[#8B7355]/50 hover:shadow-md hover:scale-102'
-                                }`}
-                              >
-                                <svg viewBox="0 0 24 24" className={`w-8 h-12 mb-2 transition-all duration-300 ${
-                                  designSettings.nailShape === shape.value ? 'scale-110' : ''
-                                }`}>
-                                  <path d={shape.path} fill="currentColor" className={`transition-colors ${
-                                    designSettings.nailShape === shape.value ? 'text-[#8B7355]' : 'text-[#C4B5A0]'
-                                  }`} />
-                                </svg>
-                                <span className={`text-[10px] font-medium tracking-wide transition-colors ${
-                                  designSettings.nailShape === shape.value ? 'text-[#8B7355]' : 'text-[#6B6B6B]'
-                                }`}>{shape.label}</span>
-                              </button>
-                            ))}
+                        <div className="mt-3 p-3 sm:p-4 bg-gradient-to-br from-[#FAFAFA] to-white rounded-lg border border-[#E8E8E8] shadow-inner animate-fade-in">
+                          <div className="relative">
+                            {/* Horizontal scrollable container */}
+                            <div className="overflow-x-auto pb-2 scrollbar-hide -mx-1">
+                              <div className="flex gap-2 sm:gap-3 min-w-max px-1">
+                                {[
+                                  { value: 'square', label: 'Square', image: '/SQUARE.png' },
+                                  { value: 'squoval', label: 'Squoval', image: '/SQUARED OVAL SQUOVAL.png' },
+                                  { value: 'oval', label: 'Oval', image: '/OVAL.png' },
+                                  { value: 'rounded', label: 'Rounded', image: '/ROUNDED.png' },
+                                  { value: 'almond', label: 'Almond', image: '/ALMOND.png' },
+                                  { value: 'mountain-peak', label: 'Mountain Peak', image: '/MOUNTAIN PEAK.png' },
+                                  { value: 'stiletto', label: 'Stiletto', image: '/STILETTO.png' },
+                                  { value: 'ballerina', label: 'Ballerina', image: '/BALLERINA.png' },
+                                  { value: 'edge', label: 'Edge', image: '/EDGE.png' },
+                                  { value: 'lipstick', label: 'Lipstick', image: '/LIPSTICK.png' },
+                                  { value: 'flare', label: 'Flare', image: '/FLARE.png' },
+                                  { value: 'arrow-head', label: 'Arrow Head', image: '/ARROW HEAD.png' }
+                                ].map((shape) => (
+                                  <button
+                                    key={shape.value}
+                                    onClick={() => handleDesignSettingChange('nailShape', shape.value)}
+                                    className={`group relative flex-shrink-0 w-20 sm:w-24 flex flex-col items-center p-2 sm:p-3 rounded-xl border-2 transition-all duration-300 ${
+                                      designSettings.nailShape === shape.value
+                                        ? 'border-[#8B7355] bg-gradient-to-br from-[#8B7355]/5 to-[#8B7355]/10 shadow-lg scale-105'
+                                        : 'border-[#E8E8E8] bg-white hover:border-[#8B7355]/50 hover:shadow-md hover:scale-102'
+                                    }`}
+                                  >
+                                    {/* Image container with aspect ratio */}
+                                    <div className="relative w-full aspect-[3/4] mb-1.5 sm:mb-2 overflow-hidden rounded-lg">
+                                      <Image
+                                        src={shape.image}
+                                        alt={shape.label}
+                                        fill
+                                        sizes="(max-width: 640px) 80px, 96px"
+                                        className={`object-contain transition-all duration-300 ${
+                                          designSettings.nailShape === shape.value ? 'scale-110' : 'group-hover:scale-105'
+                                        }`}
+                                      />
+                                    </div>
+                                    <span className={`text-[9px] sm:text-[10px] font-medium tracking-wide text-center transition-colors leading-tight ${
+                                      designSettings.nailShape === shape.value ? 'text-[#8B7355]' : 'text-[#6B6B6B]'
+                                    }`}>{shape.label}</span>
+                                    {/* Selection indicator - Always visible on top */}
+                                    {designSettings.nailShape === shape.value && (
+                                      <div className="absolute -top-1.5 -right-1.5 w-6 h-6 sm:w-5 sm:h-5 bg-[#8B7355] rounded-full flex items-center justify-center shadow-md z-10 ring-2 ring-white">
+                                        <svg className="w-3.5 h-3.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                      </div>
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                            {/* Scroll indicators - adjusted for mobile */}
+                            <div className="absolute left-0 top-0 bottom-0 w-4 sm:w-8 bg-gradient-to-r from-[#FAFAFA] to-transparent pointer-events-none" />
+                            <div className="absolute right-0 top-0 bottom-0 w-4 sm:w-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
                           </div>
                         </div>
                       )}
