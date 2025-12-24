@@ -10,6 +10,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Send, Pencil } from "lucide-react"
 import Image from "next/image"
 
+type DesignRequest = {
+  id: string
+  clientName: string
+  designImage: string
+  message: string
+  status: "pending" | "approved" | "modified"
+  date: string
+  lookId?: number
+}
+
 export default function TechReviewPage() {
   const router = useRouter()
   const params = useParams()
@@ -17,6 +27,8 @@ export default function TechReviewPage() {
   const [isDrawing, setIsDrawing] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null)
+  const [request, setRequest] = useState<DesignRequest | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -30,6 +42,58 @@ export default function TechReviewPage() {
       }
     }
   }, [])
+
+  useEffect(() => {
+    const loadRequest = async () => {
+      try {
+        const userStr = localStorage.getItem("ivoryUser")
+        if (!userStr) {
+          router.push("/")
+          return
+        }
+
+        const user = JSON.parse(userStr)
+        
+        const requestsRes = await fetch(`/api/design-requests?techId=${user.id}`)
+        if (requestsRes.ok) {
+          const data = await requestsRes.json()
+          const foundRequest = data.find((req: any) => req.id.toString() === params.id)
+          
+          if (foundRequest) {
+            let designImage = "/placeholder.svg"
+            
+            if (foundRequest.lookId) {
+              try {
+                const lookRes = await fetch(`/api/looks/${foundRequest.lookId}`)
+                if (lookRes.ok) {
+                  const look = await lookRes.json()
+                  designImage = look.imageUrl || "/placeholder.svg"
+                }
+              } catch (error) {
+                console.error(`Error fetching look ${foundRequest.lookId}:`, error)
+              }
+            }
+
+            setRequest({
+              id: foundRequest.id.toString(),
+              clientName: `Client ${foundRequest.clientId}`,
+              designImage,
+              message: foundRequest.clientMessage || "",
+              status: foundRequest.status,
+              date: foundRequest.createdAt,
+              lookId: foundRequest.lookId,
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Error loading request:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadRequest()
+  }, [router, params.id])
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!ctx) return
@@ -66,6 +130,33 @@ export default function TechReviewPage() {
     router.push("/tech/dashboard")
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-2 border-[#8B7355] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <p className="text-sm text-[#6B6B6B] font-light tracking-[0.25em] uppercase">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!request) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush flex items-center justify-center">
+        <div className="text-center p-8">
+          <h2 className="font-serif text-3xl font-light text-[#1A1A1A] mb-6 tracking-[-0.01em]">Request Not Found</h2>
+          <Button 
+            onClick={() => router.push('/tech/dashboard')} 
+            className="h-12 px-8 bg-[#1A1A1A] hover:bg-[#8B7355] text-white transition-all duration-700"
+          >
+            Back to Dashboard
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-ivory via-sand to-blush">
       {/* Header */}
@@ -83,10 +174,11 @@ export default function TechReviewPage() {
         <Card className="overflow-hidden border-0 bg-white shadow-xl mb-6 relative">
           <div className="aspect-square relative">
             <Image
-              src="/elegant-french-manicure-nails.jpg"
+              src={request.designImage || "/placeholder.svg"}
               alt="Client design"
               fill
               className="object-cover pointer-events-none"
+              unoptimized
             />
             <canvas
               ref={canvasRef}
