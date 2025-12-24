@@ -110,24 +110,10 @@ export default function TechReviewPage() {
           const foundRequest = data.find((req: any) => req.id.toString() === params.id)
           
           if (foundRequest) {
-            let designImage = "/placeholder.svg"
-            
-            if (foundRequest.lookId) {
-              try {
-                const lookRes = await fetch(`/api/looks/${foundRequest.lookId}`)
-                if (lookRes.ok) {
-                  const look = await lookRes.json()
-                  designImage = look.imageUrl || "/placeholder.svg"
-                }
-              } catch (error) {
-                console.error(`Error fetching look ${foundRequest.lookId}:`, error)
-              }
-            }
-
             setRequest({
               id: foundRequest.id.toString(),
-              clientName: `Client ${foundRequest.clientId}`,
-              designImage,
+              clientName: foundRequest.client?.username || `Client ${foundRequest.clientId}`,
+              designImage: foundRequest.look?.imageUrl || "/placeholder.svg",
               message: foundRequest.clientMessage || "",
               status: foundRequest.status,
               date: foundRequest.createdAt,

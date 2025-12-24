@@ -10,25 +10,65 @@ export async function GET(request: Request) {
     const clientId = searchParams.get('clientId');
     const status = searchParams.get('status');
 
-    let query = db.select().from(designRequests);
-
     if (techId) {
-      const requests = await query
-        .where(eq(designRequests.techId, parseInt(techId)))
-        .orderBy(desc(designRequests.createdAt));
+      const requests = await db.query.designRequests.findMany({
+        where: eq(designRequests.techId, parseInt(techId)),
+        with: {
+          client: {
+            columns: {
+              id: true,
+              username: true,
+              email: true,
+            }
+          },
+          look: true,
+        },
+        orderBy: desc(designRequests.createdAt),
+      });
       return NextResponse.json(requests);
     }
 
     if (clientId) {
-      const requests = await query
-        .where(eq(designRequests.clientId, parseInt(clientId)))
-        .orderBy(desc(designRequests.createdAt));
+      const requests = await db.query.designRequests.findMany({
+        where: eq(designRequests.clientId, parseInt(clientId)),
+        with: {
+          tech: {
+            columns: {
+              id: true,
+              username: true,
+              email: true,
+            }
+          },
+          look: true,
+        },
+        orderBy: desc(designRequests.createdAt),
+      });
       return NextResponse.json(requests);
     }
 
-    const allRequests = await query.orderBy(desc(designRequests.createdAt));
+    const allRequests = await db.query.designRequests.findMany({
+      with: {
+        client: {
+          columns: {
+            id: true,
+            username: true,
+            email: true,
+          }
+        },
+        tech: {
+          columns: {
+            id: true,
+            username: true,
+            email: true,
+          }
+        },
+        look: true,
+      },
+      orderBy: desc(designRequests.createdAt),
+    });
     return NextResponse.json(allRequests);
   } catch (error) {
+    console.error('Error fetching design requests:', error);
     return NextResponse.json({ error: 'Failed to fetch design requests' }, { status: 500 });
   }
 }

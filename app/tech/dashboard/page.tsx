@@ -62,32 +62,14 @@ export default function TechDashboardPage() {
         if (requestsRes.ok) {
           const data = await requestsRes.json()
           
-          const formattedRequests = await Promise.all(
-            data.map(async (req: any) => {
-              let designImage = "/placeholder.svg"
-              
-              if (req.lookId) {
-                try {
-                  const lookRes = await fetch(`/api/looks/${req.lookId}`)
-                  if (lookRes.ok) {
-                    const look = await lookRes.json()
-                    designImage = look.imageUrl || "/placeholder.svg"
-                  }
-                } catch (error) {
-                  console.error(`Error fetching look ${req.lookId}:`, error)
-                }
-              }
-              
-              return {
-                id: req.id.toString(),
-                clientName: `Client ${req.clientId}`,
-                designImage,
-                message: req.clientMessage || "",
-                status: req.status,
-                date: req.createdAt,
-              }
-            })
-          )
+          const formattedRequests = data.map((req: any) => ({
+            id: req.id.toString(),
+            clientName: req.client?.username || `Client ${req.clientId}`,
+            designImage: req.look?.imageUrl || "/placeholder.svg",
+            message: req.clientMessage || "",
+            status: req.status,
+            date: req.createdAt,
+          }))
           
           setRequests(formattedRequests)
         }
