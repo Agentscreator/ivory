@@ -301,7 +301,10 @@ export default function TechDashboardPage() {
                           <Button 
                             size="sm" 
                             variant="outline" 
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              router.push(`/tech/review/${request.id}`)
+                            }}
                             className="h-12 px-5 sm:px-7 text-[10px] sm:text-[11px] tracking-[0.25em] uppercase font-light border-[#E8E8E8] hover:border-[#8B7355] hover:bg-[#8B7355] hover:text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-700 rounded-none"
                           >
                             <DollarSign className="w-4 h-4 mr-2" strokeWidth={1} />

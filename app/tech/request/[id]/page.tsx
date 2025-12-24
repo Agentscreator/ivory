@@ -251,6 +251,7 @@ export default function TechRequestDetailPage() {
             </Button>
             
             <Button 
+              onClick={() => router.push(`/tech/review/${request.id}`)}
               variant="outline"
               className="w-full h-16 text-base font-light tracking-[0.25em] uppercase border-2 border-[#E8E8E8] hover:border-[#8B7355] hover:bg-[#8B7355] hover:text-white active:scale-[0.98] transition-all duration-700 rounded-none"
             >
