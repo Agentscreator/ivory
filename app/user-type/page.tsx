@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Paintbrush } from "lucide-react"
+import Image from "next/image"
 
 export default function UserTypePage() {
   const router = useRouter()
@@ -59,8 +60,14 @@ export default function UserTypePage() {
             onClick={() => selectUserType("client")}
           >
             <div className="p-6 sm:p-8 lg:p-10 text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-4 sm:mb-5 lg:mb-6 border border-[#E8E8E8] group-hover:border-[#8B7355] group-hover:scale-105 transition-all duration-700 flex items-center justify-center">
-                <Paintbrush className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-[#1A1A1A] group-hover:text-[#8B7355] transition-colors duration-700" strokeWidth={1} />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-4 sm:mb-5 lg:mb-6 border border-[#E8E8E8] group-hover:border-[#8B7355] group-hover:scale-105 transition-all duration-700 flex items-center justify-center relative overflow-hidden">
+                <Image 
+                  src="/User_Icon.png" 
+                  alt="Client Icon" 
+                  width={48} 
+                  height={48}
+                  className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 object-contain transition-all duration-700 group-hover:brightness-75"
+                />
               </div>
               <h2 className="text-[11px] tracking-[0.25em] uppercase text-[#1A1A1A] mb-3 sm:mb-4 font-light">
                 For Clients
@@ -80,29 +87,8 @@ export default function UserTypePage() {
             onClick={() => selectUserType("tech")}
           >
             <div className="p-6 sm:p-8 lg:p-10 text-center">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-4 sm:mb-5 lg:mb-6 border border-[#E8E8E8] group-hover:border-[#8B7355] group-hover:scale-105 transition-all duration-700 flex items-center justify-center relative">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 relative">
-                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                    {/* Nail/Foot shape (left side) */}
-                    <path d="M 20 30 Q 18 35 18 42 L 18 60 Q 18 68 24 72 Q 28 75 35 75 L 40 75 Q 45 75 48 72 Q 52 68 52 62 L 52 42 Q 52 35 50 30 Z" className="fill-[#1A1A1A] group-hover:fill-[#8B7355] transition-colors duration-700"/>
-                    
-                    {/* Nail polish bottle (right side) */}
-                    {/* Bottle cap */}
-                    <rect x="58" y="22" width="18" height="8" rx="2" className="fill-[#1A1A1A] group-hover:fill-[#8B7355] transition-colors duration-700"/>
-                    
-                    {/* Bottle neck */}
-                    <rect x="60" y="30" width="14" height="6" className="fill-[#1A1A1A] group-hover:fill-[#8B7355] transition-colors duration-700"/>
-                    
-                    {/* Bottle body */}
-                    <path d="M 58 36 L 58 58 Q 58 62 62 64 L 72 64 Q 76 62 76 58 L 76 36 Z" className="fill-[#1A1A1A] group-hover:fill-[#8B7355] transition-colors duration-700"/>
-                    
-                    {/* Brush handle */}
-                    <rect x="65" y="30" width="4" height="18" className="fill-[#1A1A1A] group-hover:fill-[#8B7355] transition-colors duration-700"/>
-                    
-                    {/* Brush bristles */}
-                    <ellipse cx="67" cy="49" rx="3" ry="5" className="fill-[#1A1A1A] group-hover:fill-[#8B7355] transition-colors duration-700"/>
-                  </svg>
-                </div>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-4 sm:mb-5 lg:mb-6 border border-[#E8E8E8] group-hover:border-[#8B7355] group-hover:scale-105 transition-all duration-700 flex items-center justify-center">
+                <Paintbrush className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-[#1A1A1A] group-hover:text-[#8B7355] transition-colors duration-700" strokeWidth={1} />
               </div>
               <h2 className="text-[11px] tracking-[0.25em] uppercase text-[#1A1A1A] mb-3 sm:mb-4 font-light">
                 For Nail Techs
