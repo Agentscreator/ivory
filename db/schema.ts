@@ -502,3 +502,29 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+// Generation jobs for background design generation
+export const generationJobs = pgTable('generation_jobs', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  status: varchar('status', { length: 50 }).default('pending').notNull(), // pending, processing, completed, failed
+  prompt: text('prompt').notNull(),
+  originalImage: text('original_image').notNull(),
+  selectedDesignImages: jsonb('selected_design_images'), // JSON array
+  drawingImageUrl: text('drawing_image_url'),
+  influenceWeights: jsonb('influence_weights'), // JSON object
+  designSettings: jsonb('design_settings'), // JSON object
+  resultImages: jsonb('result_images'), // JSON array of generated image URLs
+  errorMessage: text('error_message'),
+  creditsDeducted: boolean('credits_deducted').default(false),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at'),
+});
+
+export const generationJobsRelations = relations(generationJobs, ({ one }) => ({
+  user: one(users, {
+    fields: [generationJobs.userId],
+    references: [users.id],
+  }),
+}));
