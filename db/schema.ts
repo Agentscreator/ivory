@@ -517,6 +517,7 @@ export const generationJobs = pgTable('generation_jobs', {
   resultImages: jsonb('result_images'), // JSON array of generated image URLs
   errorMessage: text('error_message'),
   creditsDeducted: boolean('credits_deducted').default(false),
+  autoSaved: boolean('auto_saved').default(false), // Whether results were auto-saved to collection
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   completedAt: timestamp('completed_at'),

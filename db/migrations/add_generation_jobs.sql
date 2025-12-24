@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS generation_jobs (
   result_images TEXT, -- JSON array of generated image URLs
   error_message TEXT,
   credits_deducted BOOLEAN DEFAULT FALSE,
+  auto_saved BOOLEAN DEFAULT FALSE, -- Whether results were auto-saved to collection
   created_at INTEGER NOT NULL DEFAULT (unixepoch()),
   updated_at INTEGER NOT NULL DEFAULT (unixepoch()),
   completed_at INTEGER,
@@ -21,3 +22,4 @@ CREATE TABLE IF NOT EXISTS generation_jobs (
 CREATE INDEX IF NOT EXISTS idx_generation_jobs_user_id ON generation_jobs(user_id);
 CREATE INDEX IF NOT EXISTS idx_generation_jobs_status ON generation_jobs(status);
 CREATE INDEX IF NOT EXISTS idx_generation_jobs_created_at ON generation_jobs(created_at);
+CREATE INDEX IF NOT EXISTS idx_generation_jobs_auto_saved ON generation_jobs(auto_saved);
