@@ -153,6 +153,18 @@ ${imageInputsSection}
 7. DO NOT add extra hands, arms, bodies, or props
 8. ONLY modify the fingernail surfaces
 
+NAIL DIRECTION & ORIENTATION ALIGNMENT (CRITICAL):
+- ANALYZE the direction and angle of each fingernail in the original hand image
+- Each nail has a specific orientation based on how the finger is positioned (pointing up, down, left, right, or at an angle)
+- When applying the design from reference images, ROTATE and ALIGN the design pattern to match EACH individual nail's direction
+- If a nail is pointing upward, the design should be oriented upward on that nail
+- If a nail is pointing to the side, rotate the design to match that sideways orientation
+- If nails are at different angles (e.g., spread fingers), each nail's design should follow its unique direction
+- The design pattern should flow naturally with the nail's orientation, not be applied in a fixed direction
+- Think of it like applying a sticker - you must rotate the sticker to match the surface direction
+- CRITICAL: The same design element should appear correctly oriented on each nail based on that nail's individual angle and direction
+- This ensures the design looks natural and professionally applied, not misaligned or sideways
+
 ${drawingImageUrl ? `
 DRAWING/OUTLINE GUIDE (HIGHEST PRIORITY):
 - The user has drawn directly on the hand image to show EXACTLY where and how to apply the design
@@ -176,28 +188,36 @@ ${weights.designImage === 0 ? '- IGNORE the design images completely.' :
 - Replicate all patterns, gradients, textures, and details with PERFECT FIDELITY
 - If the references show specific nail art elements (flowers, lines, dots, etc.), reproduce them IDENTICALLY
 - The design should look like a professional nail technician perfectly recreated the reference designs
-- Adapt the designs to fit each nail's shape while maintaining ALL design details
+- CRITICAL ALIGNMENT: Rotate and orient each design element to match the direction of each individual nail
+  * If the reference shows a vertical pattern, apply it vertically RELATIVE TO EACH NAIL'S DIRECTION
+  * If a nail points left, rotate the design to point left; if it points up, rotate the design to point up
+  * Each nail gets the same design but rotated to match that nail's unique orientation and angle
+  * This ensures the design looks professionally applied and naturally aligned with each nail
+- Adapt the designs to fit each nail's shape AND orientation while maintaining ALL design details
 ${drawingImageUrl ? '- COMBINE the reference designs WITH the user\'s drawing guide - use the drawing for placement and the references for style/colors' : ''}
 - DO NOT add any base color, background color, or additional elements not in the references
 - USE ONLY what you see in the reference design images - nothing more, nothing less
-- This is a DIRECT COPY operation, not an interpretation or inspiration` : 
-  `- Use the design images as ${weights.designImage}% inspiration, blending with other parameters`}
+- This is a DIRECT COPY operation with proper orientation alignment, not an interpretation or inspiration` : 
+  `- Use the design images as ${weights.designImage}% inspiration, blending with other parameters
+- IMPORTANT: Still align design orientation with each nail's direction at ${weights.designImage}% influence`}
 ` : '- No design images provided'}
 
 ${designParamsSection}
 QUALITY REQUIREMENTS:
 - Professional salon-quality nail art
 - Realistic nail polish appearance with proper reflections
-- Design follows natural nail curvature
+- Design follows natural nail curvature AND nail direction/orientation
 - Clean, crisp edges at nail boundaries
-- Consistent application across all visible nails
+- Consistent application across all visible nails with proper directional alignment
 - Natural lighting and shadows preserved
 - CRITICAL: Output image orientation MUST match input image orientation exactly (no rotation)
+- CRITICAL: Each nail's design must be rotated to match that specific nail's direction and angle
 ${drawingImageUrl ? `- FOLLOW THE DRAWING GUIDE: The user's drawing shows exactly where and how to apply the design` : ''}
 ${weights.designImage === 100 ? `- ACCURACY IS PARAMOUNT: The result must be a faithful reproduction of the reference design(s)
-- Every color, pattern, and detail from the reference(s) must be present in the output` : ''}
+- Every color, pattern, and detail from the reference(s) must be present in the output
+- Each design element must be properly oriented to match each nail's individual direction` : ''}
 
-OUTPUT: Return ONE image with the same hand, same number of fingers, same orientation and rotation, with nail art applied ONLY to the fingernail surfaces.${drawingImageUrl ? ' Follow the user\'s drawing as your primary guide for placement and shape.' : ''}${weights.designImage === 100 ? ' The nail design must be an EXACT REPLICA of the reference design(s) provided.' : ''}`
+OUTPUT: Return ONE image with the same hand, same number of fingers, same orientation and rotation, with nail art applied ONLY to the fingernail surfaces. Each nail's design must be rotated and aligned to match that nail's specific direction and angle for a natural, professional appearance.${drawingImageUrl ? ' Follow the user\'s drawing as your primary guide for placement and shape.' : ''}${weights.designImage === 100 ? ' The nail design must be an EXACT REPLICA of the reference design(s) provided, with each nail\'s design properly oriented to match that nail\'s direction.' : ''}`
 
     console.log('🤖 Generating nail design preview with gpt-image-1...')
     console.log('📥 Fetching original hand image:', originalImage)
