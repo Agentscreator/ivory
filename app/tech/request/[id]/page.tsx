@@ -49,11 +49,17 @@ export default function TechRequestDetailPage() {
                 const lookRes = await fetch(`/api/looks/${foundRequest.lookId}`)
                 if (lookRes.ok) {
                   const look = await lookRes.json()
-                  designImage = look.imageUrl || "/placeholder.svg"
+                  if (look.imageUrl) {
+                    designImage = look.imageUrl
+                  }
+                } else {
+                  console.error(`Failed to fetch look ${foundRequest.lookId}: ${lookRes.status}`)
                 }
               } catch (error) {
                 console.error(`Error fetching look ${foundRequest.lookId}:`, error)
               }
+            } else {
+              console.warn('No lookId found in design request')
             }
 
             setRequest({
