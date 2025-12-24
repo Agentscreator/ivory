@@ -141,8 +141,8 @@ export default function BookAppointmentPage() {
 
       const lookData = await lookResponse.json();
       setUploadedImage(uploadData.url);
-      setSelectedDesign(lookData.look.id.toString());
-      setMyDesigns([lookData.look, ...myDesigns]);
+      setSelectedDesign(lookData.id.toString());
+      setMyDesigns([lookData, ...myDesigns]);
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('Failed to upload image. Please try again.');
