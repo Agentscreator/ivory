@@ -79,9 +79,27 @@ export async function POST(request: NextRequest) {
 
     // Extract nail length and shape from the prompt
     const nailLengthMatch = prompt.match(/Nail length: (\w+(?:-\w+)?)/i)
-    const nailShapeMatch = prompt.match(/Nail shape: (\w+)/i)
+    const nailShapeMatch = prompt.match(/Nail shape: ([\w-]+)/i)
     const nailLength = nailLengthMatch ? nailLengthMatch[1] : 'medium'
-    const nailShape = nailShapeMatch ? nailShapeMatch[1] : 'oval'
+    const nailShapeRaw = nailShapeMatch ? nailShapeMatch[1] : 'oval'
+    
+    // Map nail shape values to more descriptive terms for AI
+    const nailShapeDescriptions: Record<string, string> = {
+      'oval': 'oval (rounded, classic shape)',
+      'square': 'square (straight edges, flat tip)',
+      'squoval': 'squoval (square with rounded corners)',
+      'rounded': 'rounded (soft, curved edges)',
+      'almond': 'almond (tapered with rounded tip)',
+      'mountain-peak': 'mountain peak (sharp pointed center)',
+      'stiletto': 'stiletto (long, sharp pointed)',
+      'ballerina': 'ballerina/coffin (tapered with flat tip)',
+      'edge': 'edge (modern angular with sharp corners)',
+      'lipstick': 'lipstick shape (diagonal angled tip, asymmetric like a lipstick bullet)',
+      'flare': 'flare/duck nails (widened, flared out tip that spreads wider than the base)',
+      'arrow-head': 'arrow head (sharp V-shaped pointed tip)'
+    }
+    
+    const nailShape = nailShapeDescriptions[nailShapeRaw] || nailShapeRaw
 
     // Default influence weights if not provided
     const weights = influenceWeights || {
@@ -203,6 +221,19 @@ ${drawingImageUrl ? '- COMBINE the reference designs WITH the user\'s drawing gu
 ` : '- No design images provided'}
 
 ${designParamsSection}
+
+NAIL SHAPE CRITICAL INSTRUCTIONS:
+- The nail shape "${nailShape}" MUST be clearly visible and accurately formed on each nail
+- Shape the entire nail structure to match this specific shape - not just the tip
+- For "lipstick shape": Create a diagonal, asymmetric angled tip like a lipstick bullet (one side higher than the other)
+- For "flare/duck nails": Make the nail tip noticeably wider and flared out compared to the base, spreading outward
+- For "ballerina/coffin": Taper the sides inward then create a flat, straight tip
+- For "stiletto": Create long, dramatically pointed nails
+- For "almond": Taper to a soft, rounded point
+- For "square": Keep edges straight with a flat, perpendicular tip
+- For "squoval": Square shape with gently rounded corners
+- The nail shape is a CRITICAL parameter - it must be obvious and correct in the final result
+
 QUALITY REQUIREMENTS:
 - Professional salon-quality nail art
 - Realistic nail polish appearance with proper reflections
