@@ -91,7 +91,7 @@ export default function CapturePage() {
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [zoom, setZoom] = useState(1)
   const [showZoomIndicator, setShowZoomIndicator] = useState(false)
-  const [handReference, setHandReference] = useState<1 | 2 | 3>(3)
+  const [handReference, setHandReference] = useState<1 | 2 | 3>(1)
   const [designMode, setDesignMode] = useState<DesignMode>(null)
   const [aiPrompt, setAiPrompt] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
