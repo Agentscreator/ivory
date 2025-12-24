@@ -145,21 +145,37 @@ export async function POST(request: NextRequest) {
     const appointmentStart = new Date(appointmentDate);
     const appointmentEnd = new Date(appointmentStart.getTime() + (service.duration || 60) * 60000);
 
-    const conflicts = await db.query.bookings.findMany({
+    // Find all bookings for this tech that are confirmed or pending
+    const existingBookings = await db.query.bookings.findMany({
       where: and(
         eq(bookings.techProfileId, techProfileId),
         or(
           eq(bookings.status, 'confirmed'),
           eq(bookings.status, 'pending')
-        ),
-        and(
-          lte(bookings.appointmentDate, appointmentEnd),
-          gte(bookings.appointmentDate, appointmentStart)
         )
       ),
     });
 
+    // Check for time conflicts manually
+    const conflicts = existingBookings.filter(booking => {
+      const existingStart = new Date(booking.appointmentDate);
+      const existingEnd = new Date(existingStart.getTime() + (booking.duration || 60) * 60000);
+      
+      // Check if appointments overlap
+      // Overlap occurs if: new start < existing end AND new end > existing start
+      return appointmentStart < existingEnd && appointmentEnd > existingStart;
+    });
+
     if (conflicts.length > 0) {
+      console.log('Booking conflict detected:', {
+        requestedStart: appointmentStart,
+        requestedEnd: appointmentEnd,
+        conflicts: conflicts.map(c => ({
+          id: c.id,
+          start: c.appointmentDate,
+          duration: c.duration
+        }))
+      });
       return NextResponse.json({ error: 'Time slot not available' }, { status: 409 });
     }
 
