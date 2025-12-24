@@ -8,6 +8,46 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const currentUserId = searchParams.get('currentUserId'); // User viewing the feed
+    const my = searchParams.get('my'); // Fetch current user's looks
+
+    // Handle "my" parameter - fetch current user's looks
+    if (my === 'true') {
+      // Get session from cookie
+      const cookieHeader = request.headers.get('cookie');
+      const sessionCookie = cookieHeader?.split(';').find(c => c.trim().startsWith('session='));
+      const sessionToken = sessionCookie?.split('=')[1];
+
+      if (!sessionToken) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      const session = await db.query.sessions.findFirst({
+        where: (sessions, { eq }) => eq(sessions.token, sessionToken),
+      });
+
+      if (!session || new Date(session.expiresAt) < new Date()) {
+        return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+      }
+
+      const userLooks = await db
+        .select({
+          id: looks.id,
+          userId: looks.userId,
+          title: looks.title,
+          imageUrl: looks.imageUrl,
+          originalImageUrl: looks.originalImageUrl,
+          aiPrompt: looks.aiPrompt,
+          nailPositions: looks.nailPositions,
+          isPublic: looks.isPublic,
+          viewCount: looks.viewCount,
+          createdAt: looks.createdAt,
+        })
+        .from(looks)
+        .where(eq(looks.userId, session.userId))
+        .orderBy(desc(looks.createdAt));
+      
+      return NextResponse.json({ looks: userLooks });
+    }
 
     // Get list of blocked user IDs if currentUserId is provided
     let blockedUserIds: number[] = [];

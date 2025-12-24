@@ -55,10 +55,7 @@ export default function BookAppointmentPage() {
 
   const fetchMyDesigns = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/looks?my=true', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch('/api/looks?my=true');
       const data = await response.json();
       if (response.ok) {
         setMyDesigns(data.looks || []);
@@ -96,15 +93,11 @@ export default function BookAppointmentPage() {
 
     setUploadingImage(true);
     try {
-      const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('file', file);
 
       const uploadResponse = await fetch('/api/upload', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: formData,
       });
 
@@ -125,7 +118,6 @@ export default function BookAppointmentPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           userId: user.id,
@@ -171,7 +163,6 @@ export default function BookAppointmentPage() {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const appointmentDateTime = new Date(selectedDate);
       const [hours, minutes] = selectedTime.split(':');
       appointmentDateTime.setHours(parseInt(hours), parseInt(minutes));
@@ -180,7 +171,6 @@ export default function BookAppointmentPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           techProfileId: parseInt(techId),
@@ -201,7 +191,6 @@ export default function BookAppointmentPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           bookingId: bookingData.booking.id,
