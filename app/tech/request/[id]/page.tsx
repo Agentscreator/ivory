@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Check, MessageCircle, DollarSign, ArrowLeft, Clock, User, Calendar } from "lucide-react"
+import { Check, MessageCircle, DollarSign, ArrowLeft, User, Calendar, Sparkles, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { BottomNav } from "@/components/bottom-nav"
 
@@ -24,6 +24,8 @@ export default function TechRequestDetailPage() {
   const params = useParams()
   const [request, setRequest] = useState<DesignRequest | null>(null)
   const [loading, setLoading] = useState(true)
+  const [implementationGuidance, setImplementationGuidance] = useState<string>("")
+  const [loadingGuidance, setLoadingGuidance] = useState(false)
 
   useEffect(() => {
     const loadRequest = async () => {
@@ -63,6 +65,30 @@ export default function TechRequestDetailPage() {
     loadRequest()
   }, [router, params.id])
 
+  const generateImplementationGuidance = async () => {
+    if (!request?.designImage) return
+    
+    setLoadingGuidance(true)
+    try {
+      const response = await fetch('/api/analyze-design-for-tech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: request.designImage }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setImplementationGuidance(data.guidance)
+      } else {
+        console.error('Failed to generate guidance')
+      }
+    } catch (error) {
+      console.error('Error generating guidance:', error)
+    } finally {
+      setLoadingGuidance(false)
+    }
+  }
+
   const handleApprove = async () => {
     if (!request) return
     
@@ -84,6 +110,9 @@ export default function TechRequestDetailPage() {
   const handleRequestModification = () => {
     router.push(`/tech/review/${request?.id}`)
   }
+
+  // Split guidance into two paragraphs
+  const guidanceParagraphs = implementationGuidance.split('\n\n').filter(p => p.trim())
 
   if (loading) {
     return (
@@ -215,6 +244,65 @@ export default function TechRequestDetailPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Implementation Guidance */}
+        <Card className="border border-[#E8E8E8] mb-10 rounded-none bg-gradient-to-br from-[#F8F7F5] to-white">
+          <CardContent className="p-8 sm:p-10">
+            <div className="flex items-start gap-4 mb-6">
+              <Sparkles className="w-6 h-6 text-[#8B7355] mt-1" strokeWidth={1} />
+              <div className="flex-1">
+                <h3 className="text-[10px] tracking-[0.3em] uppercase text-[#6B6B6B] font-light mb-2">
+                  AI Implementation Guide
+                </h3>
+                <p className="text-sm text-[#6B6B6B] font-light tracking-wide">
+                  Get professional guidance on how to recreate this design
+                </p>
+              </div>
+            </div>
+
+            {!implementationGuidance && !loadingGuidance && (
+              <Button
+                onClick={generateImplementationGuidance}
+                className="w-full h-14 text-sm font-light tracking-[0.25em] uppercase bg-[#8B7355] hover:bg-[#1A1A1A] text-white shadow-lg hover:shadow-xl active:scale-[0.98] transition-all duration-700 rounded-none"
+              >
+                <Sparkles className="w-5 h-5 mr-3" strokeWidth={1} />
+                Generate Implementation Guide
+              </Button>
+            )}
+
+            {loadingGuidance && (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <Loader2 className="w-10 h-10 text-[#8B7355] animate-spin mx-auto mb-4" strokeWidth={1} />
+                  <p className="text-sm text-[#6B6B6B] font-light tracking-wide">
+                    Analyzing design and generating professional guidance...
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {implementationGuidance && !loadingGuidance && (
+              <div className="space-y-6 pl-10">
+                {guidanceParagraphs.map((paragraph, index) => (
+                  <p
+                    key={index}
+                    className="text-base sm:text-lg text-[#1A1A1A] leading-relaxed font-light tracking-wide"
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+                <Button
+                  onClick={generateImplementationGuidance}
+                  variant="outline"
+                  className="mt-6 h-12 text-xs font-light tracking-[0.25em] uppercase border-2 border-[#E8E8E8] hover:border-[#8B7355] hover:bg-[#8B7355] hover:text-white active:scale-[0.98] transition-all duration-700 rounded-none"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" strokeWidth={1} />
+                  Regenerate Guide
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Actions */}
         {request.status === "pending" && (
