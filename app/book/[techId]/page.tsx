@@ -136,16 +136,23 @@ export default function BookAppointmentPage() {
       });
 
       if (!lookResponse.ok) {
-        throw new Error('Failed to save design');
+        const errorData = await lookResponse.json();
+        throw new Error(errorData.error || 'Failed to save design');
       }
 
       const lookData = await lookResponse.json();
+      
+      console.log('Look created successfully:', lookData);
+      
       setUploadedImage(uploadData.url);
       setSelectedDesign(lookData.id.toString());
       setMyDesigns([lookData, ...myDesigns]);
+      
+      alert('Design uploaded successfully!');
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Failed to upload image. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload image. Please try again.';
+      alert(errorMessage);
     } finally {
       setUploadingImage(false);
     }
