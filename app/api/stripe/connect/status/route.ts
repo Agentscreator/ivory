@@ -16,8 +16,10 @@ export async function GET(request: NextRequest) {
       token = request.cookies.get('session')?.value;
     }
     
+    console.log('Stripe Connect Status - Token found:', !!token);
+    
     if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized - No token provided' }, { status: 401 });
     }
 
     const session = await db.query.sessions.findFirst({
@@ -25,14 +27,24 @@ export async function GET(request: NextRequest) {
       with: { user: true },
     });
 
+    console.log('Stripe Connect Status - Session found:', !!session);
+
     if (!session || new Date(session.expiresAt) < new Date()) {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid or expired session' }, { status: 401 });
     }
 
     // Verify user is a tech
     const user = session.user as any;
+    console.log('Stripe Connect Status - User type:', user.userType);
+    
     if (user.userType !== 'tech') {
-      return NextResponse.json({ error: 'Only nail techs can check wallet status' }, { status: 403 });
+      // Return not_setup for non-tech users instead of error
+      return NextResponse.json({
+        status: 'not_setup',
+        payoutsEnabled: false,
+        chargesEnabled: false,
+        message: 'Wallet only available for nail techs',
+      });
     }
 
     // Get tech profile
@@ -40,8 +52,15 @@ export async function GET(request: NextRequest) {
       where: eq(techProfiles.userId, session.userId),
     });
 
+    console.log('Stripe Connect Status - Tech profile found:', !!techProfile);
+
     if (!techProfile) {
-      return NextResponse.json({ error: 'Tech profile not found' }, { status: 404 });
+      return NextResponse.json({
+        status: 'not_setup',
+        payoutsEnabled: false,
+        chargesEnabled: false,
+        message: 'Tech profile not found',
+      });
     }
 
     // If no Stripe account, return not setup status
@@ -79,7 +98,12 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching Stripe Connect status:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch wallet status' },
+      { 
+        error: 'Failed to fetch wallet status',
+        status: 'not_setup',
+        payoutsEnabled: false,
+        chargesEnabled: false,
+      },
       { status: 500 }
     );
   }
