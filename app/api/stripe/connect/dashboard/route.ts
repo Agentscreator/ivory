@@ -10,7 +10,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    // Get user from session
+    let token = request.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) {
+      token = request.cookies.get('session')?.value;
+    }
+    
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -24,23 +29,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
+    // Verify user is a tech
+    const user = session.user as any;
+    if (user.userType !== 'tech') {
+      return NextResponse.json({ error: 'Only nail techs can access dashboard' }, { status: 403 });
+    }
+
     // Get tech profile
     const techProfile = await db.query.techProfiles.findFirst({
       where: eq(techProfiles.userId, session.userId),
     });
 
     if (!techProfile || !techProfile.stripeConnectAccountId) {
-      return NextResponse.json({ error: 'Stripe Connect account not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Wallet not setup' }, { status: 404 });
     }
 
-    // Create login link to Stripe Express Dashboard
+    // Create login link for Stripe Express Dashboard
     const loginLink = await stripe.accounts.createLoginLink(
       techProfile.stripeConnectAccountId
     );
 
-    return NextResponse.json({
-      url: loginLink.url,
-    });
+    return NextResponse.json({ url: loginLink.url });
   } catch (error) {
     console.error('Error creating Stripe dashboard link:', error);
     return NextResponse.json(

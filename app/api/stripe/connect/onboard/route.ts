@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db } from '@/db';
-import { techProfiles } from '@/db/schema';
+import { techProfiles, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -10,7 +10,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    // Get user from session
+    let token = request.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) {
+      token = request.cookies.get('session')?.value;
+    }
+    
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -24,9 +29,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
-    // Check if user is a tech
-    if ((session.user as any).userType !== 'tech') {
-      return NextResponse.json({ error: 'Only nail techs can set up payouts' }, { status: 403 });
+    // Verify user is a tech
+    const user = session.user as any;
+    if (user.userType !== 'tech') {
+      return NextResponse.json({ error: 'Only nail techs can setup wallet' }, { status: 403 });
     }
 
     // Get tech profile
@@ -45,7 +51,7 @@ export async function POST(request: NextRequest) {
       const account = await stripe.accounts.create({
         type: 'express',
         country: 'US',
-        email: (session.user as any).email,
+        email: user.email,
         capabilities: {
           card_payments: { requested: true },
           transfers: { requested: true },
@@ -59,12 +65,13 @@ export async function POST(request: NextRequest) {
 
       accountId = account.id;
 
-      // Save account ID to database
+      // Save account ID
       await db
         .update(techProfiles)
         .set({
           stripeConnectAccountId: accountId,
           stripeAccountStatus: 'pending',
+          updatedAt: new Date(),
         })
         .where(eq(techProfiles.id, techProfile.id));
     }
@@ -72,14 +79,12 @@ export async function POST(request: NextRequest) {
     // Create account link for onboarding
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
-      refresh_url: `${process.env.NEXT_PUBLIC_BASE_URL}/tech/dashboard?stripe_refresh=true`,
-      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/tech/dashboard?stripe_success=true`,
+      refresh_url: `${process.env.NEXT_PUBLIC_BASE_URL}/tech/settings?wallet=refresh`,
+      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/tech/settings?wallet=success`,
       type: 'account_onboarding',
     });
 
-    return NextResponse.json({
-      url: accountLink.url,
-    });
+    return NextResponse.json({ url: accountLink.url });
   } catch (error) {
     console.error('Error creating Stripe Connect onboarding:', error);
     return NextResponse.json(

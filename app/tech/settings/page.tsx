@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Shield, Bell, Lock, Trash2, HelpCircle, UserX, CreditCard, ChevronRight, Coins } from 'lucide-react';
+import { ArrowLeft, Shield, Bell, Lock, Trash2, HelpCircle, UserX, CreditCard, ChevronRight, Coins, Wallet } from 'lucide-react';
 import { BottomNav } from '@/components/bottom-nav';
+import { StripeConnectWallet } from '@/components/stripe-connect-wallet';
 
 export default function TechSettingsPage() {
   const router = useRouter();
@@ -130,6 +131,12 @@ export default function TechSettingsPage() {
               </div>
               <ChevronRight className="w-5 h-5 text-[#6B6B6B] group-hover:text-[#8B7355] transition-colors" strokeWidth={1} />
             </button>
+          </div>
+
+          {/* Payout Wallet */}
+          <div className="mb-8">
+            <p className="text-xs tracking-[0.3em] uppercase text-[#8B7355] mb-4 font-light">Payouts</p>
+            <StripeConnectWallet />
           </div>
 
           {/* Credits */}

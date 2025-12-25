@@ -54,6 +54,13 @@ export const IAP_PRODUCT_IDS = {
   CREDITS_25: 'com.yourcompany.ivory.credits.25',
   CREDITS_50: 'com.yourcompany.ivory.credits.50',
   CREDITS_100: 'com.yourcompany.ivory.credits.100',
+  
+  // Booking Payments (dynamic pricing tiers)
+  BOOKING_TIER_1: 'com.yourcompany.ivory.booking.tier1', // $0-50
+  BOOKING_TIER_2: 'com.yourcompany.ivory.booking.tier2', // $51-100
+  BOOKING_TIER_3: 'com.yourcompany.ivory.booking.tier3', // $101-150
+  BOOKING_TIER_4: 'com.yourcompany.ivory.booking.tier4', // $151-200
+  BOOKING_TIER_5: 'com.yourcompany.ivory.booking.tier5', // $201+
 };
 
 // Map product IDs to credit amounts (for clients)
@@ -159,6 +166,15 @@ class IAPManager {
 
   isNativePlatform(): boolean {
     return Capacitor.isNativePlatform();
+  }
+
+  // Get appropriate booking product ID based on total price
+  getBookingProductId(totalPrice: number): string {
+    if (totalPrice <= 50) return IAP_PRODUCT_IDS.BOOKING_TIER_1;
+    if (totalPrice <= 100) return IAP_PRODUCT_IDS.BOOKING_TIER_2;
+    if (totalPrice <= 150) return IAP_PRODUCT_IDS.BOOKING_TIER_3;
+    if (totalPrice <= 200) return IAP_PRODUCT_IDS.BOOKING_TIER_4;
+    return IAP_PRODUCT_IDS.BOOKING_TIER_5;
   }
 }
 

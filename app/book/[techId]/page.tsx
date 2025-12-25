@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ArrowLeft, Clock, DollarSign, Calendar as CalendarIcon, CheckCircle2, Loader2, Sparkles, Upload } from 'lucide-react';
 import { BottomNav } from '@/components/bottom-nav';
 import Image from 'next/image';
+import { iapManager } from '@/lib/iap';
 
 export default function BookAppointmentPage() {
   const router = useRouter();
@@ -28,8 +29,10 @@ export default function BookAppointmentPage() {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [clientNotes, setClientNotes] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isNative, setIsNative] = useState(false);
 
   useEffect(() => {
+    setIsNative(iapManager.isNativePlatform());
     fetchTechDetails();
     fetchMyDesigns();
   }, [techId]);
@@ -187,13 +190,79 @@ export default function BookAppointmentPage() {
         return;
       }
 
+      // Use IAP for native app, Stripe for web
+      if (isNative) {
+        await handleIAPPayment(bookingData.booking);
+      } else {
+        await handleStripePayment(bookingData.booking.id);
+      }
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      alert('Failed to create booking');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleIAPPayment = async (booking: any) => {
+    try {
+      const totalPrice = parseFloat(booking.totalPrice);
+      const productId = iapManager.getBookingProductId(totalPrice);
+
+      // Setup purchase listeners
+      iapManager.onPurchaseComplete(async (result) => {
+        try {
+          // Validate receipt with backend
+          const token = localStorage.getItem('token');
+          const response = await fetch('/api/iap/validate-booking-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              receipt: result.receipt,
+              productId: result.productId,
+              transactionId: result.transactionId,
+              bookingId: booking.id,
+            }),
+          });
+
+          if (response.ok) {
+            await iapManager.finishTransaction(result.transactionId);
+            router.push(`/bookings?payment=success&booking_id=${booking.id}`);
+          } else {
+            const error = await response.json();
+            alert(error.error || 'Payment validation failed');
+          }
+        } catch (error) {
+          console.error('Error validating IAP payment:', error);
+          alert('Payment validation failed');
+        }
+      });
+
+      iapManager.onPurchaseError((error) => {
+        console.error('IAP purchase error:', error);
+        alert(`Payment failed: ${error.errorMessage}`);
+      });
+
+      // Initiate purchase
+      await iapManager.purchase(productId);
+    } catch (error) {
+      console.error('Error initiating IAP payment:', error);
+      alert('Failed to initiate payment');
+    }
+  };
+
+  const handleStripePayment = async (bookingId: number) => {
+    try {
       const checkoutResponse = await fetch('/api/stripe/create-booking-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          bookingId: bookingData.booking.id,
+          bookingId,
         }),
       });
 
@@ -205,10 +274,8 @@ export default function BookAppointmentPage() {
 
       window.location.href = checkoutData.url;
     } catch (error) {
-      console.error('Error creating booking:', error);
-      alert('Failed to create booking');
-    } finally {
-      setLoading(false);
+      console.error('Error creating Stripe checkout:', error);
+      alert('Failed to create payment session');
     }
   };
 
@@ -555,7 +622,7 @@ export default function BookAppointmentPage() {
                 )}
                 
                 <p className="text-sm text-center text-[#6B6B6B] mt-6 font-light leading-[1.7] tracking-wide">
-                  Secure payment via Stripe. Your booking will be confirmed after payment.
+                  Secure payment via {isNative ? 'Apple In-App Purchase' : 'Stripe'}. Your booking will be confirmed after payment.
                 </p>
               </div>
             </div>
