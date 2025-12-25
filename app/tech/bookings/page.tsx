@@ -159,11 +159,6 @@ export default function TechBookingsPage() {
                           />
                           <div className="flex-1">
                             <p className="font-serif font-light text-base tracking-tight ">{booking.look.title}</p>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="border-[#E8E8E8] hover:border-[#8B7355] hover:bg-[#8B7355] hover:text-white transition-all duration-700 text-[10px] tracking-[0.2em] uppercase font-light h-9"
-                            </Button>
                           </div>
                         </div>
                       </div>
@@ -201,29 +196,6 @@ export default function TechBookingsPage() {
                     <div className="flex justify-between items-center pt-3">
                       <span className="text-2xl font-light text-[#1A1A1A]">${booking.totalPrice}</span>
                       <div className="flex gap-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-[#E8E8E8] hover:border-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-700 text-[10px] tracking-[0.2em] uppercase font-light h-10 px-4"
-                          onClick={() => {
-                            setSelectedBooking(booking);
-                            handleBookingAction(booking.id, 'cancelled');
-                          }}
-                        >
-                          <XCircle className="h-4 w-4 mr-1.5" strokeWidth={1} />
-                          Decline
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="bg-[#1A1A1A] hover:bg-[#8B7355] text-white transition-all duration-700 text-[10px] tracking-[0.2em] uppercase font-light h-10 px-4"
-                          onClick={() => {
-                            setSelectedBooking(booking);
-                            handleBookingAction(booking.id, 'confirmed');
-                          }}
-                        >
-                          <CheckCircle2 className="h-4 w-4 mr-1.5" strokeWidth={1} />
-                          Confirm
-                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -281,11 +253,6 @@ export default function TechBookingsPage() {
                           />
                           <div className="flex-1">
                             <p className="font-serif font-light text-base tracking-tight ">{booking.look.title}</p>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="border-[#E8E8E8] hover:border-[#8B7355] hover:bg-[#8B7355] hover:text-white transition-all duration-700 text-[10px] tracking-[0.2em] uppercase font-light h-9"
-                            </Button>
                           </div>
                         </div>
                       </div>
@@ -322,14 +289,6 @@ export default function TechBookingsPage() {
 
                     <div className="flex justify-between items-center pt-3">
                       <span className="text-2xl font-light text-[#1A1A1A]">${booking.totalPrice}</span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-[#E8E8E8] hover:border-[#8B7355] hover:bg-[#8B7355] hover:text-white transition-all duration-700 text-[10px] tracking-[0.2em] uppercase font-light h-10 px-4"
-                        onClick={() => handleBookingAction(booking.id, 'completed')}
-                      >
-                        Mark Complete
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>
