@@ -26,25 +26,23 @@ export default function TechBookingsPage() {
 
   const fetchBookings = async () => {
     try {
-      const token = localStorage.getItem('token');
-      console.log('Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'null');
+      const userStr = localStorage.getItem('ivoryUser');
+      console.log('User from localStorage:', userStr ? 'Found' : 'null');
       
-      if (!token) {
-        console.error('No token found in localStorage');
+      if (!userStr) {
+        console.error('No user found in localStorage');
         router.push('/auth');
         return;
       }
+
+      const user = JSON.parse(userStr);
       
-      const pendingRes = await fetch('/api/bookings?status=pending', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const pendingRes = await fetch(`/api/bookings?status=pending&techId=${user.id}`);
       const pendingData = await pendingRes.json();
       console.log('Pending bookings response:', pendingRes.status, pendingData);
       if (pendingRes.ok) setPendingBookings(pendingData.bookings || []);
 
-      const upcomingRes = await fetch('/api/bookings?status=confirmed', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const upcomingRes = await fetch(`/api/bookings?status=confirmed&techId=${user.id}`);
       const upcomingData = await upcomingRes.json();
       console.log('Upcoming bookings response:', upcomingRes.status, upcomingData);
       if (upcomingRes.ok) setUpcomingBookings(upcomingData.bookings || []);
@@ -55,12 +53,10 @@ export default function TechBookingsPage() {
 
   const handleBookingAction = async (bookingId: number, status: string) => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`/api/bookings/${bookingId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status, techNotes }),
       });
@@ -82,12 +78,10 @@ export default function TechBookingsPage() {
   const generateDesignBreakdown = async (lookId: number, bookingId: number) => {
     setLoadingBreakdown(true);
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch('/api/design-breakdown', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ lookId, bookingId }),
       });
