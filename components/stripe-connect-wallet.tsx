@@ -17,16 +17,28 @@ export function StripeConnectWallet() {
   const fetchStatus = async () => {
     try {
       const token = localStorage.getItem('token');
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch('/api/stripe/connect/status', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
+        credentials: 'include', // Include cookies
       });
       
       if (response.ok) {
         const data = await response.json();
         setStatus(data);
+      } else {
+        console.error('Failed to fetch wallet status:', response.status);
+        // Set default not_setup status if fetch fails
+        setStatus({ status: 'not_setup', payoutsEnabled: false });
       }
     } catch (error) {
       console.error('Error fetching wallet status:', error);
+      // Set default not_setup status on error
+      setStatus({ status: 'not_setup', payoutsEnabled: false });
     } finally {
       setLoading(false);
     }
@@ -36,14 +48,23 @@ export function StripeConnectWallet() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch('/api/stripe/connect/onboard', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
+        credentials: 'include',
       });
       
       if (response.ok) {
         const data = await response.json();
         window.location.href = data.url;
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to setup wallet');
       }
     } catch (error) {
       console.error('Error setting up wallet:', error);
@@ -57,14 +78,23 @@ export function StripeConnectWallet() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch('/api/stripe/connect/dashboard', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
+        credentials: 'include',
       });
       
       if (response.ok) {
         const data = await response.json();
         window.open(data.url, '_blank');
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to open dashboard');
       }
     } catch (error) {
       console.error('Error opening dashboard:', error);
