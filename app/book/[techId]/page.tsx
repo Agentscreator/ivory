@@ -188,8 +188,48 @@ export default function BookAppointmentPage() {
         return;
       }
 
-      // Always use IAP - Stripe only available via web browser
-      await handleIAPPayment(bookingData.booking);
+      // Check if running in Capacitor (mobile app) or web browser
+      const isNativeApp = typeof (window as any).Capacitor !== 'undefined';
+      
+      if (isNativeApp) {
+        // Use IAP for native mobile app
+        await handleIAPPayment(bookingData.booking);
+      } else {
+        // Use Stripe Checkout for web browser
+        await handleStripePayment(bookingData.booking);
+      }
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      alert('Failed to create booking');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStripePayment = async (booking: any) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/stripe/create-booking-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          bookingId: booking.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error.error || 'Failed to create payment session');
+        return;
+      }
+
+      const data = await response.json();
+      
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
     } catch (error) {
       console.error('Error creating booking:', error);
       alert('Failed to create booking');
@@ -591,7 +631,7 @@ export default function BookAppointmentPage() {
                 )}
                 
                 <p className="text-sm text-center text-[#6B6B6B] mt-6 font-light leading-[1.7] tracking-wide">
-                  Secure payment via Apple In-App Purchase. Your booking will be confirmed after payment.
+                  Secure payment via {typeof (window as any).Capacitor !== 'undefined' ? 'Apple In-App Purchase' : 'Stripe'}. Your booking will be confirmed after payment.
                 </p>
               </div>
             </div>
