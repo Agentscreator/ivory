@@ -64,7 +64,13 @@ export function StripeConnectWallet() {
         window.location.href = data.url;
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to setup wallet');
+        
+        // Show user-friendly message for Connect not enabled
+        if (response.status === 503 || error.message?.includes('being configured')) {
+          alert('The payout system is being set up. Please try again in a few minutes or contact support.');
+        } else {
+          alert(error.error || error.message || 'Failed to setup wallet');
+        }
       }
     } catch (error) {
       console.error('Error setting up wallet:', error);
